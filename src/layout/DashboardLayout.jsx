@@ -4,6 +4,13 @@ import link from "../assets/images/icons/link.png";
 import logo from "../assets/images/icons/logo_small.png";
 import serach from "../assets/images/icons/search.png";
 import bell from "../assets/images/icons/bell.png";
+import dashboard from "../assets/images/icons/dashboard.png";
+import user_outline_2 from "../assets/images/icons/user_outline_2.png";
+import policy_2 from "../assets/images/icons/policy_2.png";
+import coin_dark from "../assets/images/icons/coin_dark.png";
+import bell_dark from "../assets/images/icons/bell_dark.png";
+import wallet from "../assets/images/icons/wallet.png";
+import vector from "../assets/images/icons/vector.png";
 import {
   DesktopOutlined,
   CreditCardOutlined,
@@ -50,12 +57,13 @@ const today = new Date();
 const formattedDate = formatDate(today);
 
 const items = [
-  getItem("Dashboard", "/dashboard", <DesktopOutlined />),
-  getItem("Users", "/users", <UserOutlined />),
-  getItem("Cutlist", "/cutlist", <UnorderedListOutlined />),
-  getItem("Credit Packages", "/credit-packages", <CreditCardOutlined />),
-  getItem("Notification", "/notification", <BellOutlined />),
-  getItem("Payments", "/payments", <DollarOutlined />),
+  getItem("Dashboard", "/dashboard", <img src={dashboard} alt="" className="w-1"/>),
+  getItem("Users", "/users", <img src={user_outline_2} alt="" className="w-1"/>),
+  getItem("Cutlist", "/cutlist", <img src={policy_2} alt="" className="w-1"/>),
+  getItem("Credit Packages", "/credit-packages", <img src={coin_dark} alt="" className="w-4"/>),
+  getItem("Notification", "/notification", <img src={bell_dark} alt="" className="w-1"/>),
+  getItem("Payments", "/payment", <img src={wallet} alt="" className="w-5"/>),
+  getItem("Feedback", "/feedback", <img src={vector} alt="" className="w-4"/>),
 ];
 
 const DashboardLayout = () => {
@@ -81,8 +89,10 @@ const DashboardLayout = () => {
     title = "Credit Packages";
   } else if (location.pathname === "/notification") {
     title = "Notification";
-  } else if (location.pathname === "/payments") {
+  } else if (location.pathname === "/payment") {
     title = "Payments";
+  } else if (location.pathname === "/feedback") {
+    title = "Feedbacks";
   } else {
     title = "";
   }
@@ -152,6 +162,10 @@ const DashboardLayout = () => {
                 <p className="text-[.8rem]">Manage credit packages</p>
               ) : title === "User Profile" ? (
                 <p className="text-[.8rem]">Manage credit packages</p>
+              ) : title === "Payments" ? (
+                <p className="text-[.8rem]">Manage and monitor payments</p>
+              ) :  title === "Feedbacks" ? (
+                <p className="text-[.8rem]">Manage and reply to feedbacks</p>
               ) : (
                 <p className="text-[.8rem]">{formattedDate}</p>
               )}

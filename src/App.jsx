@@ -8,6 +8,8 @@ import User from "./pages/dashboard/User";
 import Credit from "./pages/dashboard/Credit";
 import UserDetailsPage from "./pages/dashboard/UserDetailsPage";
 import Notification from "./pages/dashboard/Notification";
+import Payment from "./pages/dashboard/Payment";
+import Feedback from "./pages/dashboard/Feedback";
 
 function App() {
   
@@ -23,6 +25,8 @@ function App() {
           <Route path="/user/:userId" element={<UserDetailsPage />} />
           <Route path="/credit-packages" element={<Credit />} ></Route>
           <Route path="/notification" element={<Notification />} ></Route>
+          <Route path="/payment" element={<Payment />} ></Route>
+          <Route path="/feedback" element={<Feedback />} ></Route>
         </Route>
       </Routes>
     </Router>
