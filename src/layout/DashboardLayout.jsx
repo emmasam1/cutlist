@@ -10,7 +10,7 @@ import policy_2 from "../assets/images/icons/policy_2.png";
 import coin_dark from "../assets/images/icons/coin_dark.png";
 import bell_dark from "../assets/images/icons/bell_dark.png";
 import wallet from "../assets/images/icons/wallet.png";
-import vector from "../assets/images/icons/vector.png";
+import feedback from "../assets/images/icons/feedback.png";
 import {
   DesktopOutlined,
   CreditCardOutlined,
@@ -63,7 +63,7 @@ const items = [
   getItem("Credit Packages", "/credit-packages", <img src={coin_dark} alt="" className="w-4"/>),
   getItem("Notification", "/notification", <img src={bell_dark} alt="" className="w-1"/>),
   getItem("Payments", "/payment", <img src={wallet} alt="" className="w-5"/>),
-  getItem("Feedback", "/feedback", <img src={vector} alt="" className="w-4"/>),
+  getItem("Feedback", "/feedback", <img src={feedback} alt="" className="w-4"/>),
 ];
 
 const DashboardLayout = () => {
