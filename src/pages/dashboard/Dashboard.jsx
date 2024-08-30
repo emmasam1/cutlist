@@ -1,5 +1,5 @@
 import React from "react";
-import { Table } from "antd";
+import { Table, Button } from "antd";
 import { Line } from '@ant-design/plots';
 import { PrinterOutlined } from "@ant-design/icons";
 
@@ -159,7 +159,7 @@ const Dashboard = () => {
             style={{
               color,
               backgroundColor: bgColor,
-              padding: "4px 8px",
+              padding: "2px 8px",
               borderRadius: "10px",
             }}
           >
@@ -291,9 +291,9 @@ const Dashboard = () => {
             <div className="bg-white rounded p-3 mt-8">
               <div className="flex justify-between items-center">
                 <p className="font-semibold">Recent Payments</p>
-                <button className="bg-[#F2C94C] p-2 rounded-full h-6 flex justify-center items-center text-[.7rem]">
+                <Button className="bg-[#F2C94C] hover:!bg-[#F2C94C] p-2 rounded-full h-6 flex justify-center items-center text-[.7rem] border-none hover:!text-black">
                   View more
-                </button>
+                </Button>
               </div>
 
               <Table
@@ -305,7 +305,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="col-span-1 bg-green-500">
+          <div className="col-span-1">
             <div class="grid grid-rols-3 gap-4">
               <div class="bg-white rounded p-4 text-center">Item 1</div>
               <div class="bg-white rounded p-4">
@@ -313,7 +313,7 @@ const Dashboard = () => {
                 <h1 className="font-bold text-lg">Recent Activity</h1>
                 <img src={arrow} alt="" />
                 </div>
-                <Line {...config} />
+                {/* <Line {...config} /> */}
               </div>
               <div class="bg-white rounded p-4">
                 <h1 className="font-bold text-lg">Recent Activity</h1>

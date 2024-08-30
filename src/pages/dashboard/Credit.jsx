@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Table, Modal, Form, Input } from "antd";
+import { Table, Modal, Form, Input, Select } from "antd";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import no_data from "../../assets/images/icons/no_data.png";
 import dots from "../../assets/images/icons/dots.png";
@@ -16,15 +16,20 @@ const Credit = () => {
   const handleOk = () => {
     setIsModalOpen(false);
   };
+
   const handleCancel = () => {
     setIsModalOpen(false);
+  };
+
+  const handleChange = (value) => {
+    console.log(`selected ${value}`);
   };
 
   const tableData = [
     {
       key: "1",
       credit: "10 Credit",
-      price: "N155,000,000,000",
+      price: "N155,000",
       status: "Active",
       total_sales: 10,
       total_revenue: "15,000 NGN",
@@ -104,8 +109,8 @@ const Credit = () => {
             style={{
               color,
               backgroundColor: bgColor,
-              padding: "4px 8px",
-              borderRadius: "10px",
+              padding: "2px 8px",
+              borderRadius: "7px",
             }}
           >
             {text.charAt(0).toUpperCase() + text.slice(1)}
@@ -138,7 +143,7 @@ const Credit = () => {
               <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-50">
                 <img
                   src={dots}
-                  style={{ width: 4, height: 15 }}
+                  style={{ width: 3, height: 15 }}
                   className="cursor-pointer"
                 />
               </MenuButton>
@@ -204,7 +209,7 @@ const Credit = () => {
         <Table
           columns={columns}
           dataSource={tableData}
-          className="mt-8"
+          // className="mt-8"
           style={{ fontSize: "11px" }}
         />
 
@@ -250,6 +255,25 @@ const Credit = () => {
                   type="text"
                   placeholder="Input Price"
                   style={{ fontSize: "14px", width: "300px" }} // Increase input size
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="package"
+                rules={[{ required: true, message: "Select an option!" }]}
+              >
+                <Select
+                  defaultValue="Select an option"
+                  style={{ width: '300px' }}
+                  onChange={handleChange}
+                  options={[
+                    { value: "1_day", label: "1 Day" },
+                    { value: "1_week", label: "1 Week" },
+                    { value: "1_month", label: "1 Month" },
+                    { value: "3_months", label: "3 Months" },
+                    { value: "6_months", label: "6 Months" },
+                    { value: "1_year", label: "1 Year" },
+                  ]}
                 />
               </Form.Item>
             </div>

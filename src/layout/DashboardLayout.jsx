@@ -11,14 +11,7 @@ import coin_dark from "../assets/images/icons/coin_dark.png";
 import bell_dark from "../assets/images/icons/bell_dark.png";
 import wallet from "../assets/images/icons/wallet.png";
 import feedback from "../assets/images/icons/feedback.png";
-import {
-  DesktopOutlined,
-  CreditCardOutlined,
-  BellOutlined,
-  DollarOutlined,
-  UserOutlined,
-  UnorderedListOutlined,
-} from "@ant-design/icons";
+
 import { Layout, Menu, theme } from "antd";
 
 const { Sider } = Layout;
@@ -57,13 +50,33 @@ const today = new Date();
 const formattedDate = formatDate(today);
 
 const items = [
-  getItem("Dashboard", "/dashboard", <img src={dashboard} alt="" className="w-1"/>),
-  getItem("Users", "/users", <img src={user_outline_2} alt="" className="w-1"/>),
-  getItem("Cutlist", "/cutlist", <img src={policy_2} alt="" className="w-1"/>),
-  getItem("Credit Packages", "/credit-packages", <img src={coin_dark} alt="" className="w-4"/>),
-  getItem("Notification", "/notification", <img src={bell_dark} alt="" className="w-1"/>),
-  getItem("Payments", "/payment", <img src={wallet} alt="" className="w-5"/>),
-  getItem("Feedback", "/feedback", <img src={feedback} alt="" className="w-4"/>),
+  getItem(
+    "Dashboard",
+    "/dashboard",
+    <img src={dashboard} alt="" className="w-1" />
+  ),
+  getItem(
+    "Users",
+    "/users",
+    <img src={user_outline_2} alt="" className="w-1" />
+  ),
+  getItem("Cutlist", "/cutlist", <img src={policy_2} alt="" className="w-1" />),
+  getItem(
+    "Credit Packages",
+    "/credit-packages",
+    <img src={coin_dark} alt="" className="w-4" />
+  ),
+  getItem(
+    "Notification",
+    "/notification",
+    <img src={bell_dark} alt="" className="w-1" />
+  ),
+  getItem("Payments", "/payment", <img src={wallet} alt="" className="w-5" />),
+  getItem(
+    "Feedback",
+    "/feedback",
+    <img src={feedback} alt="" className="w-4" />
+  ),
 ];
 
 const DashboardLayout = () => {
@@ -135,7 +148,7 @@ const DashboardLayout = () => {
           onClick={handleMenuClick}
         />
 
-        <div className="flex justify-center items-center flex-col relative top-20">
+        <div className="flex justify-center items-center flex-col relative top-10">
           <div className="rounded-full w-11 h-11 bg-slate-800"></div>
           <p className="mt-3 font-semibold text-sm">Paul Yonder</p>
           <span className="text-[.8rem] -mt-1">Admin</span>
@@ -164,8 +177,10 @@ const DashboardLayout = () => {
                 <p className="text-[.8rem]">Manage credit packages</p>
               ) : title === "Payments" ? (
                 <p className="text-[.8rem]">Manage and monitor payments</p>
-              ) :  title === "Feedbacks" ? (
+              ) : title === "Feedbacks" ? (
                 <p className="text-[.8rem]">Manage and reply to feedbacks</p>
+              ) : title === "Cutlist" ? (
+                <p className="text-[.8rem]">Manage users cutlist</p>
               ) : (
                 <p className="text-[.8rem]">{formattedDate}</p>
               )}

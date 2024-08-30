@@ -10,6 +10,7 @@ import UserDetailsPage from "./pages/dashboard/UserDetailsPage";
 import Notification from "./pages/dashboard/Notification";
 import Payment from "./pages/dashboard/Payment";
 import Feedback from "./pages/dashboard/Feedback";
+import Cutlist from "./pages/dashboard/Cutlist";
 
 function App() {
   
@@ -27,6 +28,7 @@ function App() {
           <Route path="/notification" element={<Notification />} ></Route>
           <Route path="/payment" element={<Payment />} ></Route>
           <Route path="/feedback" element={<Feedback />} ></Route>
+          <Route path="/cutlist" element={<Cutlist />} ></Route>
         </Route>
       </Routes>
     </Router>

@@ -80,7 +80,7 @@ const Payment = () => {
             style={{
               color,
               backgroundColor: bgColor,
-              padding: "4px 8px",
+              padding: "2px 8px",
               borderRadius: "10px",
             }}
           >

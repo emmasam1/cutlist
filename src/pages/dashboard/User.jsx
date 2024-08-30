@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { Input, Table, Modal, Checkbox } from "antd";
-import { useNavigate, Link } from "react-router-dom";
+import { Input, Table } from "antd";
+import { Link } from "react-router-dom";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import check from "../../assets/images/icons/check.png";
 import no_data from "../../assets/images/icons/no_data.png";
 import dots from "../../assets/images/icons/dots.png";
@@ -12,7 +11,7 @@ import edit from "../../assets/images/icons/edit_outline.png";
 import user from "../../assets/images/icons/user_outline.png";
 import plus from "../../assets/images/icons/plus.png";
 import bell from "../../assets/images/icons/bell.png";
-import send from "../../assets/images/icons/send.png";
+import Notification from "../../components/notification/Notification";
 
 const fullDataSource = [
   {
@@ -68,33 +67,42 @@ const fullDataSource = [
 
 const count = fullDataSource.length;
 
+const sections = [
+  {
+    title: "Create cutlist",
+    description: "Create new cutlist and get active",
+    options: ["None", "In-app", "Phone number"],
+  },
+  {
+    title: "Outstanding Cutlist",
+    description: "You have had outstanding task for",
+    options: ["None", "In-app", "Phone number"],
+  },
+  {
+    title: "Purchase Credits",
+    description: "You have run out of credits, purchase credits",
+    options: ["None", "In-app", "Phone number"],
+  },
+];
+
 const User = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [searchText, setSearchText] = useState("");
-  const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const [modalText, setModalText] = useState(
-    "Manage notifications to send out"
-  );
-  const [modalTitle, setModalTitel] = useState("Send Notifications");
   const [isAnyChecked, setIsAnyChecked] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const showModal = () => {
-    setOpen(true);
-  };
-
-  const handleOk = () => {
-    setModalText("The modal will be closed after two seconds");
-    setConfirmLoading(true);
-    setTimeout(() => {
-      setOpen(false);
-      setConfirmLoading(false);
-    }, 2000);
-  };
+  // const handleOk = () => {
+  //   setModalText("The modal will be closed after two seconds");
+  //   setConfirmLoading(true);
+  //   setTimeout(() => {
+  //     setOpen(false);
+  //     setConfirmLoading(false);
+  //   }, 2000);
+  // };
 
   const handleCancel = () => {
-    console.log("Clicked cancel button");
-    setOpen(false);
+    setIsModalOpen(false);
   };
 
   const onSelectChange = (newSelectedRowKeys) => {
@@ -160,7 +168,7 @@ const User = () => {
           {selectedRowKeys.length > 0 ? (
             <button
               className="rounded px-2 h-8 font-semibold bg-[#F1B31C] flex items-center"
-              onClick={showModal}
+              onClick={() => setIsModalOpen(true)}
             >
               <img src={bell} alt="" className="mr-2 w-3" />
               Send Notification
@@ -199,7 +207,7 @@ const User = () => {
               <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md py-2 text-sm font-semibold text-gray-900 hover:bg-gray-50">
                 <img
                   src={dots}
-                  style={{ width: 4, height: 15 }}
+                  style={{ width: 3, height: 15 }}
                   className="cursor-pointer"
                 />
               </MenuButton>
@@ -296,84 +304,17 @@ const User = () => {
         />
       </div>
 
-      <Modal
-        title=""
-        open={open}
-        onCancel={handleCancel}
-        footer={[
-          <div
-            className="flex items-center justify-between w-60 ml-52"
-            key="footer"
-          >
-            <button
-              key="cancel"
-              className="flex items-center rounded-full text-[#B0B2C3] px-6 h-9 font-semibold border"
-              onClick={handleCancel}
-            >
-              Cancel
-            </button>
-            <button
-              className={`flex items-center rounded-full px-6 h-9 font-semibold border ${
-                isAnyChecked ? "bg-[#F1B31C]" : "text-[#F1B31C]"
-              }`}
-              key="send"
-              type="primary"
-              loading={confirmLoading}
-              onClick={handleSendClick}
-            >
-              Send
-            </button>
-          </div>,
-        ]}
-        className="custom-modal"
-        getContainer={false}
-      >
-        <h2 className="font-semibold text-2xl">{modalTitle}</h2>
-        <p className="">{modalText}</p>
-
-        <div className="mt-3">
-          <h2 className="font-bold">Create cutlist</h2>
-          <p className="text-sm font-semibold">
-            Create new cutlist and get active
-          </p>
-          <div className="mt-3 flex flex-col">
-            <Checkbox onChange={handleCheckboxChange}>None</Checkbox>
-            <Checkbox onChange={handleCheckboxChange}>In-app</Checkbox>
-            <Checkbox onChange={handleCheckboxChange}>Phone number</Checkbox>
-          </div>
-        </div>
-        <div className="mt-3">
-          <h2 className="font-bold">Outstanding Cutlist</h2>
-          <p className="text-sm font-semibold">
-            You have had outstanding task for
-          </p>
-          <div className="mt-3 flex flex-col">
-            <Checkbox onChange={handleCheckboxChange}>None</Checkbox>
-            <Checkbox onChange={handleCheckboxChange}>In-app</Checkbox>
-            <Checkbox onChange={handleCheckboxChange}>Phone number</Checkbox>
-          </div>
-        </div>
-        <div className="mt-3">
-          <h2 className="font-bold">Purchase Credits</h2>
-          <p className="text-sm font-semibold">
-            You have run out of credits, purchase credits
-          </p>
-          <div className="mt-3 flex flex-col">
-            <Checkbox onChange={handleCheckboxChange}>None</Checkbox>
-            <Checkbox onChange={handleCheckboxChange}>In-app</Checkbox>
-            <Checkbox onChange={handleCheckboxChange}>Phone number</Checkbox>
-          </div>
-        </div>
-        <div className="mt-3">
-          <h2 className="font-bold">Verify Number</h2>
-          <p className="text-sm font-semibold">Verify your phone number</p>
-          <div className="mt-3 flex flex-col">
-            <Checkbox onChange={handleCheckboxChange}>None</Checkbox>
-            <Checkbox onChange={handleCheckboxChange}>In-app</Checkbox>
-            <Checkbox onChange={handleCheckboxChange}>Phone number</Checkbox>
-          </div>
-        </div>
-      </Modal>
+      <Notification
+        open={isModalOpen}
+        handleCancel={handleCancel}
+        modalTitle="Send Notifications"
+        modalText="Manage notifications to send out"
+        sections={sections}
+        handleSendClick={handleSendClick}
+        confirmLoading={confirmLoading}
+        isAnyChecked={isAnyChecked}
+        handleCheckboxChange={handleCheckboxChange}
+      />
     </div>
   );
 };
