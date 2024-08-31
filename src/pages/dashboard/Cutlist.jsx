@@ -10,30 +10,43 @@ import view from "../../assets/images/icons/view.png";
 import arrow from "../../assets/images/icons/arrow_long_right.png";
 import full_list from "../../assets/images/icons/full_list.png";
 import checkbox from "../../assets/images/icons/checkbox_full.png";
-import Notification from "../../components/notification/Notification";
+
+import CreateCutlist from "../../components/createCutlist/Cutlist";
+import ViewCutlist from "../../components/viewCutlist/Cutlist";
+import Users from '../../components/allUsers/AllUsers'
 
 const Cutlist = () => {
   const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalSummary, setIsModalSummary] = useState(false);
   const [sideModal, setSideModal] = useState(false);
+  const [previewCutlist, setPreviewCutlist] = useState(false);
+  const [allUsers, setAllUsers] = useState(false);
 
   const onSearch = (value) => {
     setSearchText(value);
   };
 
-  const habdleModal = () => {
-    setIsModalOpen(false)
-    setSideModal(true)
-  }
+  const handleModal = () => {
+    setIsModalOpen(false);
+    setSideModal(true);
+  };
 
   const closeSideBar = () => {
-    setSideModal(false)
-  }
+    setSideModal(false);
+    setPreviewCutlist(false); // Reset to CreateCutlist
+  };
 
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+
+  const handleClose2 = () => {
+    setAllUsers(true)
+    setPreviewCutlist(false);
+    setSideModal(false);
+  }
+
   const handleSummaryCancel = () => {
     setIsModalSummary(false);
   };
@@ -126,7 +139,7 @@ const Cutlist = () => {
                         active ? "bg-gray-100 text-gray-900" : "text-gray-700"
                       } px-4 py-2 text-sm flex items-center`}
                     >
-                      <img src={send} alt="No Data" className="w-4 h-4 mr-1" />
+                      <img src={send} alt="Send" className="w-4 h-4 mr-1" />
                       Send
                     </Link>
                   )}
@@ -253,11 +266,11 @@ const Cutlist = () => {
           footer={null}
           width={1000}
         >
-            <div className="flex justify-end">
+          <div className="flex justify-end">
             <Button className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded border-none hover:!text-black px-10">
               Edit
             </Button>
-            </div>
+          </div>
           {data.map((e) => (
             <div key={e.key} className="bg-[#FAFAFF] py-1 mb-2 rounded-sm mt-2">
               <div className="flex justify-between m-auto w-11/12">
@@ -296,7 +309,7 @@ const Cutlist = () => {
             <Button className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10">
               {" "}
               Save List
-              <img src={checkbox} alt="" className="w-4"/>
+              <img src={checkbox} alt="" className="w-4" />
             </Button>
           </div>
         </Modal>
@@ -334,7 +347,7 @@ const Cutlist = () => {
             <div className="flex justify-end">
               <Form.Item>
                 <Button
-                onClick={habdleModal}
+                  onClick={handleModal}
                   htmlType="submit"
                   className="bg-[#F2C94C] hover:!bg-[#F2C94C] hover:!text-black border-none p-3 px-3 rounded-full h-8 flex justify-center items-center text-[.7rem]"
                 >
@@ -347,71 +360,79 @@ const Cutlist = () => {
         </Modal>
 
         <Modal
-      title={<div className="flex justify-center">
-        <span className="">Create Cut List</span>
-      </div>}
-      width={400}
-      style={{height: '100vh !important'}}
-      open={sideModal}
-      onCancel={closeSideBar}
-      footer={[
-        <div
-          className="flex items-center justify-between w-60 float-right"
-          key="footer"
+          title={
+            previewCutlist ? (
+              <div className="flex justify-center">
+                <span className="">Cut List Summary</span>
+              </div>
+            ) : (
+              <div className="flex justify-center">
+                <span className="">Create Cut List</span>
+              </div>
+            )
+          }
+          width={400}
+          open={sideModal}
+          onCancel={closeSideBar}
+          footer={[
+            <div className="flex justify-center " key="footer">
+              {previewCutlist ? (
+                <Button
+                  className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10"
+                  onClick={handleClose2}
+                >
+                  {" "}
+                  Save List
+                </Button>
+              ) : (
+                <Button
+                  className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10"
+                  onClick={() => setPreviewCutlist(true)}
+                >
+                  {" "}
+                  Preview List
+                  <img src={arrow} alt="" className="w-4" />
+                </Button>
+              )}
+            </div>,
+          ]}
+          className="custom-modal"
+          getContainer={false}
         >
-          <Button
-            key="cancel"
-            className="flex items-center rounded-full text-[#B0B2C3] px-6 h-9 font-semibold border"
-            onClick={handleCancel}
-          >
-            Cancel
-          </Button>
-          {/* <Button
-            className={`flex items-center rounded-full px-6 h-9 font-semibold border bg-transparent border-none  ${
-              isAnyChecked ? "bg-[#F1B31C]" : "text-[#F1B31C]"
-            }`}
-            key="send"
-            type="primary"
-            loading={confirmLoading}
-            onClick={handleSendClick}
-          >
-            Send
-          </Button> */}
-        </div>,
-      ]}
-       className="custom-modal"
-      getContainer={false}
-    >  
-    <div>
-        <h2 className="font-semibold">Cut Type</h2>
-        <div className="flex gap-6 mt-1">
-            <Button className="rounded-full bg-[#F2C94C] hover:!bg-[#F2C94C] border-none hover:!text-black">Door Cut</Button>
-            <Button className="rounded-full bg-[#fcfcfca4] hover:!bg-[#fcfcfca4] hover:!text-black border-none">Door Cut</Button>
-            <Button className="rounded-full bg-[#fcfcfca4] hover:!bg-[#fcfcfca4] hover:!text-black border-none">Door Cut</Button>
-        </div>
-    </div>
-    <div className="mt-10">
-        <div className="flex items-center justify-between">
-        <h2 className="font-semibold">Measuremente</h2>
-        <span className="text-[#f2994a]">(2 Long)</span>
-        </div>
-        <div className="flex gap-6 mt-1">
-            <Button className="rounded-full bg-[#F2C94C] hover:!bg-[#F2C94C] border-none hover:!text-black">Door Cut</Button>
-            <Button className="rounded-full bg-[#fcfcfca4] hover:!bg-[#fcfcfca4] hover:!text-black border-none">Door Cut</Button>
-            <Button className="rounded-full bg-[#fcfcfca4] hover:!bg-[#fcfcfca4] hover:!text-black border-none">Door Cut</Button>
-        </div>
-    </div>
-    </Modal>
+          {previewCutlist ? <ViewCutlist /> : <CreateCutlist />}
+        </Modal>
 
-       <div className="flex justify-end">
-       <Button
+        <Modal
+          title=""
+          width={900}
+          style={{ top: 20 }}
+          open={allUsers}
+          onCancel={()=>setAllUsers(false)}
+          footer={[
+            <div className="flex justify-center " key="footer">
+              <Button
+                className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10"
+                onClick={() => setPreviewCutlist(true)}
+              >
+                {" "}
+                Save List
+              </Button>
+            </div>,
+          ]}
+          getContainer={false}
+        >
+          <Users />
+        </Modal>
+
+        <div className="flex justify-end">
+          <Button
             onClick={() => setIsModalOpen(true)}
             className="flex items-center bg-[#F2C94C] hover:!bg-[#F2C94C] border-none hover:!text-black rounded p-2 px-3"
           >
             <img src={plus} alt="Plus Icon" className="w-3 mr-1" />
             Create Cutlist
           </Button>
-       </div>
+        </div>
       </div>
     </div>
   );

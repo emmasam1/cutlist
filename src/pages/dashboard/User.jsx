@@ -148,8 +148,8 @@ const User = () => {
       render: (status) => {
         const isActive = status === "Active";
         const className = isActive
-          ? "bg-black text-white px-3 py-1 rounded-full"
-          : "px-3 py-1 border rounded-full";
+          ? "bg-black text-white px-3 rounded-full"
+          : "px-3 border rounded-full";
         return <span className={className}>{status}</span>;
       },
     },

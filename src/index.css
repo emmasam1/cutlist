@@ -56,7 +56,12 @@
   flex-grow: 1; /* Takes up available space */
   overflow-y: auto; /* Allows scrolling if content overflows */
 }
-
+.custom-modal .ant-modal-content{
+  height: 100vh !important;
+}
+.ant-table-wrapper .ant-table-pagination {
+  border-radius: 50% !important; 
+}
 
 /* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
