@@ -2,6 +2,9 @@ import React from "react";
 import { Table } from "antd";
 import { PrinterOutlined } from "@ant-design/icons";
 
+import LineChart from "../../components/chart/LineChart";
+import LineChart2 from "../../components/chart/LinChart2";
+
 const Payment = () => {
   const data = [
     {
@@ -154,7 +157,7 @@ const Payment = () => {
       invoice: "",
     },
   ];
-  
+
   return (
     <div className="relative top-14">
       <div className="bg-white rounded p-4">
@@ -175,6 +178,15 @@ const Payment = () => {
               </p>
             </div>
           ))}
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mt-8">
+          <div class="">
+            <LineChart />
+          </div>
+          <div class="">
+            <LineChart2 />
+          </div>
         </div>
 
         <div>

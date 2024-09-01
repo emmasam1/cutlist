@@ -3,10 +3,15 @@ import { Table, Button } from "antd";
 import { Line } from '@ant-design/plots';
 import { PrinterOutlined } from "@ant-design/icons";
 
+import LineChart3 from "../../components/chart/LineChart3";
+
 import edit from "../../assets/images/icons/edit.png";
 import user from "../../assets/images/icons/user.png";
 import book from "../../assets/images/icons/book.png";
 import arrow from "../../assets/images/icons/arrow_long_right.png";
+import user_2 from '../../assets/images/user_2.png';
+import user_3 from '../../assets/images/user_3.png';
+import user_1 from '../../assets/images/user_1.png';
 
 const Dashboard = () => {
   function formatDate(date) {
@@ -96,16 +101,19 @@ const Dashboard = () => {
         id: 1,
         name: "Rory Mcllroy",
         dec: "Made Payments for 10 credits",
+        img: user_1
     },
     {
         id: 2,
         name: "Manuel Ugate",
         dec: "Created a new cutlist",
+        img: user_2
     },
     {
         id: 3,
         name: "Alxis Sanchez",
         dec: "Complited a cutlist",
+        img: user_3
     }
   ]
 
@@ -308,12 +316,12 @@ const Dashboard = () => {
           <div className="col-span-1">
             <div class="grid grid-rols-3 gap-4">
               <div class="bg-white rounded p-4 text-center">Item 1</div>
-              <div class="bg-white rounded p-4">
+              <div class="bg-white rounded p-3">
                 <div className="flex justify-between items-center">
                 <h1 className="font-bold text-lg">Recent Activity</h1>
                 <img src={arrow} alt="" />
                 </div>
-                {/* <Line {...config} /> */}
+                <LineChart3 />
               </div>
               <div class="bg-white rounded p-4">
                 <h1 className="font-bold text-lg">Recent Activity</h1>
@@ -321,7 +329,9 @@ const Dashboard = () => {
                     {recent.map((e) => (
                         <div class="grid grid-rols gap-4 mt-2 bg-[#F5F5F5] p-2 rounded-md" key={e.id}>
                         <div className="flex gap-2">
-                            <div className="rounded-full bg-red-500 h-9 w-9"></div>
+                            <div className="rounded-full h-9 w-9 overflow-hidden">
+                              <img src={e.img} alt="" className="w-full object-cover"/>
+                            </div>
                             <div>
                                 <h1 className="font-semibold">{e.name}</h1>
                                 <p className="text-[.8rem]">{e.dec}</p>

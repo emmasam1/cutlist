@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Input, Table } from "antd";
+import { Input, Table, Button } from "antd";
 import { Link } from "react-router-dom";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import check from "../../assets/images/icons/check.png";
@@ -159,7 +159,7 @@ const User = () => {
     },
     {
       title: (
-        <div className="flex items-center">
+        <div className="flex items-center justify-end">
           <Input.Search
             className="w-44 mr-4"
             placeholder="Search"
@@ -174,16 +174,16 @@ const User = () => {
               Send Notification
             </button>
           ) : (
-            <button className="rounded px-2 h-8 font-semibold bg-[#F1B31C] flex items-center">
+            <Button className="rounded px-2 h-8 font-semibold bg-[#F1B31C] hover:!bg-[#F1B31C] hover:!text-black border-none flex items-center">
               <img src={plus} alt="" className="mr-2 w-3" />
               Add User
-            </button>
+            </Button>
           )}
         </div>
       ),
       dataIndex: "isVerified",
       render: (isVerified) => (
-        <span className="flex items-center">
+        <span className="flex items-center justify-center">
           <img
             src={isVerified === "Unverified Phone number" ? no_data : check}
             alt={isVerified}

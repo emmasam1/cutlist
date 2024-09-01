@@ -73,7 +73,7 @@ const Login = () => {
             <Form.Item className="mt-6 flex justify-center">
               <Link
                 to="/dashboard"
-                className="flex items-center bg-[#F2C94C] p-2 rounded-xl px-8 text-sm"
+                className="flex items-center bg-[#F2C94C] hover:!text-black p-2 rounded-xl px-8 text-sm"
               >
                 Next <img src={arrow} alt="arrow" className="w-4 ml-3" />
               </Link>
