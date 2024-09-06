@@ -11,12 +11,15 @@ import Notification from "./pages/dashboard/Notification";
 import Payment from "./pages/dashboard/Payment";
 import Feedback from "./pages/dashboard/Feedback";
 import Cutlist from "./pages/dashboard/Cutlist";
+import ScrollTop from "./components/top/ScrollTop";
+
 
 function App() {
   
 
   return (
     <Router>
+      <ScrollTop />
       <Routes>
         <Route path="/" element={<LandingPage />}></Route>
         <Route path="login" element={<Login/>}></Route>
