@@ -20,16 +20,16 @@ const Login = () => {
         backgroundRepeat: "no-repeat",
       }}
     >
-      {/* Overlay for dark effect */}
-      <div className="absolute inset-0 bg-black opacity-50"></div>
+      {/* Overlay for dark effect, visible only on larger screens */}
+      <div className="absolute inset-0 bg-black opacity-50 hidden sm:block"></div>
 
       {/* Content */}
       <div className="relative z-10 w-full sm:w-auto max-w-sm">
         <Card className="w-full">
-          <h1 className="text-center text-2xl md:text-3xl font-bold mb-4">
+          <h1 className="text-center text-2xl md:text-2xl font-bold mb-4">
             Enter your contact details
           </h1>
-          <p className="text-center text-sm md:text-base mb-6">
+          <p className="text-center md:text-sm text-sm mb-6">
             Provide your name and phone number to sign in
           </p>
 
@@ -93,11 +93,14 @@ const Login = () => {
         </Card>
       </div>
 
-      {/* Responsive background removal */}
+      {/* Responsive background and overlay removal */}
       <style jsx>{`
         @media (max-width: 768px) {
           div[style*="background-image"] {
             background-image: none !important;
+          }
+          .sm\\:block {
+            display: none !important; /* Hide overlay on mobile */
           }
         }
       `}</style>
