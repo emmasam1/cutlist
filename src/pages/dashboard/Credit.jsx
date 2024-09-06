@@ -1,12 +1,23 @@
 import React, { useState } from "react";
-import { Table, Modal, Form, Input, Select } from "antd";
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import no_data from "../../assets/images/icons/no_data.png";
+import {
+  Table,
+  Modal,
+  Form,
+  Input,
+  Select,
+  Button,
+  Dropdown,
+  Menu,
+} from "antd";
+
 import dots from "../../assets/images/icons/dots.png";
-import bin from "../../assets/images/icons/bin.png";
 import edit from "../../assets/images/icons/edit_outline.png";
 import plus from "../../assets/images/icons/plus.png";
 import arrow from "../../assets/images/icons/arrow_long_right.png";
+import check_green from "../../assets/images/icons/check_green.png";
+import inactive from "../../assets/images/icons/inactive.png";
+import no_data from "../../assets/images/icons/no_data.png";
+import bin from "../../assets/images/icons/bin.png";
 
 const Credit = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,6 +35,60 @@ const Credit = () => {
   const handleChange = (value) => {
     console.log(`selected ${value}`);
   };
+
+  const handleMenuClick = (e, record) => {
+    if (e.key === "profile") {
+      console.log("Profile", record);
+      // Handle view logic here
+    } else if (e.key === "deactivate") {
+      console.log("Deactivate", record);
+      // Handle edit logic here
+    } else if (e.key === "delete") {
+      console.log("Delete", record);
+      // Handle delete logic here
+    }
+  };
+
+  const getMenu = (record) => (
+    <Menu onClick={(e) => handleMenuClick(e, record)}>
+      <Menu.Item
+        key="view"
+        icon={
+          <img
+            src={edit}
+            alt="Profile"
+            style={{ width: "16px", marginRight: "8px" }}
+          />
+        }
+      >
+        Profile
+      </Menu.Item>
+      <Menu.Item
+        key="deactivate"
+        icon={
+          <img
+            src={no_data}
+            alt="Deactivate"
+            style={{ width: "16px", marginRight: "8px" }}
+          />
+        }
+      >
+        Deactivate
+      </Menu.Item>
+      <Menu.Item
+        key="delete"
+        icon={
+          <img
+            src={bin}
+            alt="Delete"
+            style={{ width: "16px", marginRight: "8px" }}
+          />
+        }
+      >
+        Block
+      </Menu.Item>
+    </Menu>
+  );
 
   const tableData = [
     {
@@ -87,33 +152,20 @@ const Credit = () => {
     {
       title: "Status",
       dataIndex: "status",
-      key: "status",
-      render: (text) => {
-        let color = "";
-        let bgColor = "";
-
-        switch (text) {
-          case "Active":
-            color = "#1F7700";
-            bgColor = "#5EDA79";
-            break;
-          case "Inactive":
-            color = "#FF3D00";
-            bgColor = "rgb(255 61 0 / 32%)";
-            break;
-          default:
-            break;
-        }
+      render: (status) => {
+        const isActive = status === "Active";
+        const className = isActive
+          ? "bg-[#5EDA79] text-[#1F7700] px-3 w-20 py-1 rounded-full flex items-center"
+          : "px-3 w-20 py-1 border rounded-full bg-[#FF000042] text-[#FF3D00] flex items-center";
+        const statusImage = isActive ? check_green : inactive;
         return (
-          <span
-            style={{
-              color,
-              backgroundColor: bgColor,
-              padding: "2px 8px",
-              borderRadius: "7px",
-            }}
-          >
-            {text.charAt(0).toUpperCase() + text.slice(1)}
+          <span className={className}>
+            <img
+              src={statusImage}
+              alt={isActive ? "Active" : "Inactive"}
+              className="w-2 h-2 mr-1"
+            />
+            {status}
           </span>
         );
       },
@@ -135,68 +187,143 @@ const Credit = () => {
     },
     {
       title: "",
-      dataIndex: "isVerified",
-      render: () => (
-        <span className="flex items-center">
-          <Menu as="div" className="relative inline-block text-left ml-2">
-            <div>
-              <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-50">
-                <img
-                  src={dots}
-                  style={{ width: 3, height: 15 }}
-                  className="cursor-pointer"
-                />
-              </MenuButton>
-            </div>
-            <MenuItems className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none">
-              <div className="py-1">
-                <MenuItem>
-                  {({ active }) => (
-                    <a
-                      href="#"
-                      className={`${
-                        active ? "bg-gray-100 text-gray-900" : "text-gray-700"
-                      } px-4 py-2 text-sm flex items-center`}
-                    >
-                      <img src={edit} alt="" className="w-4 h-4 mr-1" />
-                      Profile
-                    </a>
-                  )}
-                </MenuItem>
-                <MenuItem>
-                  {({ active }) => (
-                    <a
-                      href="#"
-                      className={`${
-                        active ? "bg-gray-100 text-gray-900" : "text-gray-700"
-                      } px-4 py-2 text-sm flex items-center`}
-                    >
-                      <img src={no_data} alt="" className="w-4 h-4 mr-1" />
-                      Deactivate
-                    </a>
-                  )}
-                </MenuItem>
-              </div>
-              <div className="py-1">
-                <MenuItem>
-                  {({ active }) => (
-                    <a
-                      href="#"
-                      className={`${
-                        active ? "bg-gray-100 text-gray-900" : "text-gray-700"
-                      } px-4 py-2 text-sm flex items-center`}
-                    >
-                      <img src={bin} alt="" className="w-4 h-4 mr-1" />
-                      Delete
-                    </a>
-                  )}
-                </MenuItem>
-              </div>
-            </MenuItems>
-          </Menu>
-        </span>
+      key: "operations",
+      render: (_, record) => (
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: "view",
+                label: (
+                  <span className="flex items-center">
+                    <img
+                      src={edit}
+                      alt="View"
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
+                    />
+                    profile
+                  </span>
+                ),
+              },
+              {
+                key: "deactivate",
+                label: (
+                  <span className="flex items-center">
+                    <img
+                      src={no_data}
+                      alt="Deactivate"
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
+                    />
+                    Deactivate
+                  </span>
+                ),
+              },
+              {
+                key: "delete",
+                label: (
+                  <span className="flex items-center">
+                    <img
+                      src={bin}
+                      alt="Delete"
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
+                    />
+                    Delete
+                  </span>
+                ),
+              },
+            ],
+            onClick: (e) => handleMenuClick(e, record),
+          }}
+          trigger={["click"]}
+        >
+          <Button>
+            <img
+              src={dots}
+              alt="Actions"
+              className="flex items-center justify-center w-1"
+            />
+          </Button>
+        </Dropdown>
       ),
     },
+    // {
+    //   title: "",
+    //   dataIndex: "isVerified",
+    //   render: () => (
+    //     <span className="flex items-center">
+    //       <Menu as="div" className="relative inline-block text-left ml-2">
+    //         <div>
+    //           <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-50">
+    //             <img
+    //               src={dots}
+    //               style={{ width: 3, height: 15 }}
+    //               className="cursor-pointer"
+    //             />
+    //           </MenuButton>
+    //         </div>
+    //         <MenuItems className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none">
+    //           <div className="py-1">
+    //             <MenuItem>
+    //               {({ active }) => (
+    //                 <a
+    //                   href="#"
+    //                   className={`${
+    //                     active ? "bg-gray-100 text-gray-900" : "text-gray-700"
+    //                   } px-4 py-2 text-sm flex items-center`}
+    //                 >
+    //                   <img src={edit} alt="" className="w-4 h-4 mr-1" />
+    //                   Profile
+    //                 </a>
+    //               )}
+    //             </MenuItem>
+    //           </div>
+    //           <div className="py-1">
+    //             <MenuItem>
+    //               {({ active }) => (
+    //                 <a
+    //                   href="#"
+    //                   className={`${
+    //                     active ? "bg-gray-100 text-gray-900" : "text-gray-700"
+    //                   } px-4 py-2 text-sm flex items-center`}
+    //                 >
+    //                   <img src={no_data} alt="" className="w-4 h-4 mr-1" />
+    //                   Deactivate
+    //                 </a>
+    //               )}
+    //             </MenuItem>
+    //           </div>
+    //           <div className="py-1">
+    //             <MenuItem>
+    //               {({ active }) => (
+    //                 <a
+    //                   href="#"
+    //                   className={`${
+    //                     active ? "bg-gray-100 text-gray-900" : "text-gray-700"
+    //                   } px-4 py-2 text-sm flex items-center`}
+    //                 >
+    //                   <img src={bin} alt="" className="w-4 h-4 mr-1" />
+    //                   Delete
+    //                 </a>
+    //               )}
+    //             </MenuItem>
+    //           </div>
+    //         </MenuItems>
+    //       </Menu>
+    //     </span>
+    //   ),
+    // },
   ];
 
   const onFinish = (values) => {
@@ -206,22 +333,25 @@ const Credit = () => {
   return (
     <div className="relative top-14">
       <div className="bg-white rounded p-3 mt-8">
+        <div className="flex justify-end mb-3">
+          <Button
+            onClick={showModal}
+            className="flex border-none items-center hover:!text-black bg-[#F2C94C] hover:!bg-[#F2C94C] rounded p-2 px-3"
+          >
+            <img src={plus} alt="" className="w-3 mr-1" />
+            Create Custom Credit
+          </Button>
+        </div>
         <Table
           columns={columns}
           dataSource={tableData}
           // className="mt-8"
-          style={{ fontSize: "11px" }}
+          size="small"
+          pagination={{ pageSize: 7, position: ["bottomCenter"] }}
+          className="custom-table"
+          scroll={{ x: "max-content" }}
         />
 
-        <div className="flex justify-end">
-          <button
-            onClick={showModal}
-            className="flex items-center bg-[#F2C94C] rounded p-2 px-3"
-          >
-            <img src={plus} alt="" className="w-4 mr-1" />
-            Create Custom Credit
-          </button>
-        </div>
         <Modal
           title="Create Custom Credit"
           open={isModalOpen}
@@ -264,7 +394,7 @@ const Credit = () => {
               >
                 <Select
                   defaultValue="Select an option"
-                  style={{ width: '300px' }}
+                  style={{ width: "300px" }}
                   onChange={handleChange}
                   options={[
                     { value: "1_day", label: "1 Day" },

@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import { Button, Input, Table, Modal, Form } from "antd";
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { Link } from "react-router-dom";
+import { Button, Input, Table, Modal, Form, Dropdown, Menu } from "antd";
 import plus from "../../assets/images/icons/plus.png";
 import dots from "../../assets/images/icons/dots.png";
 import bin from "../../assets/images/icons/bin.png";
@@ -13,7 +11,7 @@ import checkbox from "../../assets/images/icons/checkbox_full.png";
 
 import CreateCutlist from "../../components/createCutlist/Cutlist";
 import ViewCutlist from "../../components/viewCutlist/Cutlist";
-import Users from '../../components/allUsers/AllUsers'
+import Users from "../../components/allUsers/AllUsers";
 
 const Cutlist = () => {
   const [searchText, setSearchText] = useState("");
@@ -42,16 +40,160 @@ const Cutlist = () => {
   };
 
   const handleClose2 = () => {
-    setAllUsers(true)
+    setAllUsers(true);
     setPreviewCutlist(false);
     setSideModal(false);
-  }
+  };
 
   const handleSummaryCancel = () => {
     setIsModalSummary(false);
   };
 
-  const fullDataSource = [
+  const handleMenuClick = (e, record) => {
+    if (e.key === "view") {
+      console.log("View", record);
+      // Handle view logic here
+    } else if (e.key === "edit") {
+      console.log("Edit", record);
+      // Handle edit logic here
+    } else if (e.key === "delete") {
+      console.log("Delete", record);
+      // Handle delete logic here
+    }
+  };
+
+  const getMenu = (record) => (
+    <Menu onClick={(e) => handleMenuClick(e, record)}>
+      <Menu.Item
+        key="view"
+        icon={
+          <img
+            src={view}
+            alt="View"
+            style={{ width: "16px", marginRight: "8px" }}
+          />
+        }
+      >
+        View
+      </Menu.Item>
+      <Menu.Item
+        key="edit"
+        icon={
+          <img
+            src={send}
+            alt="Edit"
+            style={{ width: "16px", marginRight: "8px" }}
+          />
+        }
+      >
+        Edit
+      </Menu.Item>
+      <Menu.Item
+        key="delete"
+        icon={
+          <img
+            src={bin}
+            alt="Delete"
+            style={{ width: "16px", marginRight: "8px" }}
+          />
+        }
+      >
+        Delete
+      </Menu.Item>
+    </Menu>
+  );
+
+  const Tablecolumns = [
+    {
+      title: "SN",
+      key: "sn",
+      render: (text, record, index) => index + 1,
+      width: 50,
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+    },
+    {
+      title: "Cut Type",
+      dataIndex: "cut_type",
+    },
+    {
+      title: "Height",
+      dataIndex: "height",
+    },
+    {
+      title: "Width",
+      dataIndex: "width",
+    },
+    {
+      title: "Depth",
+      dataIndex: "depth",
+    },
+    {
+      title: "",
+      key: "operations",
+      render: (_, record) => (
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: "view",
+                label: (
+                  <span className="flex items-center">
+                    <img
+                      src={view}
+                      alt="View"
+                      style={{ width: "17px", height: "17px", marginRight: "8px" }}
+                    />
+                    View
+                  </span>
+                ),
+              },
+              {
+                key: "edit",
+                label: (
+                  <span className="flex items-center">
+                    <img
+                      src={send}
+                      alt="Edit"
+                      style={{ width: "17px", height: "17px", marginRight: "8px" }}
+                    />
+                    Edit
+                  </span>
+                ),
+              },
+              {
+                key: "delete",
+                label: (
+                  <span className="flex items-center">
+                    <img
+                      src={bin}
+                      alt="Delete"
+                      style={{ width: "17px", height: "17px", marginRight: "8px" }}
+                    />
+                    Delete
+                  </span>
+                ),
+              },
+            ],
+            onClick: (e) => handleMenuClick(e, record),
+          }}
+          trigger={["click"]}
+        >
+          <Button>
+            <img
+              src={dots}
+              alt="Actions"
+              className="flex items-center justify-center w-1"
+            />
+          </Button>
+        </Dropdown>
+      ),
+    },
+  ];
+
+  const Tabledata = [
     {
       key: 0,
       name: "Rory Mcllroy",
@@ -75,95 +217,6 @@ const Cutlist = () => {
       height: 305,
       width: 95,
       depth: 50,
-    },
-  ];
-
-  const columns = [
-    {
-      title: "Name",
-      dataIndex: "name",
-    },
-    {
-      title: "Cut Type",
-      dataIndex: "cut_type",
-    },
-    {
-      title: "Height",
-      dataIndex: "height",
-    },
-    {
-      title: "Width",
-      dataIndex: "width",
-    },
-    {
-      title: "Depth",
-      dataIndex: "depth",
-    },
-    {
-      title: "",
-      render: (text, record) => (
-        <span className="flex items-center">
-          <Menu as="div" className="relative inline-block text-left ml-2">
-            <div>
-              <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md py-2 text-sm font-semibold text-gray-900 hover:bg-gray-50">
-                <img
-                  src={dots}
-                  style={{ width: 3, height: 15 }}
-                  className="cursor-pointer"
-                />
-              </MenuButton>
-            </div>
-            <MenuItems className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none">
-              <div className="py-1">
-                <MenuItem>
-                  {({ active }) => (
-                    <button
-                      onClick={() => setIsModalSummary(true)}
-                      className={`${
-                        active ? "bg-gray-100 text-gray-900" : "text-gray-700"
-                      } px-4 py-2 text-sm flex items-center w-full text-left`}
-                    >
-                      <img src={view} alt="View" className="w-4 h-4 mr-1" />
-                      View
-                    </button>
-                  )}
-                </MenuItem>
-              </div>
-
-              <div className="py-1">
-                <MenuItem>
-                  {({ active }) => (
-                    <Link
-                      to="#"
-                      className={`${
-                        active ? "bg-gray-100 text-gray-900" : "text-gray-700"
-                      } px-4 py-2 text-sm flex items-center`}
-                    >
-                      <img src={send} alt="Send" className="w-4 h-4 mr-1" />
-                      Send
-                    </Link>
-                  )}
-                </MenuItem>
-              </div>
-              <div className="py-1">
-                <MenuItem>
-                  {({ active }) => (
-                    <Link
-                      to="#"
-                      className={`${
-                        active ? "bg-gray-100 text-gray-900" : "text-gray-700"
-                      } px-4 py-2 text-sm flex items-center`}
-                    >
-                      <img src={bin} alt="Delete" className="w-4 h-4 mr-1" />
-                      Delete
-                    </Link>
-                  )}
-                </MenuItem>
-              </div>
-            </MenuItems>
-          </Menu>
-        </span>
-      ),
     },
   ];
 
@@ -235,13 +288,9 @@ const Cutlist = () => {
 
   return (
     <div className="relative top-14">
-      <div className="flex justify-end">
-        {/* <div className="flex mt-3 mb-4">
-          <Input.Search
-            className="w-44 mr-4"
-            placeholder="Search"
-            onSearch={onSearch}
-          />
+      <div className="flex justify-end"></div>
+      <div className="bg-white rounded p-4">
+        <div className="flex justify-end mb-3">
           <Button
             onClick={() => setIsModalOpen(true)}
             className="flex items-center bg-[#F2C94C] hover:!bg-[#F2C94C] border-none hover:!text-black rounded p-2 px-3"
@@ -249,15 +298,18 @@ const Cutlist = () => {
             <img src={plus} alt="Plus Icon" className="w-3 mr-1" />
             Create Cutlist
           </Button>
-        </div> */}
-      </div>
-      <div className="bg-white rounded p-4">
-        <Table
-          columns={columns}
-          dataSource={fullDataSource}
-          pagination={{ pageSize: 7 }}
-          //   className="custom-table mt-4"
-        />
+        </div>
+        <div className="">
+          <Table
+            columns={Tablecolumns}
+            dataSource={Tabledata}
+            size="small"
+          pagination={{ pageSize: 7, position: ['bottomCenter'] }}
+          className="custom-table"
+          scroll={{ x: 'max-content' }}
+            // scroll={{ x: 600 }} // Enable horizontal scrolling
+          />
+        </div>
 
         <Modal
           title="Cut list Summary"
@@ -407,7 +459,7 @@ const Cutlist = () => {
           width={900}
           style={{ top: 20 }}
           open={allUsers}
-          onCancel={()=>setAllUsers(false)}
+          onCancel={() => setAllUsers(false)}
           footer={[
             <div className="flex justify-center " key="footer">
               <Button
@@ -423,16 +475,6 @@ const Cutlist = () => {
         >
           <Users />
         </Modal>
-
-        <div className="flex justify-end">
-          <Button
-            onClick={() => setIsModalOpen(true)}
-            className="flex items-center bg-[#F2C94C] hover:!bg-[#F2C94C] border-none hover:!text-black rounded p-2 px-3"
-          >
-            <img src={plus} alt="Plus Icon" className="w-3 mr-1" />
-            Create Cutlist
-          </Button>
-        </div>
       </div>
     </div>
   );

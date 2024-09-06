@@ -161,7 +161,7 @@ const Payment = () => {
   return (
     <div className="relative top-14">
       <div className="bg-white rounded p-4">
-        <div className="grid grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-10 mt-6 sm:mt-0">
           {data.map((e) => (
             <div
               className="p-4 rounded-lg flex flex-col items-center py-7"
@@ -180,11 +180,11 @@ const Payment = () => {
           ))}
         </div>
 
-        <div class="grid grid-cols-2 gap-4 mt-8">
-          <div class="">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+          <div className="w-full">
             <LineChart />
           </div>
-          <div class="">
+          <div className="w-full">
             <LineChart2 />
           </div>
         </div>
@@ -193,8 +193,10 @@ const Payment = () => {
           <Table
             columns={columns}
             dataSource={tableData}
-            className="mt-8"
-            style={{ fontSize: "11px" }}
+            size="small"
+            pagination={{ pageSize: 7, position: ["bottomCenter"] }}
+            className="custom-table"
+            scroll={{ x: "max-content" }}
           />
         </div>
       </div>

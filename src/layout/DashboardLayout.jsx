@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import link from "../assets/images/icons/link.png";
 import logo from "../assets/images/icons/logo_small.png";
-import serach from "../assets/images/icons/search.png";
+import search from "../assets/images/icons/search.png";
 import bell from "../assets/images/icons/bell.png";
 import dashboard from "../assets/images/icons/dashboard.png";
 import user_outline_2 from "../assets/images/icons/user_outline_2.png";
@@ -12,7 +12,7 @@ import bell_dark from "../assets/images/icons/bell_dark.png";
 import wallet from "../assets/images/icons/wallet.png";
 import feedback from "../assets/images/icons/feedback.png";
 
-import { Layout, Menu, theme } from "antd";
+import { Layout, Menu, theme, Button } from "antd";
 
 const { Sider } = Layout;
 
@@ -119,6 +119,20 @@ const DashboardLayout = () => {
     navigate("/login");
   };
 
+  // Collapse the sidebar on mobile devices
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setCollapsed(true);
+      } else {
+        setCollapsed(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Sider
@@ -138,7 +152,6 @@ const DashboardLayout = () => {
           <img src={logo} alt="" className="w-6 mx-2" />
           {!collapsed && <h2 className="text-[1rem]">Cutlist</h2>}
         </div>
-        <div className="demo-logo-vertical" />
         <Menu
           theme="light"
           selectedKeys={[location.pathname]}
@@ -153,19 +166,28 @@ const DashboardLayout = () => {
           <p className="mt-3 font-semibold text-sm">Paul Yonder</p>
           <span className="text-[.8rem] -mt-1">Admin</span>
 
-          <button
+          <Button
             onClick={handleLogout}
-            className="flex items-center mt-10 text-sm font-semibold"
+            className="flex items-center mt-10 text-sm font-semibold border-none hover:!text-black shadow-none"
           >
-            <img src={link} alt="" className="w-4 mr-2" /> Log Out
-          </button>
+            <img src={link} alt="" className="w-4" /> Log Out
+          </Button>
         </div>
       </Sider>
       <Layout
         className="p-5"
         style={{ marginLeft: collapsed ? "80px" : "200px" }}
       >
-        <div className="fixed w-[82.5%] bg-[#F5F5F5] top-0 z-10 py-4">
+        <div
+          className="fixed bg-[#F5F5F5] top-0 z-10 py-4 px-4" // Added padding left and right
+          style={{
+            left: collapsed ? "80px" : "200px",
+            width: collapsed ? "calc(100% - 80px)" : "calc(100% - 200px)",
+            transition: "left 0.3s, width 0.3s",
+            paddingLeft: "16px", // Added padding left
+            paddingRight: "16px", // Added padding right
+          }}
+        >
           <div className="flex justify-between items-center">
             <div>
               <h2 className="font-bold text-xl">{title}</h2>
@@ -187,7 +209,7 @@ const DashboardLayout = () => {
             </div>
             <div className="flex justify-center items-center">
               <div className="flex justify-center items-center mr-6">
-                <img src={serach} alt="" className="w-5 mr-2" />
+                <img src={search} alt="" className="w-5 mr-2" />
                 <img src={bell} alt="" className="w-5" />
               </div>
               <div className="flex justify-center items-center">

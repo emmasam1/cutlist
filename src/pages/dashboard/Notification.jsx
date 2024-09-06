@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { Link } from "react-router-dom";
-import { Button, Table, Input, Modal, Form } from "antd";
+import { Button, Table, Input, Modal, Form, Dropdown, Menu } from "antd";
 import Notifications from "../../components/notification/Notification";
 import plus from "../../assets/images/icons/plus.png";
 import bell from "../../assets/images/icons/bell.png";
@@ -33,11 +32,66 @@ const Notification = () => {
 
   const handleCancel = () => {
     setIsModalOpen(false);
+    setOpenModal(false);
   };
 
   const onFinish = (values) => {
     console.log("Received values of form: ", values);
   };
+
+  const handleMenuClick = (e, record) => {
+    if (e.key === "update") {
+      console.log("Update", record);
+      // Handle view logic here
+    } else if (e.key === "deactivate") {
+      console.log("Deactivate", record);
+      // Handle edit logic here
+    } else if (e.key === "delete") {
+      console.log("Delete", record);
+      // Handle delete logic here
+    }
+  };
+
+  const getMenu = (record) => (
+    <Menu onClick={(e) => handleMenuClick(e, record)}>
+      <Menu.Item
+        key="update"
+        icon={
+          <img
+            src={edit}
+            alt="Update"
+            style={{ width: "16px", marginRight: "8px" }}
+          />
+        }
+      >
+        Update
+      </Menu.Item>
+      <Menu.Item
+        key="edit"
+        icon={
+          <img
+            src={no_data}
+            alt="Update"
+            style={{ width: "16px", marginRight: "8px" }}
+          />
+        }
+      >
+        Deactivate
+      </Menu.Item>
+      <Menu.Item
+        key="delete"
+        icon={
+          <img
+            src={bin}
+            alt="Delete"
+            style={{ width: "16px", marginRight: "8px" }}
+          />
+        }
+      >
+        Delete
+      </Menu.Item>
+    </Menu>
+  );
 
   const onSearch = (value) => {
     setSearchText(value);
@@ -111,8 +165,8 @@ const Notification = () => {
       render: (status) => {
         const isActive = status === "Active";
         const className = isActive
-          ? "bg-[#5EDA79] text-[#1F7700] px-3 w-20 py-1 rounded-full flex items-center"
-          : "px-3 w-20 py-1 border rounded-full bg-[#FF000042] text-[#FF3D00] flex items-center";
+          ? "bg-[#5EDA79] text-[#1F7700] px-3 w-20 rounded-full flex items-center"
+          : "px-3 w-20 border rounded-full bg-[#FF000042] text-[#FF3D00] flex items-center";
         const statusImage = isActive ? check_green : inactive;
         return (
           <span className={className}>
@@ -140,67 +194,75 @@ const Notification = () => {
     },
     {
       title: "",
-      render: (text, record) => (
-        <span className="flex items-center">
-          <Menu as="div" className="relative inline-block text-left ml-2">
-            <div>
-              <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md py-2 text-sm font-semibold text-gray-900 hover:bg-gray-50">
-                <img
-                  src={dots}
-                  style={{ width: 3, height: 15 }}
-                  className="cursor-pointer"
-                />
-              </MenuButton>
-            </div>
-            <MenuItems className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none">
-              <div className="py-1">
-                <MenuItem>
-                  {({ active }) => (
-                    <Link
-                      to="#"
-                      className={`${
-                        active ? "bg-gray-100 text-gray-900" : "text-gray-700"
-                      } px-4 py-2 text-sm flex items-center`}
-                    >
-                      <img src={edit} alt="Edit" className="w-4 h-4 mr-1" />
-                      Update
-                    </Link>
-                  )}
-                </MenuItem>
-              </div>
-              <div className="py-1">
-                <MenuItem>
-                  {({ active }) => (
-                    <Link
-                      to="#"
-                      className={`${
-                        active ? "bg-gray-100 text-gray-900" : "text-gray-700"
-                      } px-4 py-2 text-sm flex items-center`}
-                    >
-                      <img src={no_data} alt="No Data" className="w-4 h-4 mr-1" />
-                      Deactivate
-                    </Link>
-                  )}
-                </MenuItem>
-              </div>
-              <div className="py-1">
-                <MenuItem>
-                  {({ active }) => (
-                    <Link
-                      to="#"
-                      className={`${
-                        active ? "bg-gray-100 text-gray-900" : "text-gray-700"
-                      } px-4 py-2 text-sm flex items-center`}
-                    >
-                      <img src={bin} alt="Delete" className="w-4 h-4 mr-1" />
-                      Delete
-                    </Link>
-                  )}
-                </MenuItem>
-              </div>
-            </MenuItems>
-          </Menu>
-        </span>
+      key: "operations",
+      render: (_, record) => (
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: "update",
+                label: (
+                  <span className="flex items-center">
+                    <img
+                      src={edit}
+                      alt="update"
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
+                    />
+                    Update
+                  </span>
+                ),
+              },
+              {
+                key: "deactivate",
+                label: (
+                  <span className="flex items-center">
+                    <img
+                      src={no_data}
+                      alt="Deactivate"
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
+                    />
+                    Deactivate
+                  </span>
+                ),
+              },
+              {
+                key: "delete",
+                label: (
+                  <span className="flex items-center">
+                    <img
+                      src={bin}
+                      alt="Delete"
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
+                    />
+                    Delete
+                  </span>
+                ),
+              },
+            ],
+            onClick: (e) => handleMenuClick(e, record),
+          }}
+          trigger={["click"]}
+        >
+          <Button>
+            <img
+              src={dots}
+              alt="Actions"
+              className="flex items-center justify-center w-1"
+            />
+          </Button>
+        </Dropdown>
       ),
     },
   ];
@@ -208,7 +270,7 @@ const Notification = () => {
   return (
     <div className="relative top-14">
       <div className="bg-white rounded p-4">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mb-3">
           <Button
             onClick={showModal}
             className="flex items-center bg-[#F2C94C] hover:!bg-[#F2C94C] border-none hover:!text-black rounded p-2 px-3"
@@ -224,7 +286,7 @@ const Notification = () => {
             />
             <Button
               className="flex items-center bg-[#F2C94C] hover:!bg-[#F2C94C] border-none hover:!text-black rounded p-2 px-3"
-              onClick={()=> setOpenModal(true)}
+              onClick={() => setOpenModal(true)}
             >
               <img src={bell} alt="Bell Icon" className="w-3 mr-1" />
               Send Notification
@@ -234,8 +296,10 @@ const Notification = () => {
         <Table
           columns={columns}
           dataSource={filteredDataSource}
-          pagination={{ pageSize: 7 }}
-          className="custom-table mt-4"
+          size="small"
+          pagination={{ pageSize: 7, position: ["bottomCenter"] }}
+          className="custom-table"
+          scroll={{ x: "max-content" }}
         />
         <Modal
           title="Create Custom Notification"
@@ -253,7 +317,12 @@ const Notification = () => {
             <div className="flex flex-col items-center">
               <Form.Item
                 name="name"
-                rules={[{ required: true, message: "Please enter the Notification Name!" }]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter the Notification Name!",
+                  },
+                ]}
               >
                 <Input
                   placeholder="Notification Name"
@@ -263,7 +332,9 @@ const Notification = () => {
 
               <Form.Item
                 name="description"
-                rules={[{ required: true, message: "Please enter the Description!" }]}
+                rules={[
+                  { required: true, message: "Please enter the Description!" },
+                ]}
               >
                 <TextArea
                   rows={4}

@@ -1,8 +1,6 @@
 import React from "react";
 import { Table, Button } from "antd";
-import { Line } from '@ant-design/plots';
 import { PrinterOutlined } from "@ant-design/icons";
-
 import LineChart3 from "../../components/chart/LineChart3";
 
 import edit from "../../assets/images/icons/edit.png";
@@ -19,7 +17,6 @@ const Dashboard = () => {
     const month = date.toLocaleString("default", { month: "short" });
     const year = date.getFullYear();
 
-    // Function to add the appropriate ordinal suffix
     const getOrdinalSuffix = (day) => {
       if (day > 3 && day < 21) return "th";
       switch (day % 10) {
@@ -36,6 +33,7 @@ const Dashboard = () => {
 
     return `${day}${getOrdinalSuffix(day)} ${month} ${year}`;
   }
+
   const today = new Date();
   const formattedDate = formatDate(today);
 
@@ -98,22 +96,22 @@ const Dashboard = () => {
 
   const recent = [
     {
-        id: 1,
-        name: "Rory Mcllroy",
-        dec: "Made Payments for 10 credits",
-        img: user_1
+      id: 1,
+      name: "Rory Mcllroy",
+      dec: "Made Payments for 10 credits",
+      img: user_1
     },
     {
-        id: 2,
-        name: "Manuel Ugate",
-        dec: "Created a new cutlist",
-        img: user_2
+      id: 2,
+      name: "Manuel Ugate",
+      dec: "Created a new cutlist",
+      img: user_2
     },
     {
-        id: 3,
-        name: "Alxis Sanchez",
-        dec: "Complited a cutlist",
-        img: user_3
+      id: 3,
+      name: "Alxis Sanchez",
+      dec: "Complited a cutlist",
+      img: user_3
     }
   ]
 
@@ -132,6 +130,12 @@ const Dashboard = () => {
   };
 
   const columns = [
+    {
+      title: "SN",
+      key: "sn",
+      render: (text, record, index) => index + 1,
+      width: 50,
+    },
     {
       title: "Customer Name",
       dataIndex: "customer_name",
@@ -206,78 +210,18 @@ const Dashboard = () => {
           onClick={() => handlePrint(record)}
         >
           <PrinterOutlined style={{ fontSize: "18px", marginRight: "5px" }} />{" "}
-          Printer
+          Print
         </span>
       ),
     },
   ];
 
-  const data = [
-    { day: 'Sun' },
-    { day: 'Mon', sales: 200 },
-    { day: 'Tue', sales: 150 },
-    { day: 'Wed', sales: 80 },
-    { day: 'Thu', sales: 170 },
-    { day: 'Fri', sales: 220 },
-    { day: 'Sat', sales: 130 },
-  ];
-
-  const config = {
-    data,
-    xField: 'day',   // Days of the week on the x-axis
-    yField: 'sales', // Sales data on the y-axis
-    smooth: true,    // Optional: for a smooth curve
-    tooltip: {
-      showMarkers: true,
-      formatter: (datum) => ({
-        name: 'Sales',
-        value: datum.sales ? `$${datum.sales}` : 'No Data',
-      }),
-    },
-    point: {
-      size: 5,
-      shape: 'circle',
-    },
-    xAxis: {
-      title: {
-        text: 'Day of the Week',
-        style: {
-          fontSize: 14,
-          fontWeight: 'bold',
-        },
-      },
-    },
-    yAxis: {
-      title: {
-        text: 'Sales',
-        style: {
-          fontSize: 14,
-          fontWeight: 'bold',
-        },
-      },
-    },
-    lineStyle: {
-      stroke: '#5B8FF9',
-      lineWidth: 2,
-    },
-    meta: {
-      day: {
-        alias: 'Day of the Week',
-      },
-      sales: {
-        alias: 'Sales',
-        formatter: (value) => (value ? `$${value}` : 'No Data'),
-      },
-    },
-  };
-
-
   return (
     <div className="relative top-14">
       <div className="mt-5">
-        <div className="grid grid-cols-4 gap-4">
-          <div className="col-span-3">
-            <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          <div className="lg:col-span-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {items.map((e) => (
                 <div
                   className="p-4 rounded-lg"
@@ -304,41 +248,57 @@ const Dashboard = () => {
                 </Button>
               </div>
 
-              <Table
-                columns={columns}
-                dataSource={tableData}
-                className="mt-8"
-                style={{ fontSize: "11px" }}
-              />
+              <div className="overflow-x-auto">
+                <Table
+                  columns={columns}
+                  dataSource={tableData}
+                  className="mt-8 custom-table"
+                  size="middle"
+                  pagination={{
+                    pageSize: 7,
+                    position: ['bottomCenter'], // Position pagination at the bottom center
+                  }}
+                  // className="custom-table"
+                  scroll={{ x: 'max-content' }}
+                  style={{ fontSize: "11px" }}
+                />
+              </div>
             </div>
           </div>
 
-          <div className="col-span-1">
-            <div class="grid grid-rols-3 gap-4">
-              <div class="bg-white rounded p-4 text-center">Item 1</div>
-              <div class="bg-white rounded p-3">
+          <div className="lg:col-span-1">
+            <div className="grid grid-rows-3 gap-4">
+              <div className="bg-white rounded p-4 text-center">Item 1</div>
+              <div className="bg-white rounded p-3">
                 <div className="flex justify-between items-center">
-                <h1 className="font-bold text-lg">Recent Activity</h1>
-                <img src={arrow} alt="" />
+                  <h1 className="font-bold text-lg">Recent Activity</h1>
+                  <img src={arrow} alt="" />
                 </div>
                 <LineChart3 />
               </div>
-              <div class="bg-white rounded p-4">
+              <div className="bg-white rounded p-4">
                 <h1 className="font-bold text-lg">Recent Activity</h1>
                 <div>
-                    {recent.map((e) => (
-                        <div class="grid grid-rols gap-4 mt-2 bg-[#F5F5F5] p-2 rounded-md" key={e.id}>
-                        <div className="flex gap-2">
-                            <div className="rounded-full h-9 w-9 overflow-hidden">
-                              <img src={e.img} alt="" className="w-full object-cover"/>
-                            </div>
-                            <div>
-                                <h1 className="font-semibold">{e.name}</h1>
-                                <p className="text-[.8rem]">{e.dec}</p>
-                            </div>
+                  {recent.map((e) => (
+                    <div
+                      className="grid grid-cols-1 mt-2 bg-[#F5F5F5] p-2 rounded-md"
+                      key={e.id}
+                    >
+                      <div className="flex gap-2">
+                        <div className="rounded-full h-9 w-9 overflow-hidden">
+                          <img
+                            src={e.img}
+                            alt=""
+                            className="w-full object-cover"
+                          />
                         </div>
+                        <div>
+                          <h1 className="font-semibold">{e.name}</h1>
+                          <p className="text-[.8rem]">{e.dec}</p>
+                        </div>
+                      </div>
                     </div>
-                    ))}
+                  ))}
                 </div>
               </div>
             </div>

@@ -63,6 +63,21 @@
   border-radius: 50% !important; 
 }
 
+.custom-table .ant-table-tbody > tr > td {
+  padding: 8px; /* Adjust the padding to reduce row height */
+}
+
+.custom-table .ant-table-tbody > tr {
+  height: 50px; /* Set a fixed height for the rows */
+}
+
+/* .table-container {
+  width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+} */
+
+
 /* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

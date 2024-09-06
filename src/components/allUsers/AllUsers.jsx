@@ -59,6 +59,12 @@ const dataSource = [
 
 const columns = [
   {
+    title: "SN",
+    key: "sn",
+    render: (text, record, index) => index + 1,
+    width: 50,
+  },
+  {
     title: `All Users`,
     dataIndex: "user",
   },
@@ -68,8 +74,8 @@ const columns = [
     render: (status) => {
       const isActive = status === "Active";
       const className = isActive
-        ? "bg-black text-white px-3 rounded-full"
-        : "px-3 border rounded-full";
+      ? "bg-black text-white px-3 rounded-full"
+      : "px-3 border rounded-full";
       return <span className={className}>{status}</span>;
     },
   },
@@ -111,6 +117,7 @@ const AllUsers = () => {
         <Table
         rowSelection={rowSelection}
         columns={columns}
+        size='small'
         dataSource={dataSource}
         pagination={{
           borderRadius: '50%',
