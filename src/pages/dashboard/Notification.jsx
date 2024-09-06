@@ -156,6 +156,11 @@ const Notification = () => {
 
   const columns = [
     {
+      title: "SN",
+      render: (_, __, index) => index + 1,
+      width: 70,
+    },
+    {
       title: "Notification Name",
       dataIndex: "title",
     },

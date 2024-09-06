@@ -179,7 +179,10 @@ const Feedback = () => {
         <Table 
           columns={columns}
           dataSource={filteredDataSource}
-          // pagination={false} 
+          size="small"
+          pagination={{ pageSize: 7, position: ["bottomCenter"] }}
+          className="custom-table"
+          scroll={{ x: "max-content" }}
           rowSelection={{
             onChange: (selectedRowKeys) => setSelectedRowKeys(selectedRowKeys),
           }}

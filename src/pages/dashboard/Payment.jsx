@@ -49,6 +49,11 @@ const Payment = () => {
 
   const columns = [
     {
+      title: "SN",
+      render: (_, __, index) => index + 1,
+      width: 70,
+    },
+    {
       title: "Customer Name",
       dataIndex: "customer_name",
       key: "customer_name",

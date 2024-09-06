@@ -162,16 +162,20 @@ const DashboardLayout = () => {
         />
 
         <div className="flex justify-center items-center flex-col relative top-10">
-          <div className="rounded-full w-11 h-11 bg-slate-800"></div>
+          {/* <div className="rounded-full w-11 h-11 bg-slate-800"></div>
           <p className="mt-3 font-semibold text-sm">Paul Yonder</p>
-          <span className="text-[.8rem] -mt-1">Admin</span>
+          <span className="text-[.8rem] -mt-1">Admin</span> */}
 
-          <Button
-            onClick={handleLogout}
-            className="flex items-center mt-10 text-sm font-semibold border-none hover:!text-black shadow-none"
-          >
-            <img src={link} alt="" className="w-4" /> Log Out
-          </Button>
+<Button
+  onClick={handleLogout}
+  className={`flex items-center mt-10 text-sm font-semibold border-none hover:!text-black shadow-none ${
+    collapsed ? "justify-center" : ""
+  }`}
+>
+  <img src={link} alt="" className="w-4" />
+  {!collapsed && <span className="hidden sm:inline">Log Out</span>}
+</Button>
+
         </div>
       </Sider>
       <Layout
