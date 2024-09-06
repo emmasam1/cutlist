@@ -12,12 +12,20 @@ const Login = () => {
 
   return (
     <div
-      className="relative bg-contain bg-center bg-no-repeat w-full h-screen"
-      style={{ backgroundImage: `url(${woodworker})` }}
+      className="relative w-full h-screen flex justify-center items-center px-4"
+      style={{
+        backgroundImage: `url(${woodworker})`,
+        backgroundSize: "contain",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
     >
+      {/* Overlay for dark effect */}
       <div className="absolute inset-0 bg-black opacity-50"></div>
-      <div className="relative z-10 flex justify-center items-center h-screen px-4">
-        <Card className="">
+
+      {/* Content */}
+      <div className="relative z-10 w-full sm:w-auto max-w-sm">
+        <Card className="w-full">
           <h1 className="text-center text-2xl md:text-3xl font-bold mb-4">
             Enter your contact details
           </h1>
@@ -29,16 +37,16 @@ const Login = () => {
             name="login"
             initialValues={{ remember: true }}
             onFinish={onFinish}
-            layout="vertical" // This ensures labels are on top
+            layout="vertical"
           >
-            <div className="m-auto w-full md:w-60">
+            <div className="m-auto w-full">
               <Form.Item
                 label="Full Name"
                 name="full_name"
                 rules={[
                   { required: true, message: "Please input your full name!" },
                 ]}
-                style={{ marginBottom: 8 }} // Close the gap between label and input
+                style={{ marginBottom: 8 }}
               >
                 <Input
                   prefix={<UserOutlined />}
@@ -56,11 +64,14 @@ const Login = () => {
                   },
                 ]}
               >
-                <Input prefix={<PhoneOutlined />} placeholder="Phone number" />
+                <Input
+                  prefix={<PhoneOutlined />}
+                  placeholder="Phone number"
+                />
               </Form.Item>
             </div>
 
-            <Form.Item className="flex items-center w-full md:w-80 m-auto border-t-[.9px] border-black mt-4">
+            <Form.Item className="flex items-center w-full border-t-[.9px] border-black mt-4">
               <Form.Item name="remember" valuePropName="checked" noStyle>
                 <Checkbox>
                   <span className="text-xs md:text-sm">
@@ -81,6 +92,15 @@ const Login = () => {
           </Form>
         </Card>
       </div>
+
+      {/* Responsive background removal */}
+      <style jsx>{`
+        @media (max-width: 768px) {
+          div[style*="background-image"] {
+            background-image: none !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };
