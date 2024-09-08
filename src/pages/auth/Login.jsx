@@ -27,7 +27,7 @@ const Login = () => {
       <div className="relative z-10 w-full sm:w-auto max-w-sm">
         <Card className="w-full">
           <h1 className="text-center text-2xl md:text-2xl font-bold mb-4">
-            Enter your contact details
+            Enter Login Credentials
           </h1>
           <p className="text-center md:text-sm text-sm mb-6">
             Provide your name and phone number to sign in
