@@ -40,34 +40,35 @@ const Login = () => {
             layout="vertical"
           >
             <div className="m-auto w-full">
-              <Form.Item
-                label="Full Name"
-                name="full_name"
-                rules={[
-                  { required: true, message: "Please input your full name!" },
-                ]}
-                style={{ marginBottom: 8 }}
-              >
-                <Input
-                  prefix={<UserOutlined />}
-                  placeholder="Enter your name"
-                />
-              </Form.Item>
-
+              {/* Phone Number Input with +234 as default prefix */}
               <Form.Item
                 label="Phone Number"
                 name="phone"
                 rules={[
                   {
                     required: true,
-                    message: "Please input your Phone number!",
+                    message: "Please input your phone number!",
                   },
                 ]}
               >
                 <Input
-                  prefix={<PhoneOutlined />}
-                  placeholder="Phone number"
+                  addonBefore="+234" // Adds the +234 prefix to the input
+                  placeholder="8012234566"
                 />
+              </Form.Item>
+
+              {/* Password Input */}
+              <Form.Item
+                label="Password"
+                name="password"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your password!",
+                  },
+                ]}
+              >
+                <Input.Password placeholder="Enter your password" />
               </Form.Item>
             </div>
 

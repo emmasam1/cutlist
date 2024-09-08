@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import link from "../assets/images/icons/link.png";
 import logo from "../assets/images/icons/logo_small.png";
-import search from "../assets/images/icons/search.png";
 import bell from "../assets/images/icons/bell.png";
 import dashboard from "../assets/images/icons/dashboard.png";
 import user_outline_2 from "../assets/images/icons/user_outline_2.png";
@@ -166,16 +165,15 @@ const DashboardLayout = () => {
           <p className="mt-3 font-semibold text-sm">Paul Yonder</p>
           <span className="text-[.8rem] -mt-1">Admin</span> */}
 
-<Button
-  onClick={handleLogout}
-  className={`flex items-center mt-10 text-sm font-semibold border-none hover:!text-black shadow-none ${
-    collapsed ? "justify-center" : ""
-  }`}
->
-  <img src={link} alt="" className="w-4" />
-  {!collapsed && <span className="hidden sm:inline">Log Out</span>}
-</Button>
-
+          <Button
+            onClick={handleLogout}
+            className={`flex items-center mt-10 text-sm font-semibold border-none hover:!text-black shadow-none ${
+              collapsed ? "justify-center" : ""
+            }`}
+          >
+            <img src={link} alt="" className="w-4" />
+            {!collapsed && <span className="hidden sm:inline">Log Out</span>}
+          </Button>
         </div>
       </Sider>
       <Layout
@@ -213,10 +211,9 @@ const DashboardLayout = () => {
             </div>
             <div className="flex justify-center items-center">
               <div className="flex justify-center items-center mr-6">
-                <img src={search} alt="" className="w-5 mr-2" />
                 <img src={bell} alt="" className="w-5" />
               </div>
-              <div className="flex justify-center items-center">
+              <div className="hidden sm:flex justify-center items-center">
                 <div className="rounded-full w-10 h-10 bg-slate-800 mr-1"></div>
                 <div>
                   <p className="font-semibold text-[.9rem] relative top-1">

@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import './App.css'
+import "./App.css";
 import LandingPage from "./pages/auth/LandingPage";
 import Login from "./pages/auth/Login";
 import DashboardLayout from "./layout/DashboardLayout";
@@ -12,30 +12,30 @@ import Payment from "./pages/dashboard/Payment";
 import Feedback from "./pages/dashboard/Feedback";
 import Cutlist from "./pages/dashboard/Cutlist";
 import ScrollTop from "./components/top/ScrollTop";
-
+import { Context } from "./context/Context";
 
 function App() {
-  
-
   return (
-    <Router>
-      <ScrollTop />
-      <Routes>
-        <Route path="/" element={<LandingPage />}></Route>
-        <Route path="login" element={<Login/>}></Route>
-        <Route path="" element={<DashboardLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} ></Route>
-          <Route path="/users" element={<User />} ></Route>
-          <Route path="/user/:userId" element={<UserDetailsPage />} />
-          <Route path="/credit-packages" element={<Credit />} ></Route>
-          <Route path="/notification" element={<Notification />} ></Route>
-          <Route path="/payment" element={<Payment />} ></Route>
-          <Route path="/feedback" element={<Feedback />} ></Route>
-          <Route path="/cutlist" element={<Cutlist />} ></Route>
-        </Route>
-      </Routes>
-    </Router>
-  )
+    <Context>
+      <Router>
+        <ScrollTop />
+        <Routes>
+          <Route path="/" element={<LandingPage />}></Route>
+          <Route path="login" element={<Login />}></Route>
+          <Route path="" element={<DashboardLayout />}>
+            <Route path="/dashboard" element={<Dashboard />}></Route>
+            <Route path="/users" element={<User />}></Route>
+            <Route path="/user/:userId" element={<UserDetailsPage />} />
+            <Route path="/credit-packages" element={<Credit />}></Route>
+            <Route path="/notification" element={<Notification />}></Route>
+            <Route path="/payment" element={<Payment />}></Route>
+            <Route path="/feedback" element={<Feedback />}></Route>
+            <Route path="/cutlist" element={<Cutlist />}></Route>
+          </Route>
+        </Routes>
+      </Router>
+    </Context>
+  );
 }
 
-export default App
+export default App;
