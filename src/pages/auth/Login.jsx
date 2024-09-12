@@ -33,14 +33,8 @@ const Login = () => {
       setLoggedInUser(user)
       console.log(response)
 
-      // Check if OTP is required
-      if (response === "User not verified") {
-        console.log("Navigating to OTP verification page...");
-        navigate('/otp-verification', { state: { phoneNumber: fullPhoneNumber } });
-      } else {
-        console.log("Navigating to dashboard...");
-        navigate('/dashboard');
-      }
+      navigate('/dashboard');
+     
     } catch (error) {
       console.error('Login error:', error);
       message.error(error.response?.data?.message || "Login failed. Please try again.");
@@ -134,17 +128,6 @@ const Login = () => {
               </button>
             </Form.Item>
 
-            <div style={{ textAlign: "center", marginTop: "20px" }}>
-              <p>
-                Don't have an account?{" "}
-                <Link
-                  to="/admin-registration"
-                  style={{ fontWeight: "bold", color: "#1890ff" }}
-                >
-                  Proceed to Register
-                </Link>
-              </p>
-            </div>
           </Form>
         </Card>
       </div>
