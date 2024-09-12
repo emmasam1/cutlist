@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Context } from "../context/Context";
+import Cookies from "js-cookie";
+
 import link from "../assets/images/icons/link.png";
 import logo from "../assets/images/icons/logo_small.png";
 import bell from "../assets/images/icons/bell.png";
@@ -80,10 +83,11 @@ const items = [
 
 const DashboardLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const { baseUrl, setLoggedInUser, loggedInUser } = useContext(Context);
   const navigate = useNavigate();
-  const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken();
+  // const {
+  //   token: { colorBgContainer, borderRadiusLG },
+  // } = theme.useToken();
 
   const location = useLocation();
 
@@ -114,8 +118,8 @@ const DashboardLayout = () => {
   };
 
   const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
+    Cookies.remove('loggedInUser');
+    navigate("/admin-login");
   };
 
   // Collapse the sidebar on mobile devices
@@ -217,7 +221,7 @@ const DashboardLayout = () => {
                 <div className="rounded-full w-10 h-10 bg-slate-800 mr-1"></div>
                 <div>
                   <p className="font-semibold text-[.9rem] relative top-1">
-                    Paul Yonder
+                    {loggedInUser?.fullName}
                   </p>
                   <span className="text-[.8rem] relative -top-1">Admin</span>
                 </div>

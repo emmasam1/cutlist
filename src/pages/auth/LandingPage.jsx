@@ -18,7 +18,7 @@ const LandingPage = () => {
           <h1 className="font-bold text-4xl">Elevate your </h1>
           <h1 className="font-bold text-4xl">craftsmanship</h1>
           <p className="text-sm mt-3 text-[#415371]">Perfect cut lists at your fingertips</p>
-          <Link to="/login" className="flex items-center bg-[#F2C94C] p-2 rounded-xl mt-8 px-6 text-sm">
+          <Link to="/admin-login" className="flex items-center bg-[#F2C94C] p-2 rounded-xl mt-8 px-6 text-sm">
             Continue <img src={arrow} alt="arrow" className="w-4 ml-3" />
           </Link>
         </div>
