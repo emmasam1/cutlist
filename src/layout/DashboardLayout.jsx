@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Context } from "../context/Context";
 import Cookies from "js-cookie";
-
 import link from "../assets/images/icons/link.png";
 import logo from "../assets/images/icons/logo_small.png";
 import bell from "../assets/images/icons/bell.png";
@@ -13,7 +12,6 @@ import coin_dark from "../assets/images/icons/coin_dark.png";
 import bell_dark from "../assets/images/icons/bell_dark.png";
 import wallet from "../assets/images/icons/wallet.png";
 import feedback from "../assets/images/icons/feedback.png";
-
 import { Layout, Menu, Button } from "antd";
 
 const { Sider } = Layout;
@@ -48,6 +46,7 @@ function formatDate(date) {
 
   return `${day}${getOrdinalSuffix(day)} ${month} ${year}`;
 }
+
 const today = new Date();
 const formattedDate = formatDate(today);
 
@@ -63,7 +62,7 @@ const items = [
 
 const DashboardLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const { login } = useContext(Context);
+  const { loggedInUser, logout } = useContext(Context);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -103,7 +102,9 @@ const DashboardLayout = () => {
   };
 
   const handleLogout = () => {
-    Cookies.remove('login');
+    Cookies.remove('loggedInUser'); // Updated to correct cookie name
+    Cookies.remove('accessToken');   // Remove accessToken cookie
+    logout(); // Call logout from context
     navigate("/admin-login");
   };
 
@@ -190,7 +191,7 @@ const DashboardLayout = () => {
                 <div className="rounded-full w-10 h-10 bg-slate-800 mr-1"></div>
                 <div>
                   <p className="font-semibold text-[.9rem] relative top-1">
-                    {login?.fullName}
+                    {loggedInUser?.fullName || 'Guest'}
                   </p>
                   <span className="text-[.8rem] relative -top-1">Admin</span>
                 </div>

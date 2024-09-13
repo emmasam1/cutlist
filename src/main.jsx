@@ -7,7 +7,6 @@ import { ContextProvider } from './context/Context.jsx'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ContextProvider>
-
     <App />
     </ContextProvider>
   </StrictMode>,

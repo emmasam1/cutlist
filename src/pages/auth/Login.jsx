@@ -13,35 +13,6 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // const onFinish = async (values) => {
-  //   setLoading(true);
-  //   const loginUrl = `${baseUrl}/account/login`;
-  //   const fullPhoneNumber = `+234${values.phoneNumber}`;
-
-  //   try {
-  //     const response = await axios.post(loginUrl, {
-  //       phoneNumber: fullPhoneNumber,
-  //       password: values.password,
-  //     });
-
-  //     const user = response.data.data.user;
-  //     const access_token = response.data.data.access_token
-  //     console.log(access_token)
-  //     setLoggedInUser(user);
-      
-  //     // Set the cookie
-  //     Cookies.set("loggedInUser", JSON.stringify(user), { expires: 7, path: '/' });
-
-  //     console.log(response);
-  //     navigate('/dashboard');
-     
-  //   } catch (error) {
-  //     console.error('Login error:', error);
-  //     message.error(error.response?.data?.message || "Login failed. Please try again.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const onFinish = async (values) => {
     setLoading(true);

@@ -10,7 +10,21 @@ import policy from "../../assets/images/icons/policy.png";
 
 const UserDetailsPage = () => {
   const location = useLocation();
-  const { record } = location.state || {};
+  const { state } = location;
+  const record = state?.record;
+
+  // Log the record to the console
+  console.log("UserDetailsPage record:", record);
+
+  if (!record) {
+    return (
+      <div className="relative top-14 p-4">
+        <div className="bg-white rounded p-4">
+          <p>No user data available.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative top-14 p-4">
@@ -19,12 +33,14 @@ const UserDetailsPage = () => {
           <div className="flex items-center">
             <div className="rounded-full w-10 h-10 bg-slate-800 mr-2"></div>
             <div>
-              <h2 className="font-bold">Manuel Ugate</h2>
+              <h2 className="font-bold">{record.fullName || "No Name"}</h2>
               <div className="flex items-center justify-between w-full md:w-48">
-                <p className="text-[.8rem]">+234 7998902227</p>
+                <p className="text-[.8rem]">{record.phoneNumber || "No Phone"}</p>
                 <div className="flex items-center">
                   <img src={no_data} alt="" className="w-3 mr-1" />
-                  <span className="italic text-[.8rem]">Unverified</span>
+                  <span className="italic text-[.8rem]">
+                    {record.isVerified ? "Verified" : "Unverified"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -33,7 +49,7 @@ const UserDetailsPage = () => {
             <p>Credit Balance</p>
             <div className="flex items-center mt-1 pl-2">
               <img src={coin} alt="" className="w-7" />
-              <span className="font-bold text-lg">15</span>
+              <span className="font-bold text-lg">{record.creditBalance || "0"}</span>
             </div>
             <div className="flex items-center mt-1">
               <img src={wallet} alt="" className="w-4 mr-2" />
@@ -47,21 +63,21 @@ const UserDetailsPage = () => {
           <div>
             <div className="flex items-center">
               <h2 className="font-bold mr-2">Name:</h2>
-              <h2>Manuel Ugate</h2>
+              <h2>{record.name || "No Name"}</h2>
             </div>
             <div className="flex items-center mt-4">
               <h2 className="font-bold mr-2">Email:</h2>
-              <h2>emanuelUgate@utd.org</h2>
+              <h2>{record.email || "No Email"}</h2>
             </div>
           </div>
           <div>
             <div className="flex items-center">
               <h2 className="font-bold mr-2">Username:</h2>
-              <h2>Manuel Ugate</h2>
+              <h2>{record.username || "No Username"}</h2>
             </div>
             <div className="flex items-center mt-4">
               <h2 className="font-bold mr-2">Location:</h2>
-              <h2>Carrington, old Trafford</h2>
+              <h2>{record.location || "No Location"}</h2>
             </div>
           </div>
         </div>
@@ -71,21 +87,21 @@ const UserDetailsPage = () => {
           <div>
             <div className="flex items-center">
               <h2 className="font-bold mr-2">Projects Created:</h2>
-              <span>12</span>
+              <span>{record.projectsCreated || "0"}</span>
             </div>
             <div className="flex items-center mt-3">
               <h2 className="font-bold mr-2">Cutlists Created:</h2>
-              <span>26</span>
+              <span>{record.cutlistsCreated || "0"}</span>
             </div>
           </div>
           <div>
             <div className="flex items-center">
               <h2 className="font-bold mr-2">Projects Completed:</h2>
-              <span>7</span>
+              <span>{record.projectsCompleted || "0"}</span>
             </div>
             <div className="flex items-center mt-3">
               <h2 className="font-bold mr-2">Cutlists Completed:</h2>
-              <span>18</span>
+              <span>{record.cutlistsCompleted || "0"}</span>
             </div>
           </div>
           <div>
@@ -93,10 +109,8 @@ const UserDetailsPage = () => {
             <div className="shadow-lg flex items-center p-3 rounded">
               <img src={policy} alt="" className="mr-2 w-5" />
               <div>
-                <h2 className="font-bold">Dane’s Lounge</h2>
-                <p className="text-[.7rem]">
-                  3 flush doors and a small window...
-                </p>
+                <h2 className="font-bold">{record.recentWorkTitle || "No Recent Work"}</h2>
+                <p className="text-[.7rem]">{record.recentWorkDescription || "No Description"}</p>
               </div>
             </div>
           </div>
