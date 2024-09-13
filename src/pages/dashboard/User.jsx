@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Input, Table, Button, Dropdown, Menu, Modal } from "antd";
+import { Input, Table, Button, Dropdown, Menu, Modal, Form } from "antd";
+import { PhoneOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import check from "../../assets/images/icons/check.png";
 import no_data from "../../assets/images/icons/no_data.png";
@@ -185,9 +186,9 @@ const User = () => {
     setIsAnyChecked(newSelectedRowKeys.length > 0);
   };
 
-  const handleUser =() => {
-    setIsOpen()
-  }
+  const handleUser = () => {
+    setIsOpen();
+  };
 
   const rowSelection = {
     selectedRowKeys,
@@ -420,19 +421,47 @@ const User = () => {
         footer={null}
         // width={1000}
       >
-        <div className="flex justify-end">
-          <Button className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded border-none hover:!text-black px-10">
-            Edit
-          </Button>
-        </div>
-       
-        <div className="flex justify-end mt-4">
-          <Button className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10">
-            {" "}
-            Save List
-           
-          </Button>
-        </div>
+        <Form name="user" layout="vertical">
+          <div className="m-auto w-full">
+          <Form.Item
+                label="Full Name"
+                name="fullName"
+                rules={[
+                  { required: true, message: 'Please input full name!' },
+                ]}
+              >
+                <Input.Password placeholder="Enter your password" />
+              </Form.Item>
+
+            <Form.Item
+              label="Phone Number"
+              name="phoneNumber"
+              rules={[
+                { required: true, message: "Please input your phone number!" },
+                {
+                  pattern: /^[0-9]{10}$/,
+                  message: "Please enter a valid phone number",
+                },
+              ]}
+            >
+              <Input
+                prefix={<PhoneOutlined />}
+                addonBefore="+234"
+                placeholder="8012345678"
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Password"
+              name="password"
+              rules={[
+                { required: true, message: "Please input your password!" },
+              ]}
+            >
+              <Input.Password placeholder="Enter your password" />
+            </Form.Item>
+          </div>
+        </Form>
       </Modal>
     </div>
   );

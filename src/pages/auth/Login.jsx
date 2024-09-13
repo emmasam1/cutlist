@@ -79,6 +79,7 @@ const Login = () => {
               <Form.Item
                 label="Phone Number"
                 name="phoneNumber"
+                className='mb-0'
                 rules={[
                   { required: true, message: 'Please input your phone number!' },
                   { pattern: /^[0-9]{10}$/, message: 'Please enter a valid phone number' },
