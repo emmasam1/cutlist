@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Input, Table, Button, Dropdown, Menu } from "antd";
+import { Input, Table, Button, Dropdown, Menu, Modal } from "antd";
 import { Link } from "react-router-dom";
 import check from "../../assets/images/icons/check.png";
 import no_data from "../../assets/images/icons/no_data.png";
@@ -13,13 +13,55 @@ import bell from "../../assets/images/icons/bell.png";
 import Notification from "../../components/notification/Notification";
 
 const fullDataSource = [
-  { key: 0, user: "Edward King 0", status: "Active", phone_number: "555-1234-0", isVerified: "Verified Phone number" },
-  { key: 1, user: "Edward King 1", status: "Offline", phone_number: "555-1234-1", isVerified: "Unverified Phone number" },
-  { key: 2, user: "Edward King 2", status: "Active", phone_number: "555-1234-2", isVerified: "Verified Phone number" },
-  { key: 3, user: "Edward King 3", status: "Offline", phone_number: "555-1234-3", isVerified: "Verified Phone number" },
-  { key: 4, user: "Edward King 4", status: "Active", phone_number: "555-1234-4", isVerified: "Verified Phone number" },
-  { key: 5, user: "Edward King 5", status: "Offline", phone_number: "555-1234-5", isVerified: "Unverified Phone number" },
-  { key: 6, user: "Edward King 6", status: "Active", phone_number: "555-1234-6", isVerified: "Verified Phone number" },
+  {
+    key: 0,
+    user: "Edward King 0",
+    status: "Active",
+    phone_number: "555-1234-0",
+    isVerified: "Verified Phone number",
+  },
+  {
+    key: 1,
+    user: "Edward King 1",
+    status: "Offline",
+    phone_number: "555-1234-1",
+    isVerified: "Unverified Phone number",
+  },
+  {
+    key: 2,
+    user: "Edward King 2",
+    status: "Active",
+    phone_number: "555-1234-2",
+    isVerified: "Verified Phone number",
+  },
+  {
+    key: 3,
+    user: "Edward King 3",
+    status: "Offline",
+    phone_number: "555-1234-3",
+    isVerified: "Verified Phone number",
+  },
+  {
+    key: 4,
+    user: "Edward King 4",
+    status: "Active",
+    phone_number: "555-1234-4",
+    isVerified: "Verified Phone number",
+  },
+  {
+    key: 5,
+    user: "Edward King 5",
+    status: "Offline",
+    phone_number: "555-1234-5",
+    isVerified: "Unverified Phone number",
+  },
+  {
+    key: 6,
+    user: "Edward King 6",
+    status: "Active",
+    phone_number: "555-1234-6",
+    isVerified: "Verified Phone number",
+  },
 ];
 
 const handleMenuClick = (e, record) => {
@@ -109,9 +151,21 @@ const getMenu = (record) => (
 const count = fullDataSource.length;
 
 const sections = [
-  { title: "Create cutlist", description: "Create new cutlist and get active", options: ["None", "In-app", "Phone number"] },
-  { title: "Outstanding Cutlist", description: "You have had outstanding task for", options: ["None", "In-app", "Phone number"] },
-  { title: "Purchase Credits", description: "You have run out of credits, purchase credits", options: ["None", "In-app", "Phone number"] },
+  {
+    title: "Create cutlist",
+    description: "Create new cutlist and get active",
+    options: ["None", "In-app", "Phone number"],
+  },
+  {
+    title: "Outstanding Cutlist",
+    description: "You have had outstanding task for",
+    options: ["None", "In-app", "Phone number"],
+  },
+  {
+    title: "Purchase Credits",
+    description: "You have run out of credits, purchase credits",
+    options: ["None", "In-app", "Phone number"],
+  },
 ];
 
 const User = () => {
@@ -120,6 +174,7 @@ const User = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [isAnyChecked, setIsAnyChecked] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -129,6 +184,10 @@ const User = () => {
     setSelectedRowKeys(newSelectedRowKeys);
     setIsAnyChecked(newSelectedRowKeys.length > 0);
   };
+
+  const handleUser =() => {
+    setIsOpen()
+  }
 
   const rowSelection = {
     selectedRowKeys,
@@ -187,7 +246,7 @@ const User = () => {
       // colSpan: 2,
       // width: 220,
     },
-    
+
     {
       title: "",
       key: "operations",
@@ -198,11 +257,18 @@ const User = () => {
               {
                 key: "view",
                 label: (
-                  <Link to={`/user/${record.key}`} className="flex items-center">
+                  <Link
+                    to={`/user/${record.key}`}
+                    className="flex items-center"
+                  >
                     <img
                       src={user}
                       alt="View"
-                      style={{ width: "17px", height: "17px", marginRight: "8px" }}
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
                     />
                     View profile
                   </Link>
@@ -215,7 +281,11 @@ const User = () => {
                     <img
                       src={edit}
                       alt="Edit"
-                      style={{ width: "17px", height: "17px", marginRight: "8px" }}
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
                     />
                     Update
                   </span>
@@ -228,7 +298,11 @@ const User = () => {
                     <img
                       src={no_data}
                       alt="Block"
-                      style={{ width: "17px", height: "17px", marginRight: "8px" }}
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
                     />
                     Block
                   </span>
@@ -241,7 +315,11 @@ const User = () => {
                     <img
                       src={notification}
                       alt="Notification"
-                      style={{ width: "17px", height: "17px", marginRight: "8px" }}
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
                     />
                     Send Notification
                   </span>
@@ -254,7 +332,11 @@ const User = () => {
                     <img
                       src={bin}
                       alt="Delete"
-                      style={{ width: "17px", height: "17px", marginRight: "8px" }}
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
                     />
                     Delete
                   </span>
@@ -295,7 +377,10 @@ const User = () => {
               Send Notification
             </button>
           ) : (
-            <Button className="rounded px-2 h-8 font-semibold bg-[#F1B31C] hover:!bg-[#F1B31C] hover:!text-black border-none flex items-center">
+            <Button
+              className="rounded px-2 h-8 font-semibold bg-[#F1B31C] hover:!bg-[#F1B31C] hover:!text-black border-none flex items-center"
+              onClick={() => setIsOpen(true)}
+            >
               <img src={plus} alt="" className="mr-2 w-3" />
               Add User
             </Button>
@@ -306,9 +391,9 @@ const User = () => {
           columns={columns}
           dataSource={filteredDataSource}
           size="small"
-          pagination={{ pageSize: 7, position: ['bottomCenter'] }}
+          pagination={{ pageSize: 7, position: ["bottomCenter"] }}
           className="custom-table"
-          scroll={{ x: 'max-content' }}
+          scroll={{ x: "max-content" }}
         />
       </div>
 
@@ -318,11 +403,37 @@ const User = () => {
         modalTitle="Send Notifications"
         modalText="Manage notifications to send out"
         sections={sections}
-        handleSendClick={() => { /* Handle send button click logic */ }}
+        handleSendClick={() => {
+          /* Handle send button click logic */
+        }}
         confirmLoading={confirmLoading}
         isAnyChecked={isAnyChecked}
-        handleCheckboxChange={() => { /* Handle checkbox change logic */ }}
+        handleCheckboxChange={() => {
+          /* Handle checkbox change logic */
+        }}
       />
+
+      <Modal
+        title="Add User"
+        open={isOpen}
+        onCancel={handleUser}
+        footer={null}
+        // width={1000}
+      >
+        <div className="flex justify-end">
+          <Button className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded border-none hover:!text-black px-10">
+            Edit
+          </Button>
+        </div>
+       
+        <div className="flex justify-end mt-4">
+          <Button className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10">
+            {" "}
+            Save List
+           
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 };

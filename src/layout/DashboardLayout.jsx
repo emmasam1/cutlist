@@ -14,7 +14,7 @@ import bell_dark from "../assets/images/icons/bell_dark.png";
 import wallet from "../assets/images/icons/wallet.png";
 import feedback from "../assets/images/icons/feedback.png";
 
-import { Layout, Menu, theme, Button } from "antd";
+import { Layout, Menu, Button } from "antd";
 
 const { Sider } = Layout;
 
@@ -52,65 +52,50 @@ const today = new Date();
 const formattedDate = formatDate(today);
 
 const items = [
-  getItem(
-    "Dashboard",
-    "/dashboard",
-    <img src={dashboard} alt="" className="w-1" />
-  ),
-  getItem(
-    "Users",
-    "/users",
-    <img src={user_outline_2} alt="" className="w-1" />
-  ),
+  getItem("Dashboard", "/dashboard", <img src={dashboard} alt="" className="w-1" />),
+  getItem("Users", "/users", <img src={user_outline_2} alt="" className="w-1" />),
   getItem("Cutlist", "/cutlist", <img src={policy_2} alt="" className="w-1" />),
-  getItem(
-    "Credit Packages",
-    "/credit-packages",
-    <img src={coin_dark} alt="" className="w-4" />
-  ),
-  getItem(
-    "Notification",
-    "/notification",
-    <img src={bell_dark} alt="" className="w-1" />
-  ),
+  getItem("Credit Packages", "/credit-packages", <img src={coin_dark} alt="" className="w-4" />),
+  getItem("Notification", "/notification", <img src={bell_dark} alt="" className="w-1" />),
   getItem("Payments", "/payment", <img src={wallet} alt="" className="w-5" />),
-  getItem(
-    "Feedback",
-    "/feedback",
-    <img src={feedback} alt="" className="w-4" />
-  ),
+  getItem("Feedback", "/feedback", <img src={feedback} alt="" className="w-4" />),
 ];
 
 const DashboardLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const { baseUrl, setLoggedInUser, loggedInUser } = useContext(Context);
+  const { loggedInUser } = useContext(Context);
   const navigate = useNavigate();
-  // const {
-  //   token: { colorBgContainer, borderRadiusLG },
-  // } = theme.useToken();
-
   const location = useLocation();
 
   let title = "Default Title";
 
-  if (location.pathname === "/dashboard") {
-    title = "Dashboard";
-  } else if (location.pathname === "/users") {
-    title = "Users";
-  } else if (location.pathname.startsWith("/user/")) {
-    title = "User Profile";
-  } else if (location.pathname === "/cutlist") {
-    title = "Cutlist";
-  } else if (location.pathname === "/credit-packages") {
-    title = "Credit Packages";
-  } else if (location.pathname === "/notification") {
-    title = "Notification";
-  } else if (location.pathname === "/payment") {
-    title = "Payments";
-  } else if (location.pathname === "/feedback") {
-    title = "Feedbacks";
-  } else {
-    title = "";
+  switch (location.pathname) {
+    case "/dashboard":
+      title = "Dashboard";
+      break;
+    case "/users":
+      title = "Users";
+      break;
+    case location.pathname.startsWith("/user/") && "/user/":
+      title = "User Profile";
+      break;
+    case "/cutlist":
+      title = "Cutlist";
+      break;
+    case "/credit-packages":
+      title = "Credit Packages";
+      break;
+    case "/notification":
+      title = "Notification";
+      break;
+    case "/payment":
+      title = "Payments";
+      break;
+    case "/feedback":
+      title = "Feedbacks";
+      break;
+    default:
+      title = "";
   }
 
   const handleMenuClick = (e) => {
@@ -122,14 +107,9 @@ const DashboardLayout = () => {
     navigate("/admin-login");
   };
 
-  // Collapse the sidebar on mobile devices
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setCollapsed(true);
-      } else {
-        setCollapsed(false);
-      }
+      setCollapsed(window.innerWidth < 768);
     };
     window.addEventListener("resize", handleResize);
     handleResize();
@@ -163,17 +143,10 @@ const DashboardLayout = () => {
           className="custom-menu"
           onClick={handleMenuClick}
         />
-
         <div className="flex justify-center items-center flex-col relative top-10">
-          {/* <div className="rounded-full w-11 h-11 bg-slate-800"></div>
-          <p className="mt-3 font-semibold text-sm">Paul Yonder</p>
-          <span className="text-[.8rem] -mt-1">Admin</span> */}
-
           <Button
             onClick={handleLogout}
-            className={`flex items-center mt-10 text-sm font-semibold border-none hover:!text-black shadow-none ${
-              collapsed ? "justify-center" : ""
-            }`}
+            className={`flex items-center mt-10 text-sm font-semibold border-none hover:!text-black shadow-none ${collapsed ? "justify-center" : ""}`}
           >
             <img src={link} alt="" className="w-4" />
             {!collapsed && <span className="hidden sm:inline">Log Out</span>}
@@ -185,32 +158,28 @@ const DashboardLayout = () => {
         style={{ marginLeft: collapsed ? "80px" : "200px" }}
       >
         <div
-          className="fixed bg-[#F5F5F5] top-0 z-10 py-4 px-4" // Added padding left and right
+          className="fixed bg-[#F5F5F5] top-0 z-10 py-4 px-4"
           style={{
             left: collapsed ? "80px" : "200px",
             width: collapsed ? "calc(100% - 80px)" : "calc(100% - 200px)",
             transition: "left 0.3s, width 0.3s",
-            paddingLeft: "16px", // Added padding left
-            paddingRight: "16px", // Added padding right
+            paddingLeft: "16px",
+            paddingRight: "16px",
           }}
         >
           <div className="flex justify-between items-center">
             <div>
               <h2 className="font-bold text-xl">{title}</h2>
-              {title === "Users" ? (
-                <p className="text-[.8rem]">Manage your users</p>
-              ) : title === "Credit Packages" ? (
-                <p className="text-[.8rem]">Manage credit packages</p>
-              ) : title === "User Profile" ? (
-                <p className="text-[.8rem]">Manage credit packages</p>
-              ) : title === "Payments" ? (
-                <p className="text-[.8rem]">Manage and monitor payments</p>
-              ) : title === "Feedbacks" ? (
-                <p className="text-[.8rem]">Manage and reply to feedbacks</p>
-              ) : title === "Cutlist" ? (
-                <p className="text-[.8rem]">Manage users cutlist</p>
-              ) : (
-                <p className="text-[.8rem]">{formattedDate}</p>
+              {title && (
+                <p className="text-[.8rem]">
+                  {title === "Users" ? "Manage your users" :
+                   title === "Credit Packages" ? "Manage credit packages" :
+                   title === "User Profile" ? "Manage user profile" :
+                   title === "Payments" ? "Manage and monitor payments" :
+                   title === "Feedbacks" ? "Manage and reply to feedbacks" :
+                   title === "Cutlist" ? "Manage users cutlist" :
+                   formattedDate}
+                </p>
               )}
             </div>
             <div className="flex justify-center items-center">

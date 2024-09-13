@@ -17,22 +17,20 @@ const Login = () => {
     setLoading(true);
     const loginUrl = `${baseUrl}/account/login`;
     const fullPhoneNumber = `+234${values.phoneNumber}`;
-    
-    // Log form values for debugging
-    console.log("Form Values:", values);
-    console.log("Full Phone Number:", fullPhoneNumber);
-    
+
     try {
-      // Make the API request
       const response = await axios.post(loginUrl, {
         phoneNumber: fullPhoneNumber,
         password: values.password,
       });
 
-      const user = response.data.data.user
-      setLoggedInUser(user)
-      console.log(response)
+      const user = response.data.data.user;
+      setLoggedInUser(user);
+      
+      // Set the cookie
+      Cookies.set("loggedInUser", JSON.stringify(user), { expires: 7, path: '/' });
 
+      console.log(response);
       navigate('/dashboard');
      
     } catch (error) {
@@ -57,7 +55,7 @@ const Login = () => {
         backgroundRepeat: 'no-repeat',
       }}
     >
-      {/* Overlay for dark effect, visible only on larger screens */}
+      {/* Overlay for dark effect */}
       <div className="absolute inset-0 bg-black opacity-50 hidden sm:block"></div>
 
       {/* Content */}
@@ -78,10 +76,9 @@ const Login = () => {
             layout="vertical"
           >
             <div className="m-auto w-full">
-              {/* Phone Number Input with +234 as default prefix */}
               <Form.Item
                 label="Phone Number"
-                name="phoneNumber" // Updated field name
+                name="phoneNumber"
                 rules={[
                   { required: true, message: 'Please input your phone number!' },
                   { pattern: /^[0-9]{10}$/, message: 'Please enter a valid phone number' },
@@ -94,7 +91,6 @@ const Login = () => {
                 />
               </Form.Item>
 
-              {/* Password Input */}
               <Form.Item
                 label="Password"
                 name="password"
@@ -127,7 +123,6 @@ const Login = () => {
                 )}
               </button>
             </Form.Item>
-
           </Form>
         </Card>
       </div>
