@@ -1,6 +1,16 @@
-import React, { useState } from "react";
-import { Input, Table, Button, Dropdown, Menu, Modal, Form } from "antd";
-import { PhoneOutlined } from "@ant-design/icons";
+import React, { useState, useContext } from "react";
+import axios from 'axios'
+import {
+  Input,
+  Table,
+  Button,
+  Dropdown,
+  Menu,
+  Modal,
+  Form,
+  Upload,
+} from "antd";
+import { PhoneOutlined, UploadOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import check from "../../assets/images/icons/check.png";
 import no_data from "../../assets/images/icons/no_data.png";
@@ -12,6 +22,7 @@ import user from "../../assets/images/icons/user_outline.png";
 import plus from "../../assets/images/icons/plus.png";
 import bell from "../../assets/images/icons/bell.png";
 import Notification from "../../components/notification/Notification";
+import { Context } from "../../context/Context";
 
 const fullDataSource = [
   {
@@ -169,6 +180,24 @@ const sections = [
   },
 ];
 
+const props = {
+  name: "file",
+  action: "https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload",
+  headers: {
+    authorization: "authorization-text",
+  },
+  onChange(info) {
+    if (info.file.status !== "uploading") {
+      console.log(info.file, info.fileList);
+    }
+    if (info.file.status === "done") {
+      message.success(`${info.file.name} file uploaded successfully`);
+    } else if (info.file.status === "error") {
+      message.error(`${info.file.name} file upload failed.`);
+    }
+  },
+};
+
 const User = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [searchText, setSearchText] = useState("");
@@ -176,6 +205,13 @@ const User = () => {
   const [isAnyChecked, setIsAnyChecked] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const { baseUrl } = useContext(Context)
+  const [loading, setLoading] = useState(false);
+
+  const onFinish = async (values) => {
+    setLoading(false)
+    const userRegUrl = `${baseUrl}/account/admin/register-user`
+  }
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -419,23 +455,35 @@ const User = () => {
         open={isOpen}
         onCancel={handleUser}
         footer={null}
-        // width={1000}
+        width={400}
       >
         <Form name="user" layout="vertical">
           <div className="m-auto w-full">
-          <Form.Item
-                label="Full Name"
-                name="fullName"
-                rules={[
-                  { required: true, message: 'Please input full name!' },
-                ]}
-              >
-                <Input.Password placeholder="Enter your password" />
-              </Form.Item>
+            <Form.Item
+              label="Full Name"
+              name="fullName"
+              className="mb-2"
+              rules={[{ required: true, message: "Please input full name!" }]}
+            >
+              <Input placeholder="Enter your full name" />
+            </Form.Item>
+
+            <Form.Item
+              label="Email"
+              name="email"
+              className="mb-2"
+              rules={[
+                { required: true, message: "Please input email!" },
+                { type: "email", message: "Please enter a valid email!" },
+              ]}
+            >
+              <Input placeholder="Enter your email" />
+            </Form.Item>
 
             <Form.Item
               label="Phone Number"
               name="phoneNumber"
+              className="mb-2"
               rules={[
                 { required: true, message: "Please input your phone number!" },
                 {
@@ -454,12 +502,34 @@ const User = () => {
             <Form.Item
               label="Password"
               name="password"
+              className="mb-2"
               rules={[
                 { required: true, message: "Please input your password!" },
               ]}
             >
               <Input.Password placeholder="Enter your password" />
             </Form.Item>
+
+            <Form.Item label="Image" name="avatar" className="mb-2">
+              <Upload {...props}>
+                <Button icon={<UploadOutlined />} className="w-[351px]">
+                  Click to Upload
+                </Button>
+              </Upload>
+            </Form.Item>
+
+            <div className="flex justify-end mt-4">
+              <Form>
+                <Button
+                  // onClick={handleModal}
+                  htmlType="submit"
+                  className="bg-[#F2C94C] hover:!bg-[#F2C94C] hover:!text-black border-none p-3 px-3 rounded-full h-8 flex justify-center items-center text-[.7rem]"
+                >
+                  Create Project
+                  {/* <img src={arrow} alt="" className="h-4 w-4 ml-3" /> */}
+                </Button>
+              </Form>
+            </div>
           </div>
         </Form>
       </Modal>

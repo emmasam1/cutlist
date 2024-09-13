@@ -63,7 +63,7 @@ const items = [
 
 const DashboardLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const { loggedInUser } = useContext(Context);
+  const { login } = useContext(Context);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -103,7 +103,7 @@ const DashboardLayout = () => {
   };
 
   const handleLogout = () => {
-    Cookies.remove('loggedInUser');
+    Cookies.remove('login');
     navigate("/admin-login");
   };
 
@@ -190,7 +190,7 @@ const DashboardLayout = () => {
                 <div className="rounded-full w-10 h-10 bg-slate-800 mr-1"></div>
                 <div>
                   <p className="font-semibold text-[.9rem] relative top-1">
-                    {loggedInUser?.fullName}
+                    {login?.fullName}
                   </p>
                   <span className="text-[.8rem] relative -top-1">Admin</span>
                 </div>
