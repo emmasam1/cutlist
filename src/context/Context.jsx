@@ -9,11 +9,11 @@ export const ContextProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState(null); // Add accessToken state
 
   useEffect(() => {
-    console.log("ContextProvider useEffect running...");
+    // console.log("ContextProvider useEffect running...");
     const savedUser = Cookies.get("loggedInUser");
     const savedToken = Cookies.get("accessToken"); // Retrieve accessToken from cookies
-    console.log("Saved user cookie:", savedUser);
-    console.log("Saved token cookie:", savedToken);
+    // console.log("Saved user cookie:", savedUser);
+    // console.log("Saved token cookie:", savedToken);
 
     if (savedUser) {
       try {
@@ -25,7 +25,7 @@ export const ContextProvider = ({ children }) => {
           throw new Error("Invalid user data");
         }
       } catch (error) {
-        console.error("Error parsing saved user from cookies:", error);
+        // console.error("Error parsing saved user from cookies:", error);
         Cookies.remove("loggedInUser"); // Clear invalid cookie
         Cookies.remove("accessToken"); // Clear invalid token cookie
       }

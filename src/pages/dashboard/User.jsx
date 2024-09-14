@@ -24,7 +24,7 @@ import plus from "../../assets/images/icons/plus.png";
 import bell from "../../assets/images/icons/bell.png";
 import Notification from "../../components/notification/Notification";
 import { Context } from "../../context/Context";
-import { ThreeDots } from "react-loader-spinner"; // Import loader component
+import { ThreeDots } from "react-loader-spinner"; 
 
 const User = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -34,8 +34,9 @@ const User = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false); // State to manage loading
-  const [dataSource, setDataSource] = useState([]); // State to store users
+  const [loading, setLoading] = useState(false); 
+  const [dataSource, setDataSource] = useState([]);
+  
   const { baseUrl, accessToken } = useContext(Context);
 
   const onFinish = async (values) => {
@@ -49,8 +50,8 @@ const User = () => {
         },
       });
 
-      console.log("Access Token:", accessToken); // Log accessToken
-      console.log("User registered:", response.data); // Log response data
+      console.log("Access Token:", accessToken); 
+      console.log("User registered:", response.data);
       message.success("User created successfully");
       setIsOpen(false);
       getUsers()
@@ -63,7 +64,6 @@ const User = () => {
         error.response || error.message || error
       );
 
-      // Optionally inspect specific parts of the error
       if (error.response) {
         console.error("Response data:", error.response.data);
         console.error("Response status:", error.response.status);
@@ -76,38 +76,70 @@ const User = () => {
     }
   };
 
-  // Function to fetch users
-  const getUsers = async () => {
-    const allUsers = `${baseUrl}/user/all`;
 
-    setLoading(true); // Set loading to true before starting the fetch
-    try {
-      const response = await axios.get(allUsers, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+  // const getUsers = async () => {
+  //   const allUsers = `${baseUrl}/user/all`;
 
-      // console.log(response.data.data)
+  //   setLoading(true);
+  //   try {
+  //     const response = await axios.get(allUsers, {
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`,
+  //       },
+  //     });
 
-      const sourcedData = response.data.data.map((user) => ({
-        key: user.id, // Ensure each user has a unique key
-        fullName: user.fullName,
-        phoneNumber: user.phoneNumber,
-        status: user.status,
-        isVerified: user.isVerified,
-      }));
-      setDataSource(sourcedData);
-    } catch (error) {
-      console.error("Error while getting records:", error);
-    } finally {
-      setLoading(false); // Set loading to false after the fetch is complete
-    }
-  };
+  //     // console.log(response.data.data)
+  //     console.log(accessToken)
+  //     const sourcedData = response.data.data.map((user) => ({
+  //       key: user.id, 
+  //       fullName: user.fullName,
+  //       phoneNumber: user.phoneNumber,
+  //       status: user.status,
+  //       isVerified: user.isVerified,
+  //     }));
+  //     setDataSource(sourcedData);
+  //   } catch (error) {
+  //     console.error("Error while getting records:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   useEffect(() => {
-    getUsers(); // Call getUsers when component mounts
-  }, [baseUrl, accessToken]); // Add dependencies if needed
+    if (!accessToken) return; 
+
+    const getUsers = async () => {
+      const allUsers = `${baseUrl}/user/all`;
+
+      setLoading(true);
+      try {
+        const response = await axios.get(allUsers, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        const sourcedData = response.data.data.map((user) => ({
+          key: user.id,
+          fullName: user.fullName,
+          phoneNumber: user.phoneNumber,
+          status: user.status,
+          isVerified: user.isVerified,
+        }));
+        setDataSource(sourcedData);
+      } catch (error) {
+        console.error("Error while getting records:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getUsers();
+  }, [accessToken]);
+
+  // useEffect(() => {
+  //   getUsers();
+  // }, [baseUrl, accessToken]);
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -345,7 +377,6 @@ const User = () => {
           )}
         </div>
 
-        {/* Conditionally render the loader */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <ThreeDots

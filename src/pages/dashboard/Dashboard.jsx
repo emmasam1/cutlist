@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
+import axios from "axios";
 import { Table, Button } from "antd";
 import { PrinterOutlined } from "@ant-design/icons";
 import LineChart3 from "../../components/chart/LineChart3";
+import { Context } from "../../context/Context";
 
 import edit from "../../assets/images/icons/edit.png";
 import user from "../../assets/images/icons/user.png";
@@ -12,6 +14,43 @@ import user_3 from '../../assets/images/user_3.png';
 import user_1 from '../../assets/images/user_1.png';
 
 const Dashboard = () => {
+
+  const { baseUrl, accessToken } = useContext(Context);
+  const [totalUser, setTotalUser] = useState(0)
+
+  useEffect(() => {
+    if (!accessToken) return; 
+
+    const getUsers = async () => {
+      const allUsersUrl = `${baseUrl}/user/all`;
+
+      try {
+        const response = await axios.get(allUsersUrl, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        // Ensure data exists and is an array
+        const users = response.data.data;
+        if (Array.isArray(users)) {
+          setTotalUser(users.length);
+        } else {
+          console.error("Data is not in expected format:", response.data);
+        }
+      } catch (error) {
+        console.error("Error while getting records:", error);
+      } 
+    };
+
+    getUsers();
+  }, [accessToken]);
+
+  // Logging totalUser when it changes
+  useEffect(() => {
+    // console.log(totalUser);
+  }, [totalUser]);
+
   function formatDate(date) {
     const day = date.getDate();
     const month = date.toLocaleString("default", { month: "short" });
@@ -41,7 +80,7 @@ const Dashboard = () => {
     {
       id: 1,
       title: "total user",
-      amount: 49,
+      amount: totalUser,
       dec: "Total amount of users",
       bg_color: "#C9EBED",
       img: edit,
