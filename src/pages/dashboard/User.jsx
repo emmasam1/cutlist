@@ -118,9 +118,8 @@ const User = () => {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-
         const sourcedData = response.data.data.map((user) => ({
-          key: user.id,
+          key: user._id,
           fullName: user.fullName,
           phoneNumber: user.phoneNumber,
           status: user.status,
