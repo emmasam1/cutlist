@@ -1,8 +1,11 @@
-import React from "react";
-import { useLocation } from "react-router-dom";
-import { Button } from "antd";
+import React, { useContext, useEffect, useState } from "react";
+import axios from "axios";
+import { useLocation, useParams } from "react-router-dom";
+import { Button, notification } from "antd";
+import { Context } from "../../context/Context";
 
 import no_data from "../../assets/images/icons/no_data.png";
+import check from "../../assets/images/icons/check.png";
 import coin from "../../assets/images/icons/coin.png";
 import wallet from "../../assets/images/icons/wallet.png";
 import red_bin from "../../assets/images/icons/red_bin.png";
@@ -10,11 +13,76 @@ import policy from "../../assets/images/icons/policy.png";
 
 const UserDetailsPage = () => {
   const location = useLocation();
+  const { userId } = useParams(); // Get userId from URL params
   const { state } = location;
   const record = state?.record;
+  const [loading, setLoading] = useState(false);
+  const [action, setAction] = useState('block'); // Track action for block/unblock
+  const [userStatus, setUserStatus] = useState('active'); // Track user status
 
-  // Log the record to the console
-  console.log("UserDetailsPage record:", record);
+  const { baseUrl, accessToken, userBlockedStatus, setUserBlockedStatus } = useContext(Context);
+
+  // Fetch user status when component mounts
+  useEffect(() => {
+    if (userId) {
+      const fetchUserStatus = async () => {
+        try {
+          const response = await axios.get(
+            `${baseUrl}/account/user-status/${userId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            }
+          );
+          console.log('API Response:', response.data); // Log the entire response
+          const status = response.data.user.status; // Adjust based on the actual response structure
+          setUserStatus(status);
+        } catch (error) {
+          console.error('Error fetching user status:', error);
+        }
+      };
+
+      fetchUserStatus();
+    }
+  }, [userId, baseUrl, accessToken]);
+
+  const blockUser = async () => {
+    if (!userId) {
+      console.error('No user ID available to block/unblock.');
+      return;
+    }
+
+    const blkUserUrl = `${baseUrl}/account/user-status/${userId}`; // Correct URL with userId
+    setLoading(true);
+    try {
+      const response = await axios.put(
+        blkUserUrl,
+        { action }, // Send action in the request body
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      console.log('Response from blockUser:', response.data); // Log the response
+      const status = response.data.user.status; // Adjust based on the actual response structure
+      setUserStatus(status); // Update the status based on the response
+      setUserBlockedStatus(status)
+      notification.success({
+        message: `User ${action === 'block' ? 'Blocked' : 'Unblocked'}`,
+        description: `The user has been ${action === 'block' ? 'blocked' : 'unblocked'}.`,
+      });
+    } catch (error) {
+      console.error('Error handling user status:', error);
+      notification.error({
+        message: 'Error',
+        description: 'An error occurred while trying to change the user status.',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!record) {
     return (
@@ -37,7 +105,11 @@ const UserDetailsPage = () => {
               <div className="flex items-center justify-between w-full md:w-48">
                 <p className="text-[.8rem]">{record.phoneNumber || "No Phone"}</p>
                 <div className="flex items-center">
-                  <img src={no_data} alt="" className="w-3 mr-1" />
+                  {record.isVerified ? (
+                    <img src={check} alt="" className="w-3 mr-1" />
+                  ) : (
+                    <img src={no_data} alt="" className="w-3 mr-1" />
+                  )}
                   <span className="italic text-[.8rem]">
                     {record.isVerified ? "Verified" : "Unverified"}
                   </span>
@@ -123,10 +195,31 @@ const UserDetailsPage = () => {
               <img src={red_bin} alt="" className="mr-2 w-4" />
               Delete User
             </Button>
-            <Button className="flex items-center rounded text-[#B0B2C3] hover:!text-[#B0B2C3] px-6 h-9 font-semibold border hover:!border-gray">
-              <img src={no_data} alt="" className="mr-2 w-4" />
-              Block User
-            </Button>
+            {userBlockedStatus === 'block' ? (
+              <Button
+                className="flex items-center rounded text-[#B0B2C3] hover:!text-[#B0B2C3] px-6 h-9 font-semibold border hover:!border-gray"
+                onClick={() => {
+                  setAction('unblock');
+                  blockUser();
+                }} // Set action to unblock and then call blockUser
+                loading={loading}
+              >
+                <img src={no_data} alt="" className="mr-2 w-4" />
+                {loading ? 'Please wait...' : 'Unblock User'}
+              </Button>
+            ) : userBlockedStatus === 'active' ? (
+              <Button
+                className="flex items-center rounded text-[#B0B2C3] hover:!text-[#B0B2C3] px-6 h-9 font-semibold border hover:!border-gray"
+                onClick={() => {
+                  setAction('block');
+                  blockUser();
+                }} // Set action to block and then call blockUser
+                loading={loading}
+              >
+                <img src={no_data} alt="" className="mr-2 w-4" />
+                {loading ? 'Please wait...' : 'Block User'}
+              </Button>
+            ) : null}
           </div>
           <div className="mt-4 md:mt-0">
             <Button className="rounded px-6 border-none h-9 font-semibold bg-[#F1B31C] hover:!bg-[#F1B31C] hover:!text-black">

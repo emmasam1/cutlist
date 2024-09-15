@@ -124,6 +124,7 @@ const User = () => {
           phoneNumber: user.phoneNumber,
           status: user.status,
           isVerified: user.isVerified,
+          email: user.email
         }));
         setDataSource(sourcedData);
       } catch (error) {
@@ -174,10 +175,10 @@ const User = () => {
       title: "Status",
       dataIndex: "status",
       render: (status) => {
-        const isActive = status === "Active";
+        const isActive = status === "active";
         const className = isActive
-          ? "bg-black text-white px-3 rounded-full"
-          : "px-3 border rounded-full";
+          ? "bg-[#5EDA79] text-[#1F7700] px-3 py-1 rounded-full"
+          : "px-3 py-1 border rounded-full text-transform: capitalize bg-[#FF000042] text-[#FF3D00]";
         return <span className={className}>{status}</span>;
       },
       width: 200,
@@ -490,7 +491,7 @@ const User = () => {
                 loading={loading}
                 className="bg-[#F2C94C] hover:!bg-[#F2C94C] hover:!text-black border-none p-3 px-3 rounded-full h-8 flex justify-center items-center text-[.7rem]"
               >
-                Create User
+                {loading ? "Please wait..." : "Create User"}
               </Button>
             </div>
           </div>
