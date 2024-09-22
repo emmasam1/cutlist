@@ -3,7 +3,6 @@ import axios from "axios";
 import { useLocation, useParams } from "react-router-dom";
 import { Button, notification } from "antd";
 import { Context } from "../../context/Context";
-
 import no_data from "../../assets/images/icons/no_data.png";
 import check from "../../assets/images/icons/check.png";
 import coin from "../../assets/images/icons/coin.png";
@@ -13,12 +12,12 @@ import policy from "../../assets/images/icons/policy.png";
 
 const UserDetailsPage = () => {
   const location = useLocation();
-  const { userId } = useParams(); // Get userId from URL params
+  const { userId } = useParams(); 
   const { state } = location;
   const record = state?.record;
   const [loading, setLoading] = useState(false);
-  const [action, setAction] = useState('block'); // Track action for block/unblock
-  const [userStatus, setUserStatus] = useState('active'); // Track user status
+  const [action, setAction] = useState('block'); 
+  const [userStatus, setUserStatus] = useState('');
 
   const { baseUrl, accessToken, userBlockedStatus, setUserBlockedStatus } = useContext(Context);
 
@@ -35,9 +34,9 @@ const UserDetailsPage = () => {
               },
             }
           );
-          console.log('API Response:', response.data); // Log the entire response
-          const status = response.data.user.status; // Adjust based on the actual response structure
+          const status = response.data.user.status;
           setUserStatus(status);
+          setUserBlockedStatus(status); // Sync status in context
         } catch (error) {
           console.error('Error fetching user status:', error);
         }
@@ -45,33 +44,70 @@ const UserDetailsPage = () => {
 
       fetchUserStatus();
     }
-  }, [userId, baseUrl, accessToken]);
+  }, [userId, baseUrl, accessToken, setUserBlockedStatus]);
+
+  // const blockUser = async () => {
+  //   if (!userId) {
+  //     console.error('No user ID available to block/unblock.');
+  //     return;
+  //   }
+
+  //   const blkUserUrl = `${baseUrl}/account/user-status/${userId}`;
+  //   setLoading(true);
+  //   try {
+  //     const response = await axios.put(
+  //       blkUserUrl,
+  //       { action },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${accessToken}`,
+  //         },
+  //       }
+  //     );
+  //     const userStatus = response.data.user.status;
+  //     setUserStatus(userStatus);
+  //     setUserBlockedStatus(userStatus); // Sync status after action
+  //     console.log("from user details", userStatus)
+  //     notification.success({
+  //       message: `User ${action === 'block' ? 'Blocked' : 'Unblocked'}`,
+  //       description: `The user has been ${action === 'block' ? 'blocked' : 'unblocked'}.`,
+  //     });
+  //   } catch (error) {
+  //     console.error('Error handling user status:', error);
+  //     notification.error({
+  //       message: 'Error',
+  //       description: 'An error occurred while trying to change the user status.',
+  //     });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const blockUser = async () => {
     if (!userId) {
       console.error('No user ID available to block/unblock.');
       return;
     }
-
-    const blkUserUrl = `${baseUrl}/account/user-status/${userId}`; // Correct URL with userId
+  
+    const blkUserUrl = `${baseUrl}/account/user-status/${userId}`;
     setLoading(true);
     try {
       const response = await axios.put(
         blkUserUrl,
-        { action }, // Send action in the request body
+        { action },
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         }
       );
-      console.log('Response from blockUser:', response.data); // Log the response
-      const status = response.data.user.status; // Adjust based on the actual response structure
-      setUserStatus(status); // Update the status based on the response
-      setUserBlockedStatus(status)
+      const newStatus = response.data.user.status; // Fetch the new status from the API response
+      setUserStatus(newStatus);
+      setUserBlockedStatus(newStatus); // Sync status immediately after API call
+      
       notification.success({
-        message: `User ${action === 'block' ? 'Blocked' : 'Unblocked'}`,
-        description: `The user has been ${action === 'block' ? 'blocked' : 'unblocked'}.`,
+        message: `User ${newStatus === 'block' ? 'Blocked' : 'Unblocked'}`,
+        description: `The user has been ${newStatus === 'block' ? 'blocked' : 'unblocked'}.`,
       });
     } catch (error) {
       console.error('Error handling user status:', error);
@@ -83,6 +119,7 @@ const UserDetailsPage = () => {
       setLoading(false);
     }
   };
+  
 
   if (!record) {
     return (

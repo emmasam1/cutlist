@@ -59,67 +59,302 @@
 //   );
 // };
 
+// import React, { createContext, useState, useEffect } from "react";
+// import Cookies from "js-cookie";
+
+// export const Context = createContext();
+
+// export const ContextProvider = ({ children }) => {
+//   const [baseUrl] = useState("https://cutlist.onrender.com/api/v1");
+//   const [loggedInUser, setLoggedInUser] = useState(null);
+//   const [accessToken, setAccessToken] = useState(null);
+//   const [userBlockedStatus, setUserBlockedStatus] = useState("");
+ 
+//   console.log("from user context", userBlockedStatus)
+
+//   useEffect(() => {
+//     const savedUser = Cookies.get("loggedInUser");
+//     const savedToken = Cookies.get("accessToken");
+
+
+//     if (savedUser && savedToken) {
+//       try {
+//         const user = JSON.parse(savedUser);
+//         if (user && user.phoneNumber) {
+//           setLoggedInUser(user);
+//           setAccessToken(savedToken);
+//           setUserBlockedStatus(user.userBlockedStatus || "active"); // Set the status from user data if available
+         
+//         } else {
+//           throw new Error("Invalid user data");
+//         }
+//       } catch (error) {
+//         console.error("Error parsing saved user from cookies:", error);
+//         Cookies.remove("loggedInUser");
+//         Cookies.remove("accessToken");
+//       }
+//     } else {
+//       console.log("No user or token cookie found.");
+//     }
+//   }, []);
+
+//   const farFutureDate = new Date();
+//   farFutureDate.setFullYear(farFutureDate.getFullYear() + 10);
+
+//   const login = (userData, token) => {
+//     setLoggedInUser(userData);
+//     setAccessToken(token);
+//     setUserBlockedStatus(userData.blockedStatus || "active");
+//     console.log("from user context", userBlockedStatus)
+//     Cookies.set("loggedInUser", JSON.stringify(userData), {
+//       expires: farFutureDate,
+//     });
+//     Cookies.set("accessToken", token, { expires: farFutureDate });
+//   };
+
+//   const logout = () => {
+//     setLoggedInUser(null);
+//     setAccessToken(null);
+//     setUserBlockedStatus("active");
+//     Cookies.remove("loggedInUser");
+//     Cookies.remove("accessToken");
+//   };
+
+//   return (
+//     <Context.Provider
+//       value={{
+//         baseUrl,
+//         loggedInUser,
+//         setLoggedInUser,
+//         accessToken,
+//         login,
+//         logout,
+//         userBlockedStatus,
+//         setUserBlockedStatus,
+//       }}
+//     >
+//       {children}
+//     </Context.Provider>
+//   );
+// };
+
+// export const ContextProvider = ({ children }) => {
+//   const [baseUrl] = useState("https://cutlist.onrender.com/api/v1");
+//   const [loggedInUser, setLoggedInUser] = useState(null);
+//   const [accessToken, setAccessToken] = useState(null);
+//   const [userBlockedStatus, setUserBlockedStatus] = useState(""); // Track user's blocked status in the context
+
+//   useEffect(() => {
+//     const savedUser = Cookies.get("loggedInUser");
+//     const savedToken = Cookies.get("accessToken");
+
+//     if (savedUser && savedToken) {
+//       try {
+//         const user = JSON.parse(savedUser);
+//         if (user && user.phoneNumber) {
+//           setLoggedInUser(user);
+//           setAccessToken(savedToken);
+//           setUserBlockedStatus(user.blockedStatus || "active"); // Use 'blockedStatus' instead of 'userBlockedStatus'
+//         } else {
+//           throw new Error("Invalid user data");
+//         }
+//       } catch (error) {
+//         console.error("Error parsing saved user from cookies:", error);
+//         Cookies.remove("loggedInUser");
+//         Cookies.remove("accessToken");
+//       }
+//     }
+//   }, []);
+
+//   const farFutureDate = new Date();
+//   farFutureDate.setFullYear(farFutureDate.getFullYear() + 10);
+
+//   const login = (userData, token) => {
+//     setLoggedInUser(userData);
+//     setAccessToken(token);
+//     setUserBlockedStatus(userData.blockedStatus || "active"); // Make sure the blocked status is set during login
+//     Cookies.set("loggedInUser", JSON.stringify(userData), {
+//       expires: farFutureDate,
+//     });
+//     Cookies.set("accessToken", token, { expires: farFutureDate });
+//   };
+
+//   const logout = () => {
+//     setLoggedInUser(null);
+//     setAccessToken(null);
+//     setUserBlockedStatus("active"); // Reset blocked status on logout
+//     Cookies.remove("loggedInUser");
+//     Cookies.remove("accessToken");
+//   };
+
+//   return (
+//     <Context.Provider
+//       value={{
+//         baseUrl,
+//         loggedInUser,
+//         setLoggedInUser,
+//         accessToken,
+//         login,
+//         logout,
+//         userBlockedStatus,
+//         setUserBlockedStatus,
+//       }}
+//     >
+//       {children}
+//     </Context.Provider>
+//   );
+// };
+
+  // import React, { createContext, useState, useEffect } from "react";
+  // import Cookies from "js-cookie";
+
+  // export const Context = createContext(); // This is the named export
+
+  // export const ContextProvider = ({ children }) => {
+  //   const [baseUrl] = useState("https://cutlist.onrender.com/api/v1");
+  //   const [loggedInUser, setLoggedInUser] = useState(null);
+  //   const [accessToken, setAccessToken] = useState(null);
+  //   const [userBlockedStatus, setUserBlockedStatus] = useState("");
+
+  //   useEffect(() => {
+  //     const savedUser = Cookies.get("loggedInUser");
+  //     const savedToken = Cookies.get("accessToken");
+
+  //     if (savedUser && savedToken) {
+  //       try {
+  //         const user = JSON.parse(savedUser);
+  //         if (user && user.phoneNumber) {
+  //           setLoggedInUser(user);
+  //           setAccessToken(savedToken);
+  //           setUserBlockedStatus(user.blockedStatus || "active");
+  //         } else {
+  //           throw new Error("Invalid user data");
+  //         }
+  //       } catch (error) {
+  //         console.error("Error parsing saved user from cookies:", error);
+  //         Cookies.remove("loggedInUser");
+  //         Cookies.remove("accessToken");
+  //       }
+  //     }
+  //   }, []);
+
+  //   const farFutureDate = new Date();
+  //   farFutureDate.setFullYear(farFutureDate.getFullYear() + 10);
+
+  //   const login = (userData, token) => {
+  //     setLoggedInUser(userData);
+  //     setAccessToken(token);
+  //     setUserBlockedStatus(userData.blockedStatus || "active");
+  //     Cookies.set("loggedInUser", JSON.stringify(userData), {
+  //       expires: farFutureDate,
+  //     });
+  //     Cookies.set("accessToken", token, { expires: farFutureDate });
+  //   };
+
+  //   const logout = () => {
+  //     setLoggedInUser(null);
+  //     setAccessToken(null);
+  //     setUserBlockedStatus("active");
+  //     Cookies.remove("loggedInUser");
+  //     Cookies.remove("accessToken");
+  //   };
+
+  //   return (
+  //     <Context.Provider
+  //       value={{
+  //         baseUrl,
+  //         loggedInUser,
+  //         setLoggedInUser,
+  //         accessToken,
+  //         login,
+  //         logout,
+  //         userBlockedStatus,
+  //         setUserBlockedStatus,
+  //       }}
+  //     >
+  //       {children}
+  //     </Context.Provider>
+  //   );
+  // };
+
+
+// src/context/Context.js
 
 import React, { createContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
 
-export const Context = createContext();
+export const Context = createContext(); // Named export
 
 export const ContextProvider = ({ children }) => {
   const [baseUrl] = useState("https://cutlist.onrender.com/api/v1");
   const [loggedInUser, setLoggedInUser] = useState(null);
-  const [accessToken, setAccessToken] = useState(null); // Add accessToken state
-  const [userBlockedStatus, setUserBlockedStatus] = useState(null); // Add accessToken state
+  const [accessToken, setAccessToken] = useState(null);
+  const [userBlockedStatus, setUserBlockedStatus] = useState("");
 
   useEffect(() => {
-    // Retrieve user and token from cookies
     const savedUser = Cookies.get("loggedInUser");
     const savedToken = Cookies.get("accessToken");
 
     if (savedUser && savedToken) {
       try {
         const user = JSON.parse(savedUser);
-        // Verify the user data
         if (user && user.phoneNumber) {
           setLoggedInUser(user);
-          setAccessToken(savedToken); // Set accessToken if available
+          setAccessToken(savedToken);
+          setUserBlockedStatus(user.blockedStatus || "active");
         } else {
           throw new Error("Invalid user data");
         }
       } catch (error) {
         console.error("Error parsing saved user from cookies:", error);
-        // Clear invalid cookies
         Cookies.remove("loggedInUser");
         Cookies.remove("accessToken");
       }
-    } else {
-      console.log("No user or token cookie found.");
     }
   }, []);
 
-  const login = (userData, token) => {
-    if (userData && userData.phoneNumber && token) {
-      setLoggedInUser(userData);
-      setAccessToken(token);
-      Cookies.set("loggedInUser", JSON.stringify(userData), { expires: 7, path: '/' });
-      Cookies.set("userBlockedStatus", JSON.stringify(userData), { expires: 7, path: '/' });
-      Cookies.set("accessToken", token, { expires: 7, path: '/' });
-    } else {
-      console.error("Invalid user data or token provided to login function:", userData, token);
-    }
-  };
-
   console.log(userBlockedStatus)
+
+  const farFutureDate = new Date();
+  farFutureDate.setFullYear(farFutureDate.getFullYear() + 10);
+
+  const login = (userData, token) => {
+    setLoggedInUser(userData);
+    setAccessToken(token);
+    setUserBlockedStatus(userData.blockedStatus || "active");
+    Cookies.set("loggedInUser", JSON.stringify(userData), {
+      expires: farFutureDate,
+      secure: true, // Ensures cookie is sent over HTTPS
+      sameSite: 'Strict', // Helps protect against CSRF
+    });
+    Cookies.set("accessToken", token, { 
+      expires: farFutureDate,
+      secure: true,
+      sameSite: 'Strict',
+    });
+  };
 
   const logout = () => {
     setLoggedInUser(null);
     setAccessToken(null);
+    setUserBlockedStatus("active");
     Cookies.remove("loggedInUser");
     Cookies.remove("accessToken");
   };
 
   return (
-    <Context.Provider value={{ baseUrl, loggedInUser, accessToken, userBlockedStatus, setLoggedInUser, login, logout, setUserBlockedStatus }}>
+    <Context.Provider
+      value={{
+        baseUrl,
+        loggedInUser,
+        setLoggedInUser,
+        accessToken,
+        login,
+        logout,
+        userBlockedStatus,
+        setUserBlockedStatus,
+      }}
+    >
       {children}
     </Context.Provider>
   );
