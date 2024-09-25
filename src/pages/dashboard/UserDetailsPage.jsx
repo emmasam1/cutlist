@@ -21,6 +21,11 @@ const UserDetailsPage = () => {
 
   const { baseUrl, accessToken, userBlockedStatus, setUserBlockedStatus } = useContext(Context);
 
+  // Helper function to format credits
+  const formatCredits = (credits) => {
+    return credits ? Number(credits).toLocaleString() : "0";
+  };
+
   // Fetch user status when component mounts
   useEffect(() => {
     if (userId) {
@@ -45,44 +50,6 @@ const UserDetailsPage = () => {
       fetchUserStatus();
     }
   }, [userId, baseUrl, accessToken, setUserBlockedStatus]);
-
-  console.log(record)
-  // const blockUser = async () => {
-  //   if (!userId) {
-  //     console.error('No user ID available to block/unblock.');
-  //     return;
-  //   }
-
-  //   const blkUserUrl = `${baseUrl}/account/user-status/${userId}`;
-  //   setLoading(true);
-  //   try {
-  //     const response = await axios.put(
-  //       blkUserUrl,
-  //       { action },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${accessToken}`,
-  //         },
-  //       }
-  //     );
-  //     const userStatus = response.data.user.status;
-  //     setUserStatus(userStatus);
-  //     setUserBlockedStatus(userStatus); // Sync status after action
-  //     console.log("from user details", userStatus)
-  //     notification.success({
-  //       message: `User ${action === 'block' ? 'Blocked' : 'Unblocked'}`,
-  //       description: `The user has been ${action === 'block' ? 'blocked' : 'unblocked'}.`,
-  //     });
-  //   } catch (error) {
-  //     console.error('Error handling user status:', error);
-  //     notification.error({
-  //       message: 'Error',
-  //       description: 'An error occurred while trying to change the user status.',
-  //     });
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const blockUser = async () => {
     if (!userId) {
@@ -159,7 +126,7 @@ const UserDetailsPage = () => {
             <p>Credit Balance</p>
             <div className="flex items-center mt-1 pl-2">
               <img src={coin} alt="" className="w-7" />
-              <span className="font-bold text-lg">{record.credits || "0"}</span>
+              <span className="font-bold text-lg">{formatCredits(record.credits)}</span>
             </div>
             <div className="flex items-center mt-1">
               <img src={wallet} alt="" className="w-4 mr-2" />
@@ -173,7 +140,7 @@ const UserDetailsPage = () => {
           <div>
             <div className="flex items-center">
               <h2 className="font-bold mr-2">Name:</h2>
-              <h2>{record.name || "No Name"}</h2>
+              <h2>{record.fullName || "No Name"}</h2>
             </div>
             <div className="flex items-center mt-4">
               <h2 className="font-bold mr-2">Email:</h2>
