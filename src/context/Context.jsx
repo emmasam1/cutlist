@@ -283,13 +283,14 @@
 import React, { createContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
 
-export const Context = createContext(); // Named export
+export const Context = createContext();
 
 export const ContextProvider = ({ children }) => {
   const [baseUrl] = useState("https://cutlist.onrender.com/api/v1");
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
   const [userBlockedStatus, setUserBlockedStatus] = useState("");
+  const [isLoading, setIsLoading] = useState(true); // Loading state
 
   useEffect(() => {
     const savedUser = Cookies.get("loggedInUser");
@@ -311,9 +312,11 @@ export const ContextProvider = ({ children }) => {
         Cookies.remove("accessToken");
       }
     }
+
+    setIsLoading(false); // Mark as loaded
   }, []);
 
-  console.log(userBlockedStatus)
+  console.log(userBlockedStatus);
 
   const farFutureDate = new Date();
   farFutureDate.setFullYear(farFutureDate.getFullYear() + 10);
@@ -324,13 +327,13 @@ export const ContextProvider = ({ children }) => {
     setUserBlockedStatus(userData.blockedStatus || "active");
     Cookies.set("loggedInUser", JSON.stringify(userData), {
       expires: farFutureDate,
-      secure: true, // Ensures cookie is sent over HTTPS
-      sameSite: 'Strict', // Helps protect against CSRF
+      secure: true,
+      sameSite: "Strict", // Helps protect against CSRF
     });
-    Cookies.set("accessToken", token, { 
+    Cookies.set("accessToken", token, {
       expires: farFutureDate,
       secure: true,
-      sameSite: 'Strict',
+      sameSite: "Strict",
     });
   };
 
@@ -341,6 +344,11 @@ export const ContextProvider = ({ children }) => {
     Cookies.remove("loggedInUser");
     Cookies.remove("accessToken");
   };
+
+  // If still loading, don't render children
+  if (isLoading) {
+    return <div>Loading...</div>; // Placeholder for loading screen
+  }
 
   return (
     <Context.Provider

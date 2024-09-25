@@ -46,6 +46,7 @@ const UserDetailsPage = () => {
     }
   }, [userId, baseUrl, accessToken, setUserBlockedStatus]);
 
+  console.log(record)
   // const blockUser = async () => {
   //   if (!userId) {
   //     console.error('No user ID available to block/unblock.');
@@ -158,7 +159,7 @@ const UserDetailsPage = () => {
             <p>Credit Balance</p>
             <div className="flex items-center mt-1 pl-2">
               <img src={coin} alt="" className="w-7" />
-              <span className="font-bold text-lg">{record.creditBalance || "0"}</span>
+              <span className="font-bold text-lg">{record.credits || "0"}</span>
             </div>
             <div className="flex items-center mt-1">
               <img src={wallet} alt="" className="w-4 mr-2" />

@@ -1,5 +1,17 @@
-import React, { useState } from "react";
-import { Button, Input, Table, Modal, Form, Dropdown, Menu } from "antd";
+import React, { useState, useContext, useEffect } from "react";
+import axios from "axios";
+import {
+  Button,
+  Input,
+  Table,
+  Modal,
+  Form,
+  Dropdown,
+  Menu,
+  Select,
+} from "antd";
+import { Context } from "../../context/Context";
+
 import plus from "../../assets/images/icons/plus.png";
 import dots from "../../assets/images/icons/dots.png";
 import bin from "../../assets/images/icons/bin.png";
@@ -20,9 +32,52 @@ const Cutlist = () => {
   const [sideModal, setSideModal] = useState(false);
   const [previewCutlist, setPreviewCutlist] = useState(false);
   const [allUsers, setAllUsers] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
+
+  const { baseUrl, accessToken } = useContext(Context);
 
   const onSearch = (value) => {
     setSearchText(value);
+  };
+
+  useEffect(() => {
+    const getCategory = async () => {
+      const categoryUrl = `${baseUrl}/all-cat`; // Replace with actual baseUrl
+      try {
+        const response = await axios.get(categoryUrl, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        const categoryData = response.data;
+        console.log(categoryData);
+        console.log("from thop", categoryData._id);
+        setCategories(categoryData);
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+
+    getCategory();
+  }, [accessToken, baseUrl]);
+
+  const createCutList = async (cutListData) => {
+    try {
+      const response = await axios.post(`${baseUrl}/task`, cutListData, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      console.log("Cut list created successfully:", response.data);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.log("Error creating cut list:", error);
+    }
+  };
+
+  const createCut = () => {
+    createCutList();
+    setPreviewCutlist(true);
   };
 
   const handleModal = () => {
@@ -144,7 +199,11 @@ const Cutlist = () => {
                     <img
                       src={view}
                       alt="View"
-                      style={{ width: "17px", height: "17px", marginRight: "8px" }}
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
                     />
                     View
                   </span>
@@ -157,7 +216,11 @@ const Cutlist = () => {
                     <img
                       src={send}
                       alt="Edit"
-                      style={{ width: "17px", height: "17px", marginRight: "8px" }}
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
                     />
                     Edit
                   </span>
@@ -170,7 +233,11 @@ const Cutlist = () => {
                     <img
                       src={bin}
                       alt="Delete"
-                      style={{ width: "17px", height: "17px", marginRight: "8px" }}
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
                     />
                     Delete
                   </span>
@@ -286,6 +353,11 @@ const Cutlist = () => {
     },
   ];
 
+  const handleCategoryChange = (value, option) => {
+    setSelectedCategory(value);
+    setSelectedCategoryId(option.key); // Use the key as the category ID
+  };
+
   return (
     <div className="relative top-14">
       <div className="flex justify-end"></div>
@@ -304,9 +376,9 @@ const Cutlist = () => {
             columns={Tablecolumns}
             dataSource={Tabledata}
             size="small"
-          pagination={{ pageSize: 7, position: ['bottomCenter'] }}
-          className="custom-table"
-          scroll={{ x: 'max-content' }}
+            pagination={{ pageSize: 7, position: ["bottomCenter"] }}
+            className="custom-table"
+            scroll={{ x: "max-content" }}
             // scroll={{ x: 600 }} // Enable horizontal scrolling
           />
         </div>
@@ -379,7 +451,7 @@ const Cutlist = () => {
             // onFinish={onFinish}
             className="mt-6"
           >
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col">
               <Form.Item
                 name="name"
                 rules={[
@@ -389,10 +461,17 @@ const Cutlist = () => {
                   },
                 ]}
               >
-                <Input
-                  placeholder="Enter name of category"
-                  style={{ fontSize: "14px", width: "300px" }}
-                />
+                <Select
+                  placeholder="Select a category"
+                  value={selectedCategory}
+                  onChange={handleCategoryChange}
+                >
+                  {categories.map((category, index) => (
+                    <Select.Option key={category._id} value={category.name}>
+                      {category.name}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </div>
 
@@ -451,7 +530,11 @@ const Cutlist = () => {
           className="custom-modal"
           getContainer={false}
         >
-          {previewCutlist ? <ViewCutlist /> : <CreateCutlist />}
+          {previewCutlist ? (
+            <ViewCutlist />
+          ) : (
+            <CreateCutlist selectedCategoryId={selectedCategoryId} />
+          )}
         </Modal>
 
         <Modal
@@ -464,7 +547,7 @@ const Cutlist = () => {
             <div className="flex justify-center " key="footer">
               <Button
                 className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10"
-                onClick={() => setPreviewCutlist(true)}
+                onClick={() => createCut()}
               >
                 {" "}
                 Save List

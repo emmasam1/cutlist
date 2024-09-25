@@ -14,7 +14,11 @@ import {
   Switch,
   Select,
 } from "antd";
-import { PhoneOutlined, UploadOutlined } from "@ant-design/icons";
+import {
+  PhoneOutlined,
+  UploadOutlined,
+  ExclamationCircleFilled,
+} from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import check from "../../assets/images/icons/check.png";
 import no_data from "../../assets/images/icons/no_data.png";
@@ -30,6 +34,8 @@ import { Context } from "../../context/Context";
 import { ThreeDots } from "react-loader-spinner";
 import debounce from "lodash.debounce";
 
+const { confirm } = Modal;
+
 const User = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [searchText, setSearchText] = useState("");
@@ -42,7 +48,6 @@ const User = () => {
   const [dataSource, setDataSource] = useState([]);
   const [userStatus, setUserStatus] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const { baseUrl, accessToken, loggedInUser, setUserBlockedStatus, logout } =
     useContext(Context);
@@ -54,33 +59,36 @@ const User = () => {
   useEffect(() => {
     if (!accessToken) return;
 
-    // const getUsers = async () => {
-    //   const allUsers = `${baseUrl}/user/all`;
-
-    //   setLoading(true);
-    //   try {
-    //     const response = await axios.get(allUsers, {
-    //       headers: {
-    //         Authorization: `Bearer ${accessToken}`,
-    //       },
-    //     });
-    //     const sourcedData = response.data.data.map((user) => ({
-    //       key: user._id,
-    //       fullName: user.fullName,
-    //       phoneNumber: user.phoneNumber,
-    //       status: user.status,
-    //       isVerified: user.isVerified,
-    //       email: user.email,
-    //       // Add other fields as needed
-    //     }));
-    //     setDataSource(sourcedData);
-    //   } catch (error) {
-    //     console.error("Error while getting records:", error);
-    //     message.error("Failed to fetch users.");
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
+    const getUsers = async () => {
+      const allUsers = `${baseUrl}/user/all`;
+    
+      setLoading(true);
+      try {
+        const response = await axios.get(allUsers, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        console.log(response.data.data)
+        const sourcedData = response.data.data.map((user) => ({
+          key: user._id,
+          fullName: user.fullName,
+          phoneNumber: user.phoneNumber.replace(/^(\+234)/, ''), // Remove the +234 prefix
+          status: user.status,
+          isVerified: user.isVerified,
+          email: user.email,
+          credits: user.credits
+          // Add other fields as needed
+        }));
+        setDataSource(sourcedData);
+      } catch (error) {
+        console.error("Error while getting records:", error);
+        message.error("Failed to fetch users.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
 
     getUsers();
   }, [baseUrl, accessToken]);
@@ -88,37 +96,79 @@ const User = () => {
   const onFinish = async (values) => {
     setLoading(true);
     const userRegUrl = `${baseUrl}/account/admin/register-user`;
+    const phoneNumberWithPrefix = `+234${values.phoneNumber.trim()}`;
+    const payload = {
+      ...values,
+      phoneNumber: phoneNumberWithPrefix,
+    };
 
+    console.log("API URL:", userRegUrl);
+    console.log("Values before modification:", values);
+    console.log("Payload being sent:", payload);
+
+    console.log("Access Token:", accessToken);
     try {
-      const response = await axios.post(userRegUrl, values, {
+      const response = await axios.post(userRegUrl, payload, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
 
-      console.log("Access Token:", accessToken);
       console.log("User registered:", response.data);
       message.success("User created successfully");
       setIsOpen(false);
-      // getUsers(); // Refresh the user list
       form.resetFields();
     } catch (error) {
       console.error(
         "Error registering user:",
-        error.response || error.message || error
+        error.response ? error.response.data : error.message
       );
-
       if (error.response) {
-        console.error("Response data:", error.response.data);
         console.error("Response status:", error.response.status);
         console.error("Response headers:", error.response.headers);
       }
-
       message.error("Failed to create user");
     } finally {
       setLoading(false);
     }
   };
+
+
+  // const onFinish = async (values) => {
+  //   setLoading(true);
+  //   const userRegUrl = `${baseUrl}/account/admin/register-user`;
+  //   console.log(values)
+
+  //   try {
+  //     const response = await axios.post(userRegUrl, values, {
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`,
+  //       },
+  //     });
+
+  //     console.log("Access Token:", accessToken);
+  //     console.log("User registered:", response.data);
+  //     message.success("User created successfully");
+  //     setIsOpen(false);
+  //     // getUsers(); // Refresh the user list
+  //     form.resetFields();
+  //   } catch (error) {
+  //     console.error(
+  //       "Error registering user:",
+  //       error.response || error.message || error
+  //     );
+
+  //     if (error.response) {
+  //       console.error("Response data:", error.response.data);
+  //       console.error("Response status:", error.response.status);
+  //       console.error("Response headers:", error.response.headers);
+  //     }
+
+  //     message.error("Failed to create user");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const blockUser = async (record) => {
     const userId = record.key;
@@ -192,7 +242,7 @@ const User = () => {
 
   const getUsers = async () => {
     const allUsers = `${baseUrl}/user/all`;
-
+  
     setLoading(true);
     try {
       const response = await axios.get(allUsers, {
@@ -200,13 +250,15 @@ const User = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
+      console.log(response.data.data)
       const sourcedData = response.data.data.map((user) => ({
         key: user._id,
         fullName: user.fullName,
-        phoneNumber: user.phoneNumber,
+        phoneNumber: user.phoneNumber.replace(/^(\+234)/, ''), // Remove the +234 prefix
         status: user.status,
         isVerified: user.isVerified,
         email: user.email,
+        credits: user.credits
         // Add other fields as needed
       }));
       setDataSource(sourcedData);
@@ -217,6 +269,7 @@ const User = () => {
       setLoading(false);
     }
   };
+  
 
   const handleCancelUpdate = () => {
     setIsUpdateOpen(false);
@@ -378,7 +431,10 @@ const User = () => {
                 </span>
               </Menu.Item>
               <Menu.Item key="delete">
-                <span className="flex items-center" onClick={()=> deleteUser(record)}>
+                <span
+                  className="flex items-center"
+                  onClick={() => deleteUser(record)}
+                >
                   <img
                     src={bin}
                     alt="Delete"
@@ -445,11 +501,10 @@ const User = () => {
   const updateUser = (record) => {
     console.log("Selected user for update:", record);
     setSelectedUser(record);
-    // Populate the update form with the selected user's data
     updateForm.setFieldsValue({
       email: record.email,
       fullName: record.fullName,
-      phoneNumber: record.phoneNumber,
+      phoneNumber: record.phoneNumber.replace(/^\+234/, ""), // Remove the +234 prefix
       isVerified: record.isVerified,
       status: record.status,
     });
@@ -472,12 +527,15 @@ const User = () => {
         },
       });
 
+      const userStatus = response.data.data.status;
+      setUserBlockedStatus(userStatus);
+      console.log("testing,", userStatus);
       console.log("User updated:", response.data);
       message.success("User updated successfully");
       setIsUpdateOpen(false);
       setSelectedUser(null);
       updateForm.resetFields();
-      getUsers(); // Refresh the user list
+      getUsers();
     } catch (error) {
       console.error("Error updating user:", error);
       message.error("Failed to update user");
@@ -487,9 +545,23 @@ const User = () => {
   };
 
   const deleteUser = (record) => {
-    setIsModalVisible(true)
-    console.log(record)
-  }
+    confirm({
+      title: "Do you want to delete this user?",
+      icon: <ExclamationCircleFilled />,
+      content: `Are you sure you want to delete?`,
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      onOk() {
+        // Perform delete action here
+        console.log("Deleted:", record);
+        // e.g., make a delete API call
+      },
+      onCancel() {
+        console.log("Cancel");
+      },
+    });
+  };
 
   return (
     <div className="relative top-14">
@@ -567,9 +639,9 @@ const User = () => {
         }}
         confirmLoading={confirmLoading}
         isAnyChecked={isAnyChecked}
-        handleCheckboxChange={() => {
-          /* Handle checkbox change logic */
-        }}
+        // handleCheckboxChange={() => {
+        //   /* Handle checkbox change logic */
+        // }}
       />
 
       {/* Add User Modal */}
@@ -726,6 +798,7 @@ const User = () => {
           >
             <Select placeholder="Select status">
               <Select.Option value="active">Active</Select.Option>
+              <Select.Option value="block">Block</Select.Option>
               <Select.Option value="inactive">Inactive</Select.Option>
             </Select>
           </Form.Item>
@@ -741,17 +814,6 @@ const User = () => {
             </Button>
           </div>
         </Form>
-      </Modal>
-
-      <Modal
-        title="Confirm Delete"
-        visible={isModalVisible}
-        // onOk={handleOk}
-        onCancel={handleCancel}
-        okText="Delete"
-        cancelText="Cancel"
-      >
-        <p>Are you sure you want to delete the user</p>
       </Modal>
     </div>
   );
