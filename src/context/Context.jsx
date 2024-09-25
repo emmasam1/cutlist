@@ -280,8 +280,100 @@
 
 // src/context/Context.js
 
+// import React, { createContext, useState, useEffect } from "react";
+// import Cookies from "js-cookie";
+
+// export const Context = createContext();
+
+// export const ContextProvider = ({ children }) => {
+//   const [baseUrl] = useState("https://cutlist.onrender.com/api/v1");
+//   const [loggedInUser, setLoggedInUser] = useState(null);
+//   const [accessToken, setAccessToken] = useState(null);
+//   const [userBlockedStatus, setUserBlockedStatus] = useState("");
+//   const [isLoading, setIsLoading] = useState(true); // Loading state
+
+//   useEffect(() => {
+//     const savedUser = Cookies.get("loggedInUser");
+//     const savedToken = Cookies.get("accessToken");
+
+//     if (savedUser && savedToken) {
+//       try {
+//         const user = JSON.parse(savedUser);
+//         if (user && user.phoneNumber) {
+//           setLoggedInUser(user);
+//           setAccessToken(savedToken);
+//           setUserBlockedStatus(user.blockedStatus || "active");
+//         } else {
+//           throw new Error("Invalid user data");
+//         }
+//       } catch (error) {
+//         console.error("Error parsing saved user from cookies:", error);
+//         Cookies.remove("loggedInUser");
+//         Cookies.remove("accessToken");
+//       }
+//     }
+
+//     setIsLoading(false); // Mark as loaded
+//   }, []);
+
+//   console.log(userBlockedStatus);
+
+//   const farFutureDate = new Date();
+//   farFutureDate.setFullYear(farFutureDate.getFullYear() + 10);
+
+//   const login = (userData, token) => {
+//     setLoggedInUser(userData);
+//     setAccessToken(token);
+//     setUserBlockedStatus(userData.blockedStatus || "active");
+//     Cookies.set("loggedInUser", JSON.stringify(userData), {
+//       expires: farFutureDate,
+//       secure: true,
+//       sameSite: "Strict", // Helps protect against CSRF
+//     });
+//     Cookies.set("accessToken", token, {
+//       expires: farFutureDate,
+//       secure: true,
+//       sameSite: "Strict",
+//     });
+//   };
+
+//   const logout = () => {
+//     setLoggedInUser(null);
+//     setAccessToken(null);
+//     setUserBlockedStatus("active");
+//     Cookies.remove("loggedInUser");
+//     Cookies.remove("accessToken");
+//   };
+
+//   // If still loading, don't render children
+//   if (isLoading) {
+//     return <div>Loading...</div>; // Placeholder for loading screen
+//   }
+
+//   return (
+//     <Context.Provider
+//       value={{
+//         baseUrl,
+//         loggedInUser,
+//         setLoggedInUser,
+//         accessToken,
+//         login,
+//         logout,
+//         userBlockedStatus,
+//         setUserBlockedStatus,
+//       }}
+//     >
+//       {children}
+//     </Context.Provider>
+//   );
+// };
+
+
+// src/context/Context.js
+
 import React, { createContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import axios from "axios"; // Import axios for API calls
 
 export const Context = createContext();
 
@@ -290,19 +382,40 @@ export const ContextProvider = ({ children }) => {
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
   const [userBlockedStatus, setUserBlockedStatus] = useState("");
-  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const savedUser = Cookies.get("loggedInUser");
     const savedToken = Cookies.get("accessToken");
 
+    const validateUser = async (token) => {
+      try {
+        // Make an API call to validate the user with the saved token
+        const response = await axios.get(`${baseUrl}/user/all`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Use the saved token
+          },
+        });
+
+        // If the response is successful, update the user data
+        const userData = response.data;
+        setLoggedInUser(userData);
+        setAccessToken(token);
+        setUserBlockedStatus(userData.blockedStatus || "active");
+      } catch (error) {
+        console.error("Error validating user token:", error);
+        logout(); // Log the user out if token validation fails
+      } finally {
+        setIsLoading(false); // Mark as loaded regardless of success or failure
+      }
+    };
+
     if (savedUser && savedToken) {
       try {
         const user = JSON.parse(savedUser);
         if (user && user.phoneNumber) {
-          setLoggedInUser(user);
-          setAccessToken(savedToken);
-          setUserBlockedStatus(user.blockedStatus || "active");
+          // Validate the token with the server
+          validateUser(savedToken);
         } else {
           throw new Error("Invalid user data");
         }
@@ -310,13 +423,12 @@ export const ContextProvider = ({ children }) => {
         console.error("Error parsing saved user from cookies:", error);
         Cookies.remove("loggedInUser");
         Cookies.remove("accessToken");
+        setIsLoading(false); // Mark as loaded if parsing fails
       }
+    } else {
+      setIsLoading(false); // Mark as loaded if no user or token is found
     }
-
-    setIsLoading(false); // Mark as loaded
   }, []);
-
-  console.log(userBlockedStatus);
 
   const farFutureDate = new Date();
   farFutureDate.setFullYear(farFutureDate.getFullYear() + 10);
@@ -345,7 +457,6 @@ export const ContextProvider = ({ children }) => {
     Cookies.remove("accessToken");
   };
 
-  // If still loading, don't render children
   if (isLoading) {
     return <div>Loading...</div>; // Placeholder for loading screen
   }
