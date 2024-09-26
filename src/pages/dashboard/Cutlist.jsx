@@ -540,7 +540,7 @@ const Cutlist = () => {
               key: item._id,
               ...item.measurement,
               name: item.user.fullName,
-              cut_type: item.category.name,
+              cut_type: item.name,
             }))}
             size="small"
             pagination={{ pageSize: 7, position: ["bottomCenter"] }}
