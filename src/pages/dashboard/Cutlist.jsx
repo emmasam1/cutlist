@@ -13,7 +13,7 @@ import {
   message,
 } from "antd";
 import { Context } from "../../context/Context";
-
+import { ThreeDots } from "react-loader-spinner";
 import plus from "../../assets/images/icons/plus.png";
 import dots from "../../assets/images/icons/dots.png";
 import bin from "../../assets/images/icons/bin.png";
@@ -533,7 +533,21 @@ const Cutlist = () => {
             Create Cutlist
           </Button>
         </div>
-        <div className="">
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+          <ThreeDots
+            visible={true}
+            height="80"
+            width="80"
+            color="#F1B31C"
+            radius="9"
+            ariaLabel="three-dots-loading"
+            wrapperStyle={{}}
+            wrapperClass="three-dots-loading"
+          />
+        </div>
+        ) : (
+          <div className="">
           <Table
             columns={Tablecolumns}
             dataSource={tabledata.map((item) => ({
@@ -548,6 +562,8 @@ const Cutlist = () => {
             scroll={{ x: "max-content" }}
           />
         </div>
+        )}
+        
 
         <Modal
           title="Cut list Summary"
