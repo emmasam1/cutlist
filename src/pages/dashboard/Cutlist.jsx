@@ -42,7 +42,7 @@ const Cutlist = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
   const [userModal, setUserModal] = useState(false);
   const [dataSource, setDataSource] = useState([]);
-  // const [tabledata, setTabledata] = useState([]);
+  const [tabledata, setTabledata] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const { baseUrl, accessToken } = useContext(Context);
@@ -51,7 +51,7 @@ const Cutlist = () => {
   const [cutType, setCutType] = useState("Door Cut");
   const [projectName, setProjectName] = useState("");
   const [height, setHeight] = useState("");
-  const [width, setWidth] = useState('');
+  const [width, setWidth] = useState("");
   const [depth, setDepth] = useState("");
 
   const handleRadioChange = (key) => {
@@ -71,17 +71,14 @@ const Cutlist = () => {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        // const measurements = response.data.measurement.map(e => e.measurement);
-        console.log(response.measurement);
         console.log(response.data);
-        // console.log(measurements);
+        setTabledata(response.data);
       } catch (error) {
         console.log("error", error);
       }
     };
     getCutList();
   }, [accessToken, baseUrl]);
-  
 
   useEffect(() => {
     const getCategory = async () => {
@@ -113,25 +110,27 @@ const Cutlist = () => {
       measurement: { height, width, depth },
       material: "MDF", // Change if necessary
     };
-    
-    console.log('Cut List Data:', cutListData);
-    console.log('Cut List URL:', cutListUrl);
-  
+
+    console.log("Cut List Data:", cutListData);
+    console.log("Cut List URL:", cutListUrl);
+
     try {
       const response = await axios.post(cutListUrl, cutListData, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      console.log('Response:', response);
+      console.log("Response:", response);
       message.success("Cut List Created");
     } catch (error) {
       if (error.response) {
         // Server responded with a status other than 2xx
         console.error("Error response data:", error.response.data);
         console.error("Error response status:", error.response.status);
-        message.error(`Error: ${error.response.data.message || 'An error occurred'}`);
-        console.log(error)
+        message.error(
+          `Error: ${error.response.data.message || "An error occurred"}`
+        );
+        console.log(error);
       } else if (error.request) {
         // Request was made but no response received
         console.error("Error request:", error.request);
@@ -143,7 +142,6 @@ const Cutlist = () => {
       }
     }
   };
-  
 
   useEffect(() => {
     if (!accessToken) return;
@@ -393,32 +391,32 @@ const Cutlist = () => {
     },
   ];
 
-  const Tabledata = [
-    {
-      key: 0,
-      name: "Rory Mcllroy",
-      cut_type: "Door Cut",
-      height: 225,
-      width: 75,
-      depth: 80,
-    },
-    {
-      key: 1,
-      name: "Manuel Ugate",
-      cut_type: "Shelf Cut",
-      height: 352,
-      width: 75,
-      depth: 60,
-    },
-    {
-      key: 2,
-      name: "Emile Smith",
-      cut_type: "Console Cut",
-      height: 305,
-      width: 95,
-      depth: 50,
-    },
-  ];
+  // const Tabledata = [
+  //   {
+  //     key: 0,
+  //     name: "Rory Mcllroy",
+  //     cut_type: "Door Cut",
+  //     height: 225,
+  //     width: 75,
+  //     depth: 80,
+  //   },
+  //   {
+  //     key: 1,
+  //     name: "Manuel Ugate",
+  //     cut_type: "Shelf Cut",
+  //     height: 352,
+  //     width: 75,
+  //     depth: 60,
+  //   },
+  //   {
+  //     key: 2,
+  //     name: "Emile Smith",
+  //     cut_type: "Console Cut",
+  //     height: 305,
+  //     width: 95,
+  //     depth: 50,
+  //   },
+  // ];
 
   const data = [
     {
@@ -564,12 +562,16 @@ const Cutlist = () => {
         <div className="">
           <Table
             columns={Tablecolumns}
-            dataSource={Tabledata}
+            dataSource={tabledata.map((item) => ({
+              key: item._id,
+              ...item.measurement,
+              name: item.name,
+              cut_type: item.category.name,
+            }))}
             size="small"
             pagination={{ pageSize: 7, position: ["bottomCenter"] }}
             className="custom-table"
             scroll={{ x: "max-content" }}
-            // scroll={{ x: 600 }} // Enable horizontal scrolling
           />
         </div>
 
