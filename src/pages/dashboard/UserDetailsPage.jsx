@@ -87,6 +87,9 @@ const UserDetailsPage = () => {
       setLoading(false);
     }
   };
+
+  console.log(record.projects.length);
+
   
 
   if (!record) {
@@ -164,7 +167,7 @@ const UserDetailsPage = () => {
           <div>
             <div className="flex items-center">
               <h2 className="font-bold mr-2">Projects Created:</h2>
-              <span>{record.projectsCreated || "0"}</span>
+              <span>{record.projects.length || "0"}</span>
             </div>
             <div className="flex items-center mt-3">
               <h2 className="font-bold mr-2">Cutlists Created:</h2>

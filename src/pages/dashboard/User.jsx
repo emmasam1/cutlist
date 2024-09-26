@@ -77,7 +77,8 @@ const User = () => {
           status: user.status,
           isVerified: user.isVerified,
           email: user.email,
-          credits: user.credits
+          credits: user.credits,
+          projects: user.projects
           // Add other fields as needed
         }));
         setDataSource(sourcedData);
@@ -258,7 +259,8 @@ const User = () => {
         status: user.status,
         isVerified: user.isVerified,
         email: user.email,
-        credits: user.credits
+        credits: user.credits,
+        projects: user.projects
         // Add other fields as needed
       }));
       setDataSource(sourcedData);

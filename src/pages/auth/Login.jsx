@@ -30,7 +30,7 @@ const Login = () => {
 
       if (user && access_token) {
         login(user, access_token);
-        console.log("Login successful:", response);
+        // console.log("Login successful:", response);
         // Navigate to dashboard or another page
         navigate('/dashboard');
       } else {

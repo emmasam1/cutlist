@@ -9,6 +9,8 @@ import {
   Dropdown,
   Menu,
   Select,
+  Radio,
+  message,
 } from "antd";
 import { Context } from "../../context/Context";
 
@@ -20,9 +22,11 @@ import view from "../../assets/images/icons/view.png";
 import arrow from "../../assets/images/icons/arrow_long_right.png";
 import full_list from "../../assets/images/icons/full_list.png";
 import checkbox from "../../assets/images/icons/checkbox_full.png";
+import check from "../../assets/images/icons/check.png";
+import no_data from "../../assets/images/icons/no_data.png";
 
-import CreateCutlist from "../../components/createCutlist/Cutlist";
-import ViewCutlist from "../../components/viewCutlist/Cutlist";
+// import CreateCutlist from "../../components/createCutlist/Cutlist";
+// import ViewCutlist from "../../components/viewCutlist/Cutlist";
 import Users from "../../components/allUsers/AllUsers";
 
 const Cutlist = () => {
@@ -33,18 +37,55 @@ const Cutlist = () => {
   const [previewCutlist, setPreviewCutlist] = useState(false);
   const [allUsers, setAllUsers] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [user, setUser] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
+  const [userModal, setUserModal] = useState(false);
+  const [dataSource, setDataSource] = useState([]);
+  // const [tabledata, setTabledata] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const { baseUrl, accessToken } = useContext(Context);
+  const [selectedRole, setSelectedRole] = useState(null);
+
+  const [cutType, setCutType] = useState("Door Cut");
+  const [projectName, setProjectName] = useState("");
+  const [height, setHeight] = useState("");
+  const [width, setWidth] = useState('');
+  const [depth, setDepth] = useState("");
+
+  const handleRadioChange = (key) => {
+    setSelectedRole(key);
+  };
 
   const onSearch = (value) => {
     setSearchText(value);
   };
 
   useEffect(() => {
+    const getCutList = async () => {
+      const cutList = `${baseUrl}/admin/tasks`;
+      try {
+        const response = await axios.get(cutList, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        // const measurements = response.data.measurement.map(e => e.measurement);
+        console.log(response.measurement);
+        console.log(response.data);
+        // console.log(measurements);
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+    getCutList();
+  }, [accessToken, baseUrl]);
+  
+
+  useEffect(() => {
     const getCategory = async () => {
-      const categoryUrl = `${baseUrl}/all-cat`; // Replace with actual baseUrl
+      const categoryUrl = `${baseUrl}/all-cat`;
       try {
         const response = await axios.get(categoryUrl, {
           headers: {
@@ -52,8 +93,8 @@ const Cutlist = () => {
           },
         });
         const categoryData = response.data;
-        console.log(categoryData);
-        console.log("from thop", categoryData._id);
+        // console.log(categoryData);
+        // console.log("from thop", categoryData._id);
         setCategories(categoryData);
       } catch (error) {
         console.log("error", error);
@@ -62,6 +103,83 @@ const Cutlist = () => {
 
     getCategory();
   }, [accessToken, baseUrl]);
+
+  const createCutlit = async () => {
+    const cutListUrl = `${baseUrl}/task`;
+    const cutListData = {
+      categoryId: selectedCategoryId,
+      userId: user,
+      name: projectName,
+      measurement: { height, width, depth },
+      material: "MDF", // Change if necessary
+    };
+    
+    console.log('Cut List Data:', cutListData);
+    console.log('Cut List URL:', cutListUrl);
+  
+    try {
+      const response = await axios.post(cutListUrl, cutListData, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      console.log('Response:', response);
+      message.success("Cut List Created");
+    } catch (error) {
+      if (error.response) {
+        // Server responded with a status other than 2xx
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        message.error(`Error: ${error.response.data.message || 'An error occurred'}`);
+        console.log(error)
+      } else if (error.request) {
+        // Request was made but no response received
+        console.error("Error request:", error.request);
+        message.error("No response received from server.");
+      } else {
+        // Something else caused the error
+        console.error("Error message:", error.message);
+        message.error(`Error: ${error.message}`);
+      }
+    }
+  };
+  
+
+  useEffect(() => {
+    if (!accessToken) return;
+
+    const getUsers = async () => {
+      const allUsers = `${baseUrl}/user/all`;
+
+      setLoading(true);
+      try {
+        const response = await axios.get(allUsers, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        // console.log(response.data.data);
+        const sourcedData = response.data.data.map((user) => ({
+          key: user._id,
+          fullName: user.fullName,
+          phoneNumber: user.phoneNumber.replace(/^(\+234)/, ""), // Remove the +234 prefix
+          status: user.status,
+          isVerified: user.isVerified,
+          // email: user.email,
+          // credits: user.credits,
+          // projects: user.projects,
+          // Add other fields as needed
+        }));
+        setDataSource(sourcedData);
+      } catch (error) {
+        console.error("Error while getting records:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getUsers();
+  }, [baseUrl, accessToken]);
 
   const createCutList = async (cutListData) => {
     try {
@@ -72,6 +190,21 @@ const Cutlist = () => {
       setIsModalOpen(false);
     } catch (error) {
       console.log("Error creating cut list:", error);
+    }
+  };
+
+  const openUserModal = () => {
+    setUserModal(false);
+  };
+
+  const handleUserModal = () => {
+    console.log("Current User State:", user); // Debug log
+    if (!user) {
+      message.warning("Please select a user");
+    } else {
+      console.log("Selected User ID:", user);
+      setIsModalOpen(true);
+      setUserModal(false);
     }
   };
 
@@ -87,7 +220,7 @@ const Cutlist = () => {
 
   const closeSideBar = () => {
     setSideModal(false);
-    setPreviewCutlist(false); // Reset to CreateCutlist
+    setPreviewCutlist(false);
   };
 
   const handleCancel = () => {
@@ -353,6 +486,62 @@ const Cutlist = () => {
     },
   ];
 
+  const columns = [
+    {
+      dataIndex: "select",
+      width: 50,
+      render: (_, record) => (
+        <Radio
+          checked={selectedRole === record.key}
+          onChange={() => handleRadioChange(record.key)}
+          onClick={() => setUser(record.key)}
+        />
+      ),
+    },
+    {
+      title: "All User",
+      dataIndex: "fullName",
+      width: 200,
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      render: (status) => {
+        const isActive = status === "active";
+        const className = isActive
+          ? "bg-[#5EDA79] text-[#1F7700] px-3 py-1 rounded-full"
+          : "bg-[#FF000042] text-[#FF3D00] px-3 py-1 rounded-full";
+        return (
+          <span className={className}>
+            {status.charAt(0).toUpperCase() + status.slice(1)}
+          </span>
+        );
+      },
+      width: 100,
+    },
+    {
+      title: "Phone Number",
+      dataIndex: "phoneNumber",
+      width: 150,
+      render: (phoneNumber) => `+234${phoneNumber}`,
+    },
+    {
+      title: "Verification",
+      dataIndex: "isVerified",
+      render: (isVerified) => (
+        <span className="flex items-center">
+          <img
+            src={isVerified ? check : no_data}
+            alt={isVerified ? "Verified" : "Unverified"}
+            style={{ width: 18, height: 18, marginRight: 8 }}
+          />
+          {isVerified ? "Verified Phone Number" : "Unverified Phone Number"}
+        </span>
+      ),
+      width: 200,
+    },
+  ];
+
   const handleCategoryChange = (value, option) => {
     setSelectedCategory(value);
     setSelectedCategoryId(option.key); // Use the key as the category ID
@@ -364,7 +553,8 @@ const Cutlist = () => {
       <div className="bg-white rounded p-4">
         <div className="flex justify-end mb-3">
           <Button
-            onClick={() => setIsModalOpen(true)}
+            // onClick={() => setIsModalOpen(true)}
+            onClick={() => setUserModal(true)}
             className="flex items-center bg-[#F2C94C] hover:!bg-[#F2C94C] border-none hover:!text-black rounded p-2 px-3"
           >
             <img src={plus} alt="Plus Icon" className="w-3 mr-1" />
@@ -438,8 +628,9 @@ const Cutlist = () => {
           </div>
         </Modal>
 
+        {/* selset category modal */}
         <Modal
-          title="Create Cut list"
+          title="Create Cut List"
           open={isModalOpen}
           footer={null}
           onCancel={handleCancel}
@@ -448,7 +639,7 @@ const Cutlist = () => {
           <Form
             name="notificationForm"
             initialValues={{ remember: true }}
-            // onFinish={onFinish}
+            onFinish={handleModal} // Handle form submission
             className="mt-6"
           >
             <div className="flex flex-col">
@@ -457,7 +648,7 @@ const Cutlist = () => {
                 rules={[
                   {
                     required: true,
-                    message: "Please enter category!",
+                    message: "Please select a category!",
                   },
                 ]}
               >
@@ -466,7 +657,7 @@ const Cutlist = () => {
                   value={selectedCategory}
                   onChange={handleCategoryChange}
                 >
-                  {categories.map((category, index) => (
+                  {categories.map((category) => (
                     <Select.Option key={category._id} value={category.name}>
                       {category.name}
                     </Select.Option>
@@ -478,8 +669,7 @@ const Cutlist = () => {
             <div className="flex justify-end">
               <Form.Item>
                 <Button
-                  onClick={handleModal}
-                  htmlType="submit"
+                  htmlType="submit" // Submit the form
                   className="bg-[#F2C94C] hover:!bg-[#F2C94C] hover:!text-black border-none p-3 px-3 rounded-full h-8 flex justify-center items-center text-[.7rem]"
                 >
                   Create Project
@@ -489,6 +679,7 @@ const Cutlist = () => {
             </div>
           </Form>
         </Modal>
+        {/* selset category modal */}
 
         <Modal
           title={
@@ -518,7 +709,7 @@ const Cutlist = () => {
               ) : (
                 <Button
                   className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10"
-                  onClick={() => setPreviewCutlist(true)}
+                  onClick={() => createCutlit()}
                 >
                   {" "}
                   Preview List
@@ -530,11 +721,79 @@ const Cutlist = () => {
           className="custom-modal"
           getContainer={false}
         >
-          {previewCutlist ? (
+          {/* {previewCutlist ? (
             <ViewCutlist />
           ) : (
             <CreateCutlist selectedCategoryId={selectedCategoryId} />
-          )}
+          )} */}
+          <div>
+            <div>
+              <h2 className="font-semibold">Cut Type</h2>
+              <div className="flex gap-6 mt-1">
+                <Button className="rounded-full bg-[#F2C94C] hover:!bg-[#F2C94C] border-none hover:!text-black">
+                  Door Cut
+                </Button>
+                <Button className="rounded-full bg-[#fcfcfca4] hover:!bg-[#fcfcfca4] hover:!text-black border-none">
+                  Window Cut
+                </Button>
+                <Button className="rounded-full bg-[#fcfcfca4] hover:!bg-[#fcfcfca4] hover:!text-black border-none">
+                  Bed Cut
+                </Button>
+              </div>
+            </div>
+            <div className="mt-10">
+              <Input
+                placeholder="Enter Project Name"
+                value={projectName}
+                onChange={(e) => setProjectName(e.target.value)}
+              />
+              <div className="flex items-center justify-between">
+                <h2 className="font-semibold">Measuremente</h2>
+                <span className="text-[#f2994a]">(2 Long)</span>
+              </div>
+              <div className="flex gap-6 mt-1">
+                <Input
+                  placeholder="Height"
+                  type="number"
+                  value={height}
+                  onChange={(e) => setHeight(e.target.value)}
+                />
+                <Input
+                  placeholder="Weight"
+                  type="number"
+                  value={width}
+                  onChange={(e) => setWidth(e.target.value)}
+                />
+                <Input
+                  placeholder="Depth"
+                  type="number"
+                  value={depth}
+                  onChange={(e) => setDepth(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="mt-52 border-t-[.1rem]">
+              <p className="mt-3">
+                <span className="text-[#F2994A] font-semibold text-lg">
+                  LNG &nbsp;
+                </span>
+                - Means (Long).
+              </p>
+              <p>
+                <span className="text-[#F2994A] font-semibold text-lg">
+                  F-E-T&nbsp;
+                </span>
+                - Means (Long).
+              </p>
+              <p>
+                <span className="text-[#F2994A] font-semibold text-lg">
+                  & &nbsp;
+                </span>
+                - Means (And).
+              </p>
+            </div>
+          </div>
         </Modal>
 
         <Modal
@@ -557,6 +816,34 @@ const Cutlist = () => {
           getContainer={false}
         >
           <Users />
+        </Modal>
+
+        <Modal
+          title="All users"
+          open={userModal}
+          onCancel={openUserModal}
+          footer={
+            user == [] || !user ? null : (
+              <Button
+                onClick={handleUserModal}
+                htmlType="submit"
+                className="bg-[#F2C94C] hover:!bg-[#F2C94C] hover:!text-black border-none p-3 px-3 rounded-full h-8  text-[.7rem]"
+              >
+                Select A User
+              </Button>
+            )
+          }
+          width={1000}
+          size="small"
+          pagination={{ pageSize: 7, position: ["bottomCenter"] }}
+          className="custom-table"
+          scroll={{ x: "max-content" }}
+        >
+          <Table
+            columns={columns}
+            dataSource={dataSource}
+            // pagination={false} // You can enable pagination if needed
+          />
         </Modal>
       </div>
     </div>
