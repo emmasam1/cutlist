@@ -539,7 +539,7 @@ const Cutlist = () => {
             dataSource={tabledata.map((item) => ({
               key: item._id,
               ...item.measurement,
-              name: item.name,
+              name: item.user.fullName,
               cut_type: item.category.name,
             }))}
             size="small"

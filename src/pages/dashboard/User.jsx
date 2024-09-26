@@ -69,7 +69,7 @@ const User = () => {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        console.log(response.data.data)
+        // console.log(response.data.data)
         const sourcedData = response.data.data.map((user) => ({
           key: user._id,
           fullName: user.fullName,
@@ -103,11 +103,11 @@ const User = () => {
       phoneNumber: phoneNumberWithPrefix,
     };
 
-    console.log("API URL:", userRegUrl);
-    console.log("Values before modification:", values);
-    console.log("Payload being sent:", payload);
+    // console.log("API URL:", userRegUrl);
+    // console.log("Values before modification:", values);
+    // console.log("Payload being sent:", payload);
 
-    console.log("Access Token:", accessToken);
+    // console.log("Access Token:", accessToken);
     try {
       const response = await axios.post(userRegUrl, payload, {
         headers: {
