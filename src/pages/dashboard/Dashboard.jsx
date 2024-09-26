@@ -17,6 +17,7 @@ const Dashboard = () => {
 
   const { baseUrl, accessToken } = useContext(Context);
   const [totalUser, setTotalUser] = useState(0)
+  const [totalCutList, setTotalCutList] = useState(0)
 
   useEffect(() => {
     if (!accessToken) return; 
@@ -44,6 +45,24 @@ const Dashboard = () => {
     };
 
     getUsers();
+  }, [accessToken]);
+
+  useEffect(() => {
+    const getCategory = async () => {
+      const cutList = `${baseUrl}/admin/tasks`;
+      try {
+        const response = await axios.get(cutList, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        const cut = response.data.length;
+        setTotalCutList(cut)
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+    getCategory();
   }, [accessToken]);
 
   // Logging totalUser when it changes
@@ -96,7 +115,7 @@ const Dashboard = () => {
     {
       id: 3,
       title: "total cutlist",
-      amount: "12.5k",
+      amount: totalCutList,
       dec: "Total amount of cutlist created",
       bg_color: "#F5DEDE",
       img: book,

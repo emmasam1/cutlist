@@ -391,32 +391,6 @@ const Cutlist = () => {
     },
   ];
 
-  // const Tabledata = [
-  //   {
-  //     key: 0,
-  //     name: "Rory Mcllroy",
-  //     cut_type: "Door Cut",
-  //     height: 225,
-  //     width: 75,
-  //     depth: 80,
-  //   },
-  //   {
-  //     key: 1,
-  //     name: "Manuel Ugate",
-  //     cut_type: "Shelf Cut",
-  //     height: 352,
-  //     width: 75,
-  //     depth: 60,
-  //   },
-  //   {
-  //     key: 2,
-  //     name: "Emile Smith",
-  //     cut_type: "Console Cut",
-  //     height: 305,
-  //     width: 95,
-  //     depth: 50,
-  //   },
-  // ];
 
   const data = [
     {
