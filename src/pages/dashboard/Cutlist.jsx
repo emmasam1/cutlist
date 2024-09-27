@@ -25,16 +25,13 @@ import checkbox from "../../assets/images/icons/checkbox_full.png";
 import check from "../../assets/images/icons/check.png";
 import no_data from "../../assets/images/icons/no_data.png";
 
-// import CreateCutlist from "../../components/createCutlist/Cutlist";
-// import ViewCutlist from "../../components/viewCutlist/Cutlist";
 import Users from "../../components/allUsers/AllUsers";
 
 const Cutlist = () => {
   const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isModalSummary, setIsModalSummary] = useState(false);
+  // const [isModalSummary, setIsModalSummary] = useState(false);
   const [sideModal, setSideModal] = useState(false);
-  const [previewCutlist, setPreviewCutlist] = useState(false);
   const [allUsers, setAllUsers] = useState(false);
   const [categories, setCategories] = useState([]);
   const [user, setUser] = useState([]);
@@ -108,7 +105,7 @@ const Cutlist = () => {
       userId: user,
       name: projectName,
       measurement: { height, width, depth },
-      material: "MDF", // Change if necessary
+      material: "MDF",
     };
 
     console.log("Cut List Data:", cutListData);
@@ -163,8 +160,8 @@ const Cutlist = () => {
           phoneNumber: user.phoneNumber.replace(/^(\+234)/, ""), // Remove the +234 prefix
           status: user.status,
           isVerified: user.isVerified,
+          credits: user.credits,
           // email: user.email,
-          // credits: user.credits,
           // projects: user.projects,
           // Add other fields as needed
         }));
@@ -248,46 +245,46 @@ const Cutlist = () => {
     }
   };
 
-  const getMenu = (record) => (
-    <Menu onClick={(e) => handleMenuClick(e, record)}>
-      <Menu.Item
-        key="view"
-        icon={
-          <img
-            src={view}
-            alt="View"
-            style={{ width: "16px", marginRight: "8px" }}
-          />
-        }
-      >
-        View
-      </Menu.Item>
-      <Menu.Item
-        key="edit"
-        icon={
-          <img
-            src={send}
-            alt="Edit"
-            style={{ width: "16px", marginRight: "8px" }}
-          />
-        }
-      >
-        Edit
-      </Menu.Item>
-      <Menu.Item
-        key="delete"
-        icon={
-          <img
-            src={bin}
-            alt="Delete"
-            style={{ width: "16px", marginRight: "8px" }}
-          />
-        }
-      >
-        Delete
-      </Menu.Item>
-    </Menu>
-  );
+  // const getMenu = (record) => (
+  //   <Menu onClick={(e) => handleMenuClick(e, record)}>
+  //     <Menu.Item
+  //       key="view"
+  //       icon={
+  //         <img
+  //           src={view}
+  //           alt="View"
+  //           style={{ width: "16px", marginRight: "8px" }}
+  //         />
+  //       }
+  //     >
+  //       View
+  //     </Menu.Item>
+  //     <Menu.Item
+  //       key="edit"
+  //       icon={
+  //         <img
+  //           src={send}
+  //           alt="Edit"
+  //           style={{ width: "16px", marginRight: "8px" }}
+  //         />
+  //       }
+  //     >
+  //       Edit
+  //     </Menu.Item>
+  //     <Menu.Item
+  //       key="delete"
+  //       icon={
+  //         <img
+  //           src={bin}
+  //           alt="Delete"
+  //           style={{ width: "16px", marginRight: "8px" }}
+  //         />
+  //       }
+  //     >
+  //       Delete
+  //     </Menu.Item>
+  //   </Menu>
+  // );
 
   const Tablecolumns = [
     {
@@ -391,7 +388,6 @@ const Cutlist = () => {
     },
   ];
 
-
   const data = [
     {
       key: 0,
@@ -476,6 +472,10 @@ const Cutlist = () => {
       width: 200,
     },
     {
+      title: "Credits",
+      dataIndex: "credits",
+    },
+    {
       title: "Status",
       dataIndex: "status",
       render: (status) => {
@@ -535,17 +535,17 @@ const Cutlist = () => {
         </div>
         {loading ? (
           <div className="flex justify-center items-center h-64">
-          <ThreeDots
-            visible={true}
-            height="80"
-            width="80"
-            color="#F1B31C"
-            radius="9"
-            ariaLabel="three-dots-loading"
-            wrapperStyle={{}}
-            wrapperClass="three-dots-loading"
-          />
-        </div>
+            <ThreeDots
+              visible={true}
+              height="80"
+              width="80"
+              color="#F1B31C"
+              radius="9"
+              ariaLabel="three-dots-loading"
+              wrapperStyle={{}}
+              wrapperClass="three-dots-loading"
+            />
+          </div>
         ) : (
           <Table
             columns={Tablecolumns}
@@ -561,9 +561,8 @@ const Cutlist = () => {
             scroll={{ x: "max-content" }}
           />
         )}
-        
 
-        <Modal
+        {/* <Modal
           title="Cut list Summary"
           open={isModalSummary}
           onCancel={handleSummaryCancel}
@@ -616,9 +615,9 @@ const Cutlist = () => {
               <img src={checkbox} alt="" className="w-4" />
             </Button>
           </div>
-        </Modal>
+        </Modal> */}
 
-        {/* selset category modal */}
+        {/* select category modal */}
         <Modal
           title="Create Cut List"
           open={isModalOpen}
@@ -629,7 +628,7 @@ const Cutlist = () => {
           <Form
             name="notificationForm"
             initialValues={{ remember: true }}
-            onFinish={handleModal} // Handle form submission
+            onFinish={handleModal}
             className="mt-6"
           >
             <div className="flex flex-col">
@@ -669,53 +668,40 @@ const Cutlist = () => {
             </div>
           </Form>
         </Modal>
-        {/* selset category modal */}
+        {/* select category modal */}
 
+      <Modal
+        className="custom-modal"
+        width={400}
+      >
+
+      </Modal>
+
+        {/* create cutlist modal */}
         <Modal
           title={
-            previewCutlist ? (
-              <div className="flex justify-center">
-                <span className="">Cut List Summary</span>
-              </div>
-            ) : (
-              <div className="flex justify-center">
-                <span className="">Create Cut List</span>
-              </div>
-            )
+            <div className="flex justify-center">
+              <span className="">Create Cut List</span>
+            </div>
           }
           width={400}
           open={sideModal}
           onCancel={closeSideBar}
           footer={[
             <div className="flex justify-center " key="footer">
-              {previewCutlist ? (
-                <Button
-                  className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10"
-                  onClick={handleClose2}
-                >
-                  {" "}
-                  Save List
-                </Button>
-              ) : (
-                <Button
-                  className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10"
-                  onClick={() => createCutlit()}
-                >
-                  {" "}
-                  Preview List
-                  <img src={arrow} alt="" className="w-4" />
-                </Button>
-              )}
+              <Button
+                className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10"
+                onClick={() => createCutlit()}
+              >
+                {" "}
+                Preview List
+                <img src={arrow} alt="" className="w-4" />
+              </Button>
             </div>,
           ]}
           className="custom-modal"
           getContainer={false}
         >
-          {/* {previewCutlist ? (
-            <ViewCutlist />
-          ) : (
-            <CreateCutlist selectedCategoryId={selectedCategoryId} />
-          )} */}
           <div>
             <div>
               <h2 className="font-semibold">Cut Type</h2>
@@ -785,6 +771,7 @@ const Cutlist = () => {
             </div>
           </div>
         </Modal>
+        {/* create cutlist modal */}
 
         <Modal
           title=""

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import moment from "moment";
 import {
   Table,
   Modal,
@@ -9,6 +10,7 @@ import {
   Dropdown,
   Menu,
   message,
+  DatePicker,
 } from "antd";
 
 import dots from "../../assets/images/icons/dots.png";
@@ -23,40 +25,57 @@ import bin from "../../assets/images/icons/bin.png";
 import { Context } from "../../context/Context";
 import { ThreeDots } from "react-loader-spinner";
 import axios from "axios";
+const { RangePicker } = DatePicker;
 
 const Credit = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { baseUrl, accessToken } = useContext(Context);
   const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState([]);
+  const [showDate, setShowDate] = useState("");
+  const [currentRecord, setCurrentRecord] = useState(null);
   const [form] = Form.useForm();
+
+  const handleDate = (value) => {
+    setShowDate(value);
+  };
 
   const createCredit = async (values) => {
     const creditUrl = `${baseUrl}/credit-package/create`;
-    setLoading(true); 
-  
+    setLoading(true);
+
+    if (values.duration === "custom" && showDate.length === 2) {
+      const start = showDate[0];
+      const end = showDate[1];
+      const customDurationInDays = end.diff(start, "days");
+
+      values = {
+        ...values,
+        customDuration: customDurationInDays,
+      };
+    }
+
     try {
       console.log("Submitting values:", values);
-  
+
       const response = await axios.post(creditUrl, values, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-  
-      console.log("Response data:", response.data); 
-      form.resetFields(); 
-      setIsModalOpen(false)
+
+      form.resetFields();
+      setIsModalOpen(false);
       message.success("Package created successfully");
+      getCredit();
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Failed to create";
       console.error("Error:", error);
       message.error(errorMessage);
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
-  
 
   useEffect(() => {
     const getCredit = async () => {
@@ -71,16 +90,16 @@ const Credit = () => {
         const data = response.data.data.map((credit) => ({
           key: credit._id,
           duration: credit.duration,
+          amount: credit.amount,
           price: credit.price,
-          status: credit.status
-        }))
-        console.log(data)
-        setDataSource(data)
-        console.log(response);
+          status: credit.status,
+        }));
+
+        setDataSource(data);
       } catch (error) {
         console.error(error);
       } finally {
-        setLoading(false); // Ensure loading is set to false
+        setLoading(false);
       }
     };
     getCredit();
@@ -93,57 +112,48 @@ const Credit = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
     form.resetFields();
+    setCurrentRecord(null);
   };
 
-  const handleMenuClick = (e, record) => {
-    if (e.key === "view") {
-      console.log("Profile", record);
-      // Handle view logic here
-    } else if (e.key === "deactivate") {
-      console.log("Deactivate", record);
-      // Handle deactivate logic here
-    } else if (e.key === "delete") {
-      console.log("Delete", record);
-      // Handle delete logic here
+  const updateCredit = (record) => {
+    if (!record) {
+      console.error("No record provided to updateCredit");
+      return;
+    }
+
+    console.log("Updating record:", record);
+
+    setCurrentRecord(record);
+    form.setFieldsValue({
+      amount: record.amount,
+      price: record.price,
+      duration: record.duration,
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleUpdateSubmit = async (values) => {
+    const updateUrl = `${baseUrl}/credit-package/update/${currentRecord.key}`; // Use the record's ID
+    setLoading(true);
+
+    try {
+      const response = await axios.put(updateUrl, values, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      message.success("Package updated successfully");
+      form.resetFields();
+      setIsModalOpen(false);
+      getCredit();
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || "Failed to update";
+      message.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
-
-  const getMenu = (record) => (
-    <Menu onClick={(e) => handleMenuClick(e, record)}>
-      <Menu.Item
-        key="view"
-        icon={<img src={edit} alt="Profile" style={{ width: "16px", marginRight: "8px" }} />}
-      >
-        Profile
-      </Menu.Item>
-      <Menu.Item
-        key="deactivate"
-        icon={<img src={no_data} alt="Deactivate" style={{ width: "16px", marginRight: "8px" }} />}
-      >
-        Deactivate
-      </Menu.Item>
-      <Menu.Item
-        key="delete"
-        icon={<img src={bin} alt="Delete" style={{ width: "16px", marginRight: "8px" }} />}
-      >
-        Block
-      </Menu.Item>
-    </Menu>
-  );
-
-  const tableData = [
-    // Sample data for the table
-    {
-      key: "1",
-      credit: "10 Credit",
-      price: "N155,000",
-      status: "Active",
-      total_sales: 10,
-      total_revenue: "15,000 NGN",
-      create_at: "Aug 17, 2023 4:30pm",
-    },
-    // Other rows...
-  ];
 
   const columns = [
     {
@@ -157,6 +167,11 @@ const Credit = () => {
       key: "duration",
     },
     {
+      title: "Amount",
+      dataIndex: "amount",
+      key: "amount",
+    },
+    {
       title: "Price",
       dataIndex: "price",
       key: "price",
@@ -165,15 +180,19 @@ const Credit = () => {
       title: "Status",
       dataIndex: "status",
       render: (status) => {
-        const isActive = status; // This is a boolean now
+        const isActive = status;
         const className = isActive
           ? "bg-[#5EDA79] text-[#1F7700] px-3 w-20 rounded-full flex items-center"
           : "px-3 w-20 border rounded-full bg-[#FF000042] text-[#FF3D00] flex items-center";
         const statusImage = isActive ? check_green : inactive;
-    
+
         return (
           <span className={className}>
-            <img src={statusImage} alt={isActive ? "Active" : "Inactive"} className="w-2 h-2 mr-1" />
+            <img
+              src={statusImage}
+              alt={isActive ? "Active" : "Inactive"}
+              className="w-2 h-2 mr-1"
+            />
             {isActive ? "Active" : "Inactive"}
           </span>
         );
@@ -187,10 +206,21 @@ const Credit = () => {
           menu={{
             items: [
               {
-                key: "view",
+                key: "update",
                 label: (
-                  <span className="flex items-center">
-                    <img src={edit} alt="View" style={{ width: "17px", height: "17px", marginRight: "8px" }} />
+                  <span
+                    className="flex items-center"
+                    onClick={() => updateCredit(record)}
+                  >
+                    <img
+                      src={edit}
+                      alt="Edit"
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
+                    />
                     Update
                   </span>
                 ),
@@ -199,7 +229,15 @@ const Credit = () => {
                 key: "deactivate",
                 label: (
                   <span className="flex items-center">
-                    <img src={no_data} alt="Deactivate" style={{ width: "17px", height: "17px", marginRight: "8px" }} />
+                    <img
+                      src={no_data}
+                      alt="Deactivate"
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
+                    />
                     Deactivate
                   </span>
                 ),
@@ -208,18 +246,29 @@ const Credit = () => {
                 key: "delete",
                 label: (
                   <span className="flex items-center">
-                    <img src={bin} alt="Delete" style={{ width: "17px", height: "17px", marginRight: "8px" }} />
+                    <img
+                      src={bin}
+                      alt="Delete"
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
+                    />
                     Delete
                   </span>
                 ),
               },
             ],
-            onClick: (e) => handleMenuClick(e, record),
           }}
           trigger={["click"]}
         >
           <Button>
-            <img src={dots} alt="Actions" className="flex items-center justify-center w-1" />
+            <img
+              src={dots}
+              alt="Actions"
+              className="flex items-center justify-center w-1"
+            />
           </Button>
         </Dropdown>
       ),
@@ -232,7 +281,7 @@ const Credit = () => {
         <div className="flex justify-end mb-3">
           <Button
             onClick={showModal}
-            className="flex border-none items-center hover:!text-black bg-[#F2C94C] rounded p-2 px-3"
+            className="flex items-center bg-[#F2C94C] hover:!bg-[#F2C94C] border-none hover:!text-black rounded p-2 px-3"
           >
             <img src={plus} alt="" className="w-3 mr-1" />
             Add Credit Package
@@ -241,53 +290,55 @@ const Credit = () => {
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
-          <ThreeDots
-            visible={true}
-            height="80"
-            width="80"
-            color="#F1B31C"
-            radius="9"
-            ariaLabel="three-dots-loading"
-            wrapperStyle={{}}
-            wrapperClass="three-dots-loading"
-          />
-        </div>
+            <ThreeDots
+              visible={true}
+              height="80"
+              width="80"
+              color="#F1B31C"
+              radius="9"
+              ariaLabel="three-dots-loading"
+              wrapperStyle={{}}
+              wrapperClass="three-dots-loading"
+            />
+          </div>
         ) : (
           <Table
-          columns={columns}
-          dataSource={dataSource}
-          size="small"
-          pagination={{ pageSize: 7, position: ["bottomCenter"] }}
-          className="custom-table"
-          scroll={{ x: "max-content" }}
-        />
+            columns={columns}
+            dataSource={dataSource}
+            size="small"
+            pagination={{ pageSize: 7, position: ["bottomCenter"] }}
+            className="custom-table"
+            scroll={{ x: "max-content" }}
+          />
         )}
-        
 
         <Modal
-          title="Create Custom Credit"
+          title={
+            currentRecord ? "Update Credit Package" : "Create Custom Credit"
+          }
           open={isModalOpen}
-          footer={null} // Disable default footer buttons
+          footer={null}
           onCancel={handleCancel}
           width={350}
         >
           <Form
             name="creditForm"
+            onFinish={currentRecord ? handleUpdateSubmit : createCredit} // Use the correct handler
             initialValues={{ remember: true }}
-            onFinish={createCredit}
-            form={form} // Link the form instance
+            form={form}
             className="mt-6"
           >
             <div className="flex flex-col items-center">
               <Form.Item
                 name="amount"
-                rules={[{ required: true, message: "Input credit package amount!" }]}
+                rules={[
+                  { required: true, message: "Input credit package amount!" },
+                ]}
               >
                 <Input
                   placeholder="Input credit package amount"
                   type="number"
-                  name="amount"
-                  style={{ fontSize: "14px", width: "300px" }} // Increase input size
+                  style={{ fontSize: "14px", width: "300px" }}
                 />
               </Form.Item>
               <Form.Item
@@ -296,9 +347,8 @@ const Credit = () => {
               >
                 <Input
                   type="number"
-                  name="price"
                   placeholder="Input Price"
-                  style={{ fontSize: "14px", width: "300px" }} // Increase input size
+                  style={{ fontSize: "14px", width: "300px" }}
                 />
               </Form.Item>
 
@@ -307,8 +357,7 @@ const Credit = () => {
                 rules={[{ required: true, message: "Select an option!" }]}
               >
                 <Select
-                  defaultValue="Select an option"
-                  name="duration"
+                  onChange={handleDate}
                   style={{ width: "300px" }}
                   options={[
                     { value: "1 day", label: "1 Day" },
@@ -323,14 +372,27 @@ const Credit = () => {
               </Form.Item>
             </div>
 
+            {showDate === "custom" ? (
+              <Form.Item
+                name="customDuration"
+                rules={[{ required: true, message: "Select a date range!" }]}
+              >
+                <RangePicker style={{ width: "300px" }} onChange={handleDate} />
+              </Form.Item>
+            ) : null}
+
             <div className="flex justify-end">
               <Form.Item>
                 <Button
                   className="bg-[#F2C94C] hover:!bg-[#F2C94C] hover:!text-black border-none p-3 rounded-full h-8 flex justify-center items-center text-[.7rem]"
-                  loading={loading} // Set loading state for the button
+                  loading={loading}
                   htmlType="submit"
                 >
-                  {loading ? "Please wait..." : "Create"}
+                  {loading
+                    ? "Please wait..."
+                    : currentRecord
+                    ? "Update"
+                    : "Create"}
                   <img src={arrow} alt="" className="h-4 w-4 ml-3" />
                 </Button>
               </Form.Item>
