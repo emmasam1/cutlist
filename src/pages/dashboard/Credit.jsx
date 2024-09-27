@@ -77,33 +77,34 @@ const Credit = () => {
     }
   };
 
-  useEffect(() => {
-    const getCredit = async () => {
-      const packageUrl = `${baseUrl}/credit/credit-packages`;
-      setLoading(true);
-      try {
-        const response = await axios.get(packageUrl, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        const data = response.data.data.map((credit) => ({
-          key: credit._id,
-          duration: credit.duration,
-          amount: credit.amount,
-          price: credit.price,
-          status: credit.status,
-        }));
-
-        setDataSource(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  useEffect(() => { 
     getCredit();
   }, [baseUrl, accessToken]);
+
+  const getCredit = async () => {
+    const packageUrl = `${baseUrl}/credit/credit-packages`;
+    setLoading(true);
+    try {
+      const response = await axios.get(packageUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const data = response.data.data.map((credit) => ({
+        key: credit._id,
+        duration: credit.duration,
+        amount: credit.amount,
+        price: credit.price,
+        status: credit.status,
+      }));
+
+      setDataSource(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const showModal = () => {
     setIsModalOpen(true);
