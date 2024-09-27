@@ -328,8 +328,8 @@ const User = () => {
       render: (status) => {
         const isActive = status === "active";
         const className = isActive
-          ? "bg-[#5EDA79] text-[#1F7700] px-3 py-1 rounded-full"
-          : "bg-[#FF000042] text-[#FF3D00] px-3 py-1 rounded-full";
+          ? "bg-[#5EDA79] text-[#1F7700] px-3 rounded-full"
+          : "bg-[#FF000042] text-[#FF3D00] px-3 rounded-full";
         return (
           <span className={className}>
             {status.charAt(0).toUpperCase() + status.slice(1)}

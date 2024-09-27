@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Table,
   Modal,
@@ -8,6 +8,7 @@ import {
   Button,
   Dropdown,
   Menu,
+  message,
 } from "antd";
 
 import dots from "../../assets/images/icons/dots.png";
@@ -19,30 +20,88 @@ import inactive from "../../assets/images/icons/inactive.png";
 import no_data from "../../assets/images/icons/no_data.png";
 import bin from "../../assets/images/icons/bin.png";
 
+import { Context } from "../../context/Context";
+import { ThreeDots } from "react-loader-spinner";
+import axios from "axios";
+
 const Credit = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { baseUrl, accessToken } = useContext(Context);
+  const [loading, setLoading] = useState(false);
+  const [dataSource, setDataSource] = useState([]);
+  const [form] = Form.useForm();
+
+  const createCredit = async (values) => {
+    const creditUrl = `${baseUrl}/credit-package/create`;
+    setLoading(true); 
+  
+    try {
+      console.log("Submitting values:", values);
+  
+      const response = await axios.post(creditUrl, values, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+  
+      console.log("Response data:", response.data); 
+      form.resetFields(); 
+      setIsModalOpen(false)
+      message.success("Package created successfully");
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || "Failed to create";
+      console.error("Error:", error);
+      message.error(errorMessage);
+    } finally {
+      setLoading(false); 
+    }
+  };
+  
+
+  useEffect(() => {
+    const getCredit = async () => {
+      const packageUrl = `${baseUrl}/credit/credit-packages`;
+      setLoading(true);
+      try {
+        const response = await axios.get(packageUrl, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        const data = response.data.data.map((credit) => ({
+          key: credit._id,
+          duration: credit.duration,
+          price: credit.price,
+          status: credit.status
+        }))
+        console.log(data)
+        setDataSource(data)
+        console.log(response);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false); // Ensure loading is set to false
+      }
+    };
+    getCredit();
+  }, [baseUrl, accessToken]);
+
   const showModal = () => {
     setIsModalOpen(true);
-  };
-  const handleOk = () => {
-    setIsModalOpen(false);
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
-  };
-
-  const handleChange = (value) => {
-    console.log(`selected ${value}`);
+    form.resetFields();
   };
 
   const handleMenuClick = (e, record) => {
-    if (e.key === "profile") {
+    if (e.key === "view") {
       console.log("Profile", record);
       // Handle view logic here
     } else if (e.key === "deactivate") {
       console.log("Deactivate", record);
-      // Handle edit logic here
+      // Handle deactivate logic here
     } else if (e.key === "delete") {
       console.log("Delete", record);
       // Handle delete logic here
@@ -53,37 +112,19 @@ const Credit = () => {
     <Menu onClick={(e) => handleMenuClick(e, record)}>
       <Menu.Item
         key="view"
-        icon={
-          <img
-            src={edit}
-            alt="Profile"
-            style={{ width: "16px", marginRight: "8px" }}
-          />
-        }
+        icon={<img src={edit} alt="Profile" style={{ width: "16px", marginRight: "8px" }} />}
       >
         Profile
       </Menu.Item>
       <Menu.Item
         key="deactivate"
-        icon={
-          <img
-            src={no_data}
-            alt="Deactivate"
-            style={{ width: "16px", marginRight: "8px" }}
-          />
-        }
+        icon={<img src={no_data} alt="Deactivate" style={{ width: "16px", marginRight: "8px" }} />}
       >
         Deactivate
       </Menu.Item>
       <Menu.Item
         key="delete"
-        icon={
-          <img
-            src={bin}
-            alt="Delete"
-            style={{ width: "16px", marginRight: "8px" }}
-          />
-        }
+        icon={<img src={bin} alt="Delete" style={{ width: "16px", marginRight: "8px" }} />}
       >
         Block
       </Menu.Item>
@@ -91,6 +132,7 @@ const Credit = () => {
   );
 
   const tableData = [
+    // Sample data for the table
     {
       key: "1",
       credit: "10 Credit",
@@ -100,42 +142,7 @@ const Credit = () => {
       total_revenue: "15,000 NGN",
       create_at: "Aug 17, 2023 4:30pm",
     },
-    {
-      key: "2",
-      credit: "20 Credit",
-      price: "N30,000",
-      status: "Inactive",
-      total_sales: "",
-      total_revenue: "",
-      create_at: "Aug 17, 2023 4:30pm",
-    },
-    {
-      key: "3",
-      credit: "30 Credit",
-      price: "N15,000",
-      status: "Active",
-      total_sales: 15,
-      total_revenue: "675,000 NGN",
-      create_at: "Aug 17, 2023 4:30pm",
-    },
-    {
-      key: "4",
-      credit: "55 Credit",
-      price: "N82,000",
-      status: "Active",
-      total_sales: 15,
-      total_revenue: "1,675,000 NGN",
-      create_at: "Aug 17, 2023 4:30pm",
-    },
-    {
-      key: "5",
-      credit: "155 Credit",
-      price: "N82,000",
-      status: "Active",
-      total_sales: 10,
-      total_revenue: "1,675,000 NGN",
-      create_at: "Aug 17, 2023 4:30pm",
-    },
+    // Other rows...
   ];
 
   const columns = [
@@ -146,8 +153,8 @@ const Credit = () => {
     },
     {
       title: "Credit Package",
-      dataIndex: "credit",
-      key: "credit_package",
+      dataIndex: "duration",
+      key: "duration",
     },
     {
       title: "Price",
@@ -158,37 +165,19 @@ const Credit = () => {
       title: "Status",
       dataIndex: "status",
       render: (status) => {
-        const isActive = status === "Active";
+        const isActive = status; // This is a boolean now
         const className = isActive
-          ? "bg-[#5EDA79] text-[#1F7700] px-3 w-20 py-1 rounded-full flex items-center"
-          : "px-3 w-20 py-1 border rounded-full bg-[#FF000042] text-[#FF3D00] flex items-center";
+          ? "bg-[#5EDA79] text-[#1F7700] px-3 w-20 rounded-full flex items-center"
+          : "px-3 w-20 border rounded-full bg-[#FF000042] text-[#FF3D00] flex items-center";
         const statusImage = isActive ? check_green : inactive;
+    
         return (
           <span className={className}>
-            <img
-              src={statusImage}
-              alt={isActive ? "Active" : "Inactive"}
-              className="w-2 h-2 mr-1"
-            />
-            {status}
+            <img src={statusImage} alt={isActive ? "Active" : "Inactive"} className="w-2 h-2 mr-1" />
+            {isActive ? "Active" : "Inactive"}
           </span>
         );
       },
-    },
-    {
-      title: "Total Sales",
-      dataIndex: "total_sales",
-      key: "total_sales",
-    },
-    {
-      title: "Total Revenue",
-      dataIndex: "total_revenue",
-      key: "total_revenue",
-    },
-    {
-      title: "Created At",
-      dataIndex: "create_at",
-      key: "created_at",
     },
     {
       title: "",
@@ -201,16 +190,8 @@ const Credit = () => {
                 key: "view",
                 label: (
                   <span className="flex items-center">
-                    <img
-                      src={edit}
-                      alt="View"
-                      style={{
-                        width: "17px",
-                        height: "17px",
-                        marginRight: "8px",
-                      }}
-                    />
-                    profile
+                    <img src={edit} alt="View" style={{ width: "17px", height: "17px", marginRight: "8px" }} />
+                    Update
                   </span>
                 ),
               },
@@ -218,15 +199,7 @@ const Credit = () => {
                 key: "deactivate",
                 label: (
                   <span className="flex items-center">
-                    <img
-                      src={no_data}
-                      alt="Deactivate"
-                      style={{
-                        width: "17px",
-                        height: "17px",
-                        marginRight: "8px",
-                      }}
-                    />
+                    <img src={no_data} alt="Deactivate" style={{ width: "17px", height: "17px", marginRight: "8px" }} />
                     Deactivate
                   </span>
                 ),
@@ -235,15 +208,7 @@ const Credit = () => {
                 key: "delete",
                 label: (
                   <span className="flex items-center">
-                    <img
-                      src={bin}
-                      alt="Delete"
-                      style={{
-                        width: "17px",
-                        height: "17px",
-                        marginRight: "8px",
-                      }}
-                    />
+                    <img src={bin} alt="Delete" style={{ width: "17px", height: "17px", marginRight: "8px" }} />
                     Delete
                   </span>
                 ),
@@ -254,86 +219,12 @@ const Credit = () => {
           trigger={["click"]}
         >
           <Button>
-            <img
-              src={dots}
-              alt="Actions"
-              className="flex items-center justify-center w-1"
-            />
+            <img src={dots} alt="Actions" className="flex items-center justify-center w-1" />
           </Button>
         </Dropdown>
       ),
     },
-    // {
-    //   title: "",
-    //   dataIndex: "isVerified",
-    //   render: () => (
-    //     <span className="flex items-center">
-    //       <Menu as="div" className="relative inline-block text-left ml-2">
-    //         <div>
-    //           <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-50">
-    //             <img
-    //               src={dots}
-    //               style={{ width: 3, height: 15 }}
-    //               className="cursor-pointer"
-    //             />
-    //           </MenuButton>
-    //         </div>
-    //         <MenuItems className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none">
-    //           <div className="py-1">
-    //             <MenuItem>
-    //               {({ active }) => (
-    //                 <a
-    //                   href="#"
-    //                   className={`${
-    //                     active ? "bg-gray-100 text-gray-900" : "text-gray-700"
-    //                   } px-4 py-2 text-sm flex items-center`}
-    //                 >
-    //                   <img src={edit} alt="" className="w-4 h-4 mr-1" />
-    //                   Profile
-    //                 </a>
-    //               )}
-    //             </MenuItem>
-    //           </div>
-    //           <div className="py-1">
-    //             <MenuItem>
-    //               {({ active }) => (
-    //                 <a
-    //                   href="#"
-    //                   className={`${
-    //                     active ? "bg-gray-100 text-gray-900" : "text-gray-700"
-    //                   } px-4 py-2 text-sm flex items-center`}
-    //                 >
-    //                   <img src={no_data} alt="" className="w-4 h-4 mr-1" />
-    //                   Deactivate
-    //                 </a>
-    //               )}
-    //             </MenuItem>
-    //           </div>
-    //           <div className="py-1">
-    //             <MenuItem>
-    //               {({ active }) => (
-    //                 <a
-    //                   href="#"
-    //                   className={`${
-    //                     active ? "bg-gray-100 text-gray-900" : "text-gray-700"
-    //                   } px-4 py-2 text-sm flex items-center`}
-    //                 >
-    //                   <img src={bin} alt="" className="w-4 h-4 mr-1" />
-    //                   Delete
-    //                 </a>
-    //               )}
-    //             </MenuItem>
-    //           </div>
-    //         </MenuItems>
-    //       </Menu>
-    //     </span>
-    //   ),
-    // },
   ];
-
-  const onFinish = (values) => {
-    console.log("Received values of form: ", values);
-  };
 
   return (
     <div className="relative top-14">
@@ -341,21 +232,37 @@ const Credit = () => {
         <div className="flex justify-end mb-3">
           <Button
             onClick={showModal}
-            className="flex border-none items-center hover:!text-black bg-[#F2C94C] hover:!bg-[#F2C94C] rounded p-2 px-3"
+            className="flex border-none items-center hover:!text-black bg-[#F2C94C] rounded p-2 px-3"
           >
             <img src={plus} alt="" className="w-3 mr-1" />
-            Create Custom Credit
+            Add Credit Package
           </Button>
         </div>
-        <Table
+
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+          <ThreeDots
+            visible={true}
+            height="80"
+            width="80"
+            color="#F1B31C"
+            radius="9"
+            ariaLabel="three-dots-loading"
+            wrapperStyle={{}}
+            wrapperClass="three-dots-loading"
+          />
+        </div>
+        ) : (
+          <Table
           columns={columns}
-          dataSource={tableData}
-          // className="mt-8"
+          dataSource={dataSource}
           size="small"
           pagination={{ pageSize: 7, position: ["bottomCenter"] }}
           className="custom-table"
           scroll={{ x: "max-content" }}
         />
+        )}
+        
 
         <Modal
           title="Create Custom Credit"
@@ -367,18 +274,19 @@ const Credit = () => {
           <Form
             name="creditForm"
             initialValues={{ remember: true }}
-            onFinish={onFinish}
+            onFinish={createCredit}
+            form={form} // Link the form instance
             className="mt-6"
           >
             <div className="flex flex-col items-center">
               <Form.Item
-                name="credit"
-                rules={[
-                  { required: true, message: "Input credit package amount!" },
-                ]}
+                name="amount"
+                rules={[{ required: true, message: "Input credit package amount!" }]}
               >
                 <Input
                   placeholder="Input credit package amount"
+                  type="number"
+                  name="amount"
                   style={{ fontSize: "14px", width: "300px" }} // Increase input size
                 />
               </Form.Item>
@@ -387,27 +295,29 @@ const Credit = () => {
                 rules={[{ required: true, message: "Input Price!" }]}
               >
                 <Input
-                  type="text"
+                  type="number"
+                  name="price"
                   placeholder="Input Price"
                   style={{ fontSize: "14px", width: "300px" }} // Increase input size
                 />
               </Form.Item>
 
               <Form.Item
-                name="package"
+                name="duration"
                 rules={[{ required: true, message: "Select an option!" }]}
               >
                 <Select
                   defaultValue="Select an option"
+                  name="duration"
                   style={{ width: "300px" }}
-                  onChange={handleChange}
                   options={[
-                    { value: "1_day", label: "1 Day" },
-                    { value: "1_week", label: "1 Week" },
-                    { value: "1_month", label: "1 Month" },
-                    { value: "3_months", label: "3 Months" },
-                    { value: "6_months", label: "6 Months" },
-                    { value: "1_year", label: "1 Year" },
+                    { value: "1 day", label: "1 Day" },
+                    { value: "1 week", label: "1 Week" },
+                    { value: "1 month", label: "1 Month" },
+                    { value: "3 months", label: "3 Months" },
+                    { value: "6 months", label: "6 Months" },
+                    { value: "1 year", label: "1 Year" },
+                    { value: "custom", label: "Custom" },
                   ]}
                 />
               </Form.Item>
@@ -415,10 +325,14 @@ const Credit = () => {
 
             <div className="flex justify-end">
               <Form.Item>
-                <button className="bg-[#F2C94C] p-3 rounded-full h-8 flex justify-center items-center text-[.7rem]">
-                  Save
+                <Button
+                  className="bg-[#F2C94C] hover:!bg-[#F2C94C] hover:!text-black border-none p-3 rounded-full h-8 flex justify-center items-center text-[.7rem]"
+                  loading={loading} // Set loading state for the button
+                  htmlType="submit"
+                >
+                  {loading ? "Please wait..." : "Create"}
                   <img src={arrow} alt="" className="h-4 w-4 ml-3" />
-                </button>
+                </Button>
               </Form.Item>
             </div>
           </Form>

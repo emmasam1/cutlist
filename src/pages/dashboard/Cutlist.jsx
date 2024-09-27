@@ -547,7 +547,6 @@ const Cutlist = () => {
           />
         </div>
         ) : (
-          <div className="">
           <Table
             columns={Tablecolumns}
             dataSource={tabledata.map((item) => ({
@@ -561,7 +560,6 @@ const Cutlist = () => {
             className="custom-table"
             scroll={{ x: "max-content" }}
           />
-        </div>
         )}
         
 
