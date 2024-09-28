@@ -106,13 +106,13 @@ const Login = () => {
               </Form.Item>
             </div>
 
-            <Form.Item className="flex items-center w-full border-t-[.9px] border-black mt-4">
+            {/* <Form.Item className="flex items-center w-full border-t-[.9px] border-black mt-4">
               <Checkbox>
                 <span className="text-xs md:text-sm">
                   By continuing you accept our Privacy Policy and Terms of Use
                 </span>
               </Checkbox>
-            </Form.Item>
+            </Form.Item> */}
 
             <Form.Item className="mt-6 flex justify-center">
               <button
