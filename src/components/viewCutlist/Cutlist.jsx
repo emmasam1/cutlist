@@ -2,7 +2,7 @@ import React from "react";
 import full_list from "../../assets/images/icons/full_list.png";
 
 const Cutlist = () => {
-  const data = [
+  const prv = [
     {
       key: 0,
       title: "Frame Vertical",
@@ -69,7 +69,7 @@ const Cutlist = () => {
   ];
   return (
     <div>
-      {data.map((e) => (
+      {prv.map((e) => (
         <div className="mt-3 m-auto w-5/6" id={e.key}>
           <span className="font-sm font-semibold">{e.title}</span>
           <div className="flex justify-between items-center border-b-[.1rem]">

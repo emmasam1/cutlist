@@ -30,7 +30,8 @@ import Users from "../../components/allUsers/AllUsers";
 const Cutlist = () => {
   const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [isModalSummary, setIsModalSummary] = useState(false);
+  const [previewCutlist, setPreviewCutlist] = useState(false);
+  const [previewData, setPreviewData] = useState("")
   const [sideModal, setSideModal] = useState(false);
   const [allUsers, setAllUsers] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -51,6 +52,8 @@ const Cutlist = () => {
   const [width, setWidth] = useState("");
   const [depth, setDepth] = useState("");
 
+  const [form] = Form.useForm();
+
   const handleRadioChange = (key) => {
     setSelectedRole(key);
   };
@@ -68,7 +71,7 @@ const Cutlist = () => {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        console.log(response.data);
+        // console.log(response.data);
         setTabledata(response.data);
       } catch (error) {
         console.log("error", error);
@@ -108,8 +111,8 @@ const Cutlist = () => {
       material: "MDF",
     };
 
-    console.log("Cut List Data:", cutListData);
-    console.log("Cut List URL:", cutListUrl);
+    setLoading(true); // Start loading
+    console.log(cutListData)
 
     try {
       const response = await axios.post(cutListUrl, cutListData, {
@@ -117,28 +120,62 @@ const Cutlist = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      console.log("Response:", response);
       message.success("Cut List Created");
+      setPreviewCutlist(true);
+      setSideModal(false)
+      // form.resetFields();
+      const data = response.data.cutlist
+      setPreviewData(data)
+      console.log(data)
     } catch (error) {
       if (error.response) {
-        // Server responded with a status other than 2xx
-        console.error("Error response data:", error.response.data);
-        console.error("Error response status:", error.response.status);
         message.error(
           `Error: ${error.response.data.message || "An error occurred"}`
         );
-        console.log(error);
       } else if (error.request) {
-        // Request was made but no response received
-        console.error("Error request:", error.request);
         message.error("No response received from server.");
       } else {
-        // Something else caused the error
-        console.error("Error message:", error.message);
         message.error(`Error: ${error.message}`);
       }
+    } finally {
+      setLoading(false); // End loading
     }
   };
+
+  // console.log(previewData)
+  // const createCutlit = async () => {
+  //   const cutListUrl = `${baseUrl}/task`;
+  //   const cutListData = {
+  //     categoryId: selectedCategoryId,
+  //     userId: user,
+  //     name: projectName,
+  //     measurement: { height, width, depth },
+  //     material: "MDF",
+  //   };
+
+  //   setLoading(true); // Start loading
+
+  //   try {
+  //     const response = await axios.post(cutListUrl, cutListData, {
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`,
+  //       },
+  //     });
+  //     message.success("Cut List Created");
+  //   } catch (error) {
+  //     if (error.response) {
+  //       message.error(
+  //         `Error: ${error.response.data.message || "An error occurred"}`
+  //       );
+  //     } else if (error.request) {
+  //       message.error("No response received from server.");
+  //     } else {
+  //       message.error(`Error: ${error.message}`);
+  //     }
+  //   } finally {
+  //     setLoading(false); // End loading
+  //   }
+  // };
 
   useEffect(() => {
     if (!accessToken) return;
@@ -182,7 +219,9 @@ const Cutlist = () => {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       console.log("Cut list created successfully:", response.data);
-      setIsModalOpen(false);
+      setSideModal(false);
+      form.resetFields();
+      
     } catch (error) {
       console.log("Error creating cut list:", error);
     }
@@ -190,6 +229,7 @@ const Cutlist = () => {
 
   const openUserModal = () => {
     setUserModal(false);
+    form.resetFields();
   };
 
   const handleUserModal = () => {
@@ -228,10 +268,6 @@ const Cutlist = () => {
     setSideModal(false);
   };
 
-  const handleSummaryCancel = () => {
-    setIsModalSummary(false);
-  };
-
   const handleMenuClick = (e, record) => {
     if (e.key === "view") {
       console.log("View", record);
@@ -244,47 +280,6 @@ const Cutlist = () => {
       // Handle delete logic here
     }
   };
-
-  // const getMenu = (record) => (
-  //   <Menu onClick={(e) => handleMenuClick(e, record)}>
-  //     <Menu.Item
-  //       key="view"
-  //       icon={
-  //         <img
-  //           src={view}
-  //           alt="View"
-  //           style={{ width: "16px", marginRight: "8px" }}
-  //         />
-  //       }
-  //     >
-  //       View
-  //     </Menu.Item>
-  //     <Menu.Item
-  //       key="edit"
-  //       icon={
-  //         <img
-  //           src={send}
-  //           alt="Edit"
-  //           style={{ width: "16px", marginRight: "8px" }}
-  //         />
-  //       }
-  //     >
-  //       Edit
-  //     </Menu.Item>
-  //     <Menu.Item
-  //       key="delete"
-  //       icon={
-  //         <img
-  //           src={bin}
-  //           alt="Delete"
-  //           style={{ width: "16px", marginRight: "8px" }}
-  //         />
-  //       }
-  //     >
-  //       Delete
-  //     </Menu.Item>
-  //   </Menu>
-  // );
 
   const Tablecolumns = [
     {
@@ -388,71 +383,44 @@ const Cutlist = () => {
     },
   ];
 
-  const data = [
+  const PrvData = [
     {
-      key: 0,
       title: "Frame Vertical",
-      length: 244.0,
-      width: 22.8,
-      qty: 3,
+      dataIndex: "length",
     },
     {
-      key: 1,
       title: "Frame Horizontal",
-      length: 244.0,
-      width: 22.8,
-      qty: 3,
+      dataIndex: "fullName",
     },
     {
-      key: 2,
       title: "Adjustment Vertical",
-      length: 244.0,
-      width: 22.8,
-      qty: 3,
+      dataIndex: "fullName",
     },
     {
-      key: 3,
       title: "Adjustment Horizontal",
-      length: 244.0,
-      width: 22.8,
-      qty: 3,
+      dataIndex: "fullName",
     },
     {
-      key: 4,
       title: "Architrave",
-      length: 244.0,
-      width: 22.8,
-      qty: 3,
+      dataIndex: "fullName",
     },
     {
-      key: 5,
       title: "Door Cap",
-      length: 244.0,
-      width: 22.8,
-      qty: 3,
+      dataIndex: "fullName",
     },
     {
-      key: 6,
       title: "Door Frame Supports",
-      length: 244.0,
-      width: 22.8,
-      qty: 3,
+      dataIndex: "fullName",
     },
     {
-      key: 7,
-      title: "Door Leaf Rough Cut",
-      length: 244.0,
-      width: 22.8,
-      qty: 3,
-    },
-    {
-      key: 8,
       title: "Door Leaf Final Cut",
-      length: 244.0,
-      width: 22.8,
-      qty: 3,
+      dataIndex: "fullName",
     },
-  ];
+    {
+      title: "Door Leaf Rough Cut",
+      dataIndex: "fullName",
+    }
+  ]
 
   const columns = [
     {
@@ -474,6 +442,7 @@ const Cutlist = () => {
     {
       title: "Credits",
       dataIndex: "credits",
+      width: 150,
     },
     {
       title: "Status",
@@ -516,6 +485,7 @@ const Cutlist = () => {
 
   const handleCategoryChange = (value, option) => {
     setSelectedCategory(value);
+    form.resetFields();
     setSelectedCategoryId(option.key); // Use the key as the category ID
   };
 
@@ -556,66 +526,15 @@ const Cutlist = () => {
               cut_type: item.name,
             }))}
             size="small"
-            pagination={{ pageSize: 7, position: ["bottomCenter"] }}
+            pagination={{
+              pageSize: 7,
+              position: ["bottomCenter"],
+              className: "custom-pagination",
+            }}
             className="custom-table"
             scroll={{ x: "max-content" }}
           />
         )}
-
-        {/* <Modal
-          title="Cut list Summary"
-          open={isModalSummary}
-          onCancel={handleSummaryCancel}
-          footer={null}
-          width={1000}
-        >
-          <div className="flex justify-end">
-            <Button className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded border-none hover:!text-black px-10">
-              Edit
-            </Button>
-          </div>
-          {data.map((e) => (
-            <div key={e.key} className="bg-[#FAFAFF] py-1 mb-2 rounded-sm mt-2">
-              <div className="flex justify-between m-auto w-11/12">
-                <div className="w-52">
-                  <span className="font-bold">{e.title}</span>
-                </div>
-                <div>
-                  <span className="font-semibold">
-                    <span className="text-[#F2994A] font-semibold text-[.6rem]">
-                      L -
-                    </span>{" "}
-                    {e.length}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-semibold">
-                    <span className="text-[#F2994A] font-semibold text-[.6rem]">
-                      W -
-                    </span>{" "}
-                    {e.width}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">
-                    <span className="text-[#F2994A] font-semibold text-[.6rem]">
-                      Q -
-                    </span>
-                    {e.qty}
-                  </span>
-                  <img src={full_list} alt="" className="w-4" />
-                </div>
-              </div>
-            </div>
-          ))}
-          <div className="flex justify-end mt-4">
-            <Button className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10">
-              {" "}
-              Save List
-              <img src={checkbox} alt="" className="w-4" />
-            </Button>
-          </div>
-        </Modal> */}
 
         {/* select category modal */}
         <Modal
@@ -670,12 +589,31 @@ const Cutlist = () => {
         </Modal>
         {/* select category modal */}
 
-      <Modal
-        className="custom-modal"
-        width={400}
-      >
-
-      </Modal>
+        <Modal
+          title="Preview Cutlist"
+          open={previewCutlist}
+          onCancel={() => setPreviewCutlist(false)}
+          footer={null}
+          width={1500}
+        >
+           <Table
+            columns={PrvData}
+            dataSource={previewData.map((e)=> ({
+              key: e._id,
+              part: e.part,
+              length: e.length,
+              width: e.width,
+              quantity: e.quantity,
+            }))}
+            size="small"
+            pagination={{
+              position: ["bottomCenter"],
+              className: "custom-pagination", 
+            }}
+            className="custom-table"
+            scroll={{ x: "max-content" }}
+          />
+        </Modal>
 
         {/* create cutlist modal */}
         <Modal
@@ -690,12 +628,13 @@ const Cutlist = () => {
           footer={[
             <div className="flex justify-center " key="footer">
               <Button
+                loading={loading} // Show loading spinner
+                htmlType="submit"
                 className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10"
                 onClick={() => createCutlit()}
               >
-                {" "}
-                Preview List
-                <img src={arrow} alt="" className="w-4" />
+                {loading ? "Please wait..." : "Create Cutlist"}
+                <img src={arrow} alt="" className="h-4 w-4 ml-1" />
               </Button>
             </div>,
           ]}
@@ -796,15 +735,15 @@ const Cutlist = () => {
         </Modal>
 
         <Modal
-          title="All users"
+          title="Select a user"
           open={userModal}
           onCancel={openUserModal}
           footer={
-            user == [] || !user ? null : (
+            user.length === 0 || !user ? null : (
               <Button
                 onClick={handleUserModal}
                 htmlType="submit"
-                className="bg-[#F2C94C] hover:!bg-[#F2C94C] hover:!text-black border-none p-3 px-3 rounded-full h-8  text-[.7rem]"
+                className="bg-[#F2C94C] hover:!bg-[#F2C94C] hover:!text-black border-none p-3 px-3 rounded-full h-8 text-[.7rem]"
               >
                 Select A User
               </Button>
@@ -812,14 +751,19 @@ const Cutlist = () => {
           }
           width={1000}
           size="small"
-          pagination={{ pageSize: 7, position: ["bottomCenter"] }}
+          // pagination={false} // Disable modal pagination since we'll handle it in the Table
           className="custom-table"
           scroll={{ x: "max-content" }}
         >
           <Table
             columns={columns}
             dataSource={dataSource}
-            // pagination={false} // You can enable pagination if needed
+            size="small"
+            pagination={{
+              pageSize: 5,
+              position: ["bottomCenter"],
+              className: "custom-pagination",
+            }}
           />
         </Modal>
       </div>

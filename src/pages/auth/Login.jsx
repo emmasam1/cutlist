@@ -1,10 +1,10 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState } from "react";
 import Cookies from "js-cookie";
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { Form, Input, Checkbox, Card, message } from 'antd';
-import { PhoneOutlined } from '@ant-design/icons';
-import { Context } from '../../context/Context';
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Form, Input, Button, Card, message } from "antd";
+import { PhoneOutlined } from "@ant-design/icons";
+import { Context } from "../../context/Context";
 import woodworker from "../../assets/images/Woodworker_transparent.png";
 import arrow from "../../assets/images/icons/arrow_long_right.png";
 
@@ -12,7 +12,6 @@ const Login = () => {
   const { baseUrl, login } = useContext(Context);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
 
   const onFinish = async (values) => {
     setLoading(true);
@@ -32,20 +31,22 @@ const Login = () => {
         login(user, access_token);
         // console.log("Login successful:", response);
         // Navigate to dashboard or another page
-        navigate('/dashboard');
+        navigate("/dashboard");
       } else {
         console.error("User or access token not found in response.");
       }
     } catch (error) {
-      console.error('Login error:', error);
-      message.error(error.response?.data?.message || "Login failed. Please try again.");
+      console.error("Login error:", error);
+      message.error(
+        error.response?.data?.message || "Login failed. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const onFinishFailed = (errorInfo) => {
-    message.error('Please fill out the form correctly.');
+    message.error("Please fill out the form correctly.");
   };
 
   return (
@@ -53,9 +54,9 @@ const Login = () => {
       className="relative w-full h-screen flex justify-center items-center px-4"
       style={{
         backgroundImage: `url(${woodworker})`,
-        backgroundSize: 'contain',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
+        backgroundSize: "contain",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
       }}
     >
       {/* Overlay for dark effect */}
@@ -82,10 +83,16 @@ const Login = () => {
               <Form.Item
                 label="Phone Number"
                 name="phoneNumber"
-                className='mb-0'
+                className="mb-0"
                 rules={[
-                  { required: true, message: 'Please input your phone number!' },
-                  { pattern: /^[0-9]{10}$/, message: 'Please enter a valid phone number' },
+                  {
+                    required: true,
+                    message: "Please input your phone number!",
+                  },
+                  {
+                    pattern: /^[0-9]{10}$/,
+                    message: "Please enter a valid phone number",
+                  },
                 ]}
               >
                 <Input
@@ -99,7 +106,7 @@ const Login = () => {
                 label="Password"
                 name="password"
                 rules={[
-                  { required: true, message: 'Please input your password!' },
+                  { required: true, message: "Please input your password!" },
                 ]}
               >
                 <Input.Password placeholder="Enter your password" />
@@ -115,17 +122,14 @@ const Login = () => {
             </Form.Item> */}
 
             <Form.Item className="mt-6 flex justify-center">
-              <button
-                type="submit"
-                className="flex items-center bg-[#F2C94C] hover:!text-black p-2 rounded-xl px-6 md:px-8 text-xs md:text-sm"
-                disabled={loading}
+              <Button
+                className="bg-[#F2C94C] hover:!bg-[#F2C94C] hover:!text-black border-none p-3 rounded-full flex justify-center text-[.7rem] px-7 text-sm"
+                loading={loading}
+                htmlType="submit"
               >
-                {loading ? 'Logging in...' : (
-                  <>
-                    Next <img src={arrow} alt="arrow" className="w-4 ml-3" />
-                  </>
-                )}
-              </button>
+                {loading ? "Please wait..." : "Login"}
+                <img src={arrow} alt="" className="h-4 w-4 ml-1" />
+              </Button>
             </Form.Item>
           </Form>
         </Card>
@@ -133,7 +137,7 @@ const Login = () => {
 
       <style jsx>{`
         @media (max-width: 768px) {
-          div[style*='background-image'] {
+          div[style*="background-image"] {
             background-image: none !important;
           }
           .sm\\:block {

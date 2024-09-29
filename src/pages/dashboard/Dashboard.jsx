@@ -311,10 +311,11 @@ const Dashboard = () => {
                   columns={columns}
                   dataSource={tableData}
                   className="mt-8 custom-table"
-                  size="middle"
+                  size="small"
                   pagination={{
                     pageSize: 7,
-                    position: ['bottomCenter'], // Position pagination at the bottom center
+                    position: ["bottomCenter"],
+                    className: "custom-pagination", 
                   }}
                   // className="custom-table"
                   scroll={{ x: 'max-content' }}

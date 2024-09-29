@@ -310,7 +310,11 @@ const Credit = () => {
             columns={columns}
             dataSource={dataSource}
             size="small"
-            pagination={{ pageSize: 7, position: ["bottomCenter"] }}
+            pagination={{
+              pageSize: 7,
+              position: ["bottomCenter"],
+              className: "custom-pagination", 
+            }}
             className="custom-table"
             scroll={{ x: "max-content" }}
           />

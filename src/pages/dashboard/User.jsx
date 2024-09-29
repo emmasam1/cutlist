@@ -620,7 +620,7 @@ const User = () => {
                 user.phoneNumber.includes(searchText)
             )}
             size="small"
-            pagination={{ pageSize: 7, position: ["bottomCenter"] }}
+            pagination={{ pageSize: 7, position: ["bottomCenter"], className: "custom-pagination"  }}
             className="custom-table"
             scroll={{ x: "max-content" }}
           />
@@ -720,7 +720,7 @@ const User = () => {
                 type="primary"
                 htmlType="submit"
                 loading={loading}
-                className="bg-[#F2C94C] hover:!bg-[#F2C94C] hover:!text-black border-none p-3 px-3 rounded-full h-8 flex justify-center items-center text-[.7rem]"
+                className="bg-[#F2C94C] hover:!bg-[#F2C94C] text-black hover:!text-black border-none p-3 px-3 rounded-full h-8 flex justify-center items-center text-[.7rem]"
               >
                 {loading ? "Please wait..." : "Create User"}
               </Button>
