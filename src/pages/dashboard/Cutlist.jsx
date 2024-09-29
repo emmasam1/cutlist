@@ -31,7 +31,7 @@ const Cutlist = () => {
   const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [previewCutlist, setPreviewCutlist] = useState(false);
-  const [previewData, setPreviewData] = useState("")
+  const [previewData, setPreviewData] = useState([]);
   const [sideModal, setSideModal] = useState(false);
   const [allUsers, setAllUsers] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -112,7 +112,7 @@ const Cutlist = () => {
     };
 
     setLoading(true); // Start loading
-    console.log(cutListData)
+    console.log(cutListData);
 
     try {
       const response = await axios.post(cutListUrl, cutListData, {
@@ -122,11 +122,11 @@ const Cutlist = () => {
       });
       message.success("Cut List Created");
       setPreviewCutlist(true);
-      setSideModal(false)
+      setSideModal(false);
       // form.resetFields();
-      const data = response.data.cutlist
-      setPreviewData(data)
-      console.log(data)
+      const data = response.data.cutlist;
+      setPreviewData(data);
+      console.log(data);
     } catch (error) {
       if (error.response) {
         message.error(
@@ -221,7 +221,6 @@ const Cutlist = () => {
       console.log("Cut list created successfully:", response.data);
       setSideModal(false);
       form.resetFields();
-      
     } catch (error) {
       console.log("Error creating cut list:", error);
     }
@@ -419,8 +418,8 @@ const Cutlist = () => {
     {
       title: "Door Leaf Rough Cut",
       dataIndex: "fullName",
-    }
-  ]
+    },
+  ];
 
   const columns = [
     {
@@ -596,19 +595,23 @@ const Cutlist = () => {
           footer={null}
           width={1500}
         >
-           <Table
+          <Table
             columns={PrvData}
-            dataSource={previewData.map((e)=> ({
-              key: e._id,
-              part: e.part,
-              length: e.length,
-              width: e.width,
-              quantity: e.quantity,
-            }))}
+            dataSource={
+              Array.isArray(previewData)
+                ? previewData.map((e) => ({
+                    key: e._id,
+                    part: e.part,
+                    length: e.length,
+                    width: e.width,
+                    quantity: e.quantity,
+                  }))
+                : []
+            }
             size="small"
             pagination={{
               position: ["bottomCenter"],
-              className: "custom-pagination", 
+              className: "custom-pagination",
             }}
             className="custom-table"
             scroll={{ x: "max-content" }}
