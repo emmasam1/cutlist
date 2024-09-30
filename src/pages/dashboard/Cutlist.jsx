@@ -115,7 +115,9 @@ const Cutlist = () => {
       material: "MDF",
     };
 
-    setLoading(true); // Start loading
+    setLoading(true);
+    console.log("Cut List Data:", cutListData);
+    console.log("Access Token:", accessToken);
 
     try {
       const response = await axios.post(cutListUrl, cutListData, {
@@ -132,17 +134,19 @@ const Cutlist = () => {
       setHeight("");
       setWidth("");
       setDepth("");
-      setSelectedCategory("");
+      setSelectedCategoryId("");
       setUser("");
 
       const data = response.data.cutlist;
       setPreviewData(data);
     } catch (error) {
-      // Handle error as before
+      console.error("Error creating cut list:", error);
+      message.error("Failed to create Cut List: " + (error.response ? error.response.data.message : error.message));
     } finally {
-      setLoading(false); // End loading
+      setLoading(false);
     }
   };
+
 
   // const createCutlit = async () => {
   //   const cutListUrl = `${baseUrl}/task`;
@@ -721,7 +725,7 @@ const Cutlist = () => {
         {/* view single cutlist */}
 
         {/* create cutlist modal */}
-        <Modal
+        {/* <Modal
           title={<div className="flex justify-center">{getModalTitle()}</div>}
           width={400}
           open={sideModal}
@@ -810,7 +814,83 @@ const Cutlist = () => {
               </p>
             </div>
           </div>
-        </Modal>
+        </Modal> */}
+
+<Modal
+      title={<div className="flex justify-center">{/* Your modal title */}</div>}
+      width={400}
+      open={sideModal}
+      onCancel={closeSideBar}
+      footer={[
+        <div className="flex justify-center" key="footer">
+          <Button
+            loading={loading}
+            htmlType="submit"
+            className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10"
+            onClick={async () => await createCutlit()}
+          >
+            {loading ? "Please wait..." : "Create Cutlist"}
+            <img src="path/to/arrow.png" alt="" className="h-4 w-4 ml-1" />
+          </Button>
+        </div>,
+      ]}
+      className="custom-modal"
+      getContainer={false}
+    >
+      <div>
+        <div>
+          <h2 className="font-semibold">Cut Type</h2>
+          <div className="flex gap-6 mt-1">
+            <Button className="rounded-full bg-[#F2C94C] hover:!bg-[#F2C94C] border-none hover:!text-black">Door Cut</Button>
+            <Button className="rounded-full bg-[#fcfcfca4] hover:!bg-[#fcfcfca4] hover:!text-black border-none">Window Cut</Button>
+            <Button className="rounded-full bg-[#fcfcfca4] hover:!bg-[#fcfcfca4] hover:!text-black border-none">Bed Cut</Button>
+          </div>
+        </div>
+        <div className="mt-10">
+          <Input
+            placeholder="Enter Project Name"
+            value={selectedCutlist?.cutType || projectName}
+            onChange={(e) => setProjectName(e.target.value)}
+          />
+          <div className="flex items-center justify-between">
+            <h2 className="font-semibold">Measurement</h2>
+            <span className="text-[#f2994a]">(2 Long)</span>
+          </div>
+          <div className="flex gap-6 mt-1">
+            <Input
+              placeholder="Height"
+              type="number"
+              value={selectedCutlist?.height || height}
+              onChange={(e) => setHeight(e.target.value)}
+            />
+            <Input
+              placeholder="Width"
+              type="number"
+              value={selectedCutlist?.width || width}
+              onChange={(e) => setWidth(e.target.value)}
+            />
+            <Input
+              placeholder="Depth"
+              type="number"
+              value={selectedCutlist?.depth || depth}
+              onChange={(e) => setDepth(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="mt-52 border-t-[.1rem]">
+          <p className="mt-3">
+            <span className="text-[#F2994A] font-semibold text-lg">LNG &nbsp;</span> - Means (Long).
+          </p>
+          <p>
+            <span className="text-[#F2994A] font-semibold text-lg">F-E-T&nbsp;</span> - Means (Long).
+          </p>
+          <p>
+            <span className="text-[#F2994A] font-semibold text-lg">& &nbsp;</span> - Means (And).
+          </p>
+        </div>
+      </div>
+    </Modal>
         {/* create cutlist modal */}
 
         <Modal
