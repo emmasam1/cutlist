@@ -42,9 +42,13 @@ const Cutlist = () => {
   const [dataSource, setDataSource] = useState([]);
   const [tabledata, setTabledata] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [modalMode, setModalMode] = useState("Create");
 
   const { baseUrl, accessToken } = useContext(Context);
   const [selectedRole, setSelectedRole] = useState(null);
+  const [selectedCutlist, setSelectedCutlist] = useState(null);
+  const [singleCutlist, setSingleCutlist] = useState(false);
+  const [prevSingleCutlist, setPrevSingleCutlist] = useState([]);
 
   const [cutType, setCutType] = useState("Door Cut");
   const [projectName, setProjectName] = useState("");
@@ -112,7 +116,6 @@ const Cutlist = () => {
     };
 
     setLoading(true); // Start loading
-    console.log(cutListData);
 
     try {
       const response = await axios.post(cutListUrl, cutListData, {
@@ -123,26 +126,24 @@ const Cutlist = () => {
       message.success("Cut List Created");
       setPreviewCutlist(true);
       setSideModal(false);
-      // form.resetFields();
+
+      // Reset input fields
+      setProjectName("");
+      setHeight("");
+      setWidth("");
+      setDepth("");
+      setSelectedCategory("");
+      setUser("");
+
       const data = response.data.cutlist;
       setPreviewData(data);
-      console.log(data);
     } catch (error) {
-      if (error.response) {
-        message.error(
-          `Error: ${error.response.data.message || "An error occurred"}`
-        );
-      } else if (error.request) {
-        message.error("No response received from server.");
-      } else {
-        message.error(`Error: ${error.message}`);
-      }
+      // Handle error as before
     } finally {
       setLoading(false); // End loading
     }
   };
 
-  // console.log(previewData)
   // const createCutlit = async () => {
   //   const cutListUrl = `${baseUrl}/task`;
   //   const cutListData = {
@@ -154,6 +155,7 @@ const Cutlist = () => {
   //   };
 
   //   setLoading(true); // Start loading
+  //   console.log(cutListData);
 
   //   try {
   //     const response = await axios.post(cutListUrl, cutListData, {
@@ -162,6 +164,12 @@ const Cutlist = () => {
   //       },
   //     });
   //     message.success("Cut List Created");
+  //     setPreviewCutlist(true);
+  //     setSideModal(false);
+  //     // form.resetFields();
+  //     const data = response.data.cutlist;
+  //     setPreviewData(data);
+  //     console.log(data);
   //   } catch (error) {
   //     if (error.response) {
   //       message.error(
@@ -219,11 +227,25 @@ const Cutlist = () => {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       console.log("Cut list created successfully:", response.data);
+
+      // Close the modal and reset state after successful creation
       setSideModal(false);
+      setModalMode("Create");
+      setSelectedCutlist({});
       form.resetFields();
     } catch (error) {
       console.log("Error creating cut list:", error);
+      // Optionally handle error state or display a notification
     }
+  };
+
+  const getModalTitle = () => {
+    if (modalMode === "Edit") {
+      return "Edit Cut List";
+    } else if (modalMode === "Create") {
+      return "Create Cut List";
+    }
+    return null; // Default case
   };
 
   const openUserModal = () => {
@@ -255,30 +277,52 @@ const Cutlist = () => {
   const closeSideBar = () => {
     setSideModal(false);
     setPreviewCutlist(false);
+
+    setProjectName("");
+    setHeight("");
+    setWidth("");
+    setDepth("");
+    setSelectedCategory("");
+    setUser("");
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
+    setSelectedCategory("");
   };
 
-  const handleClose2 = () => {
-    setAllUsers(true);
-    setPreviewCutlist(false);
-    setSideModal(false);
+  const deleteTasks = async (record) => {
+    const id = record.key;
+    // const removeTask = `${baseUrl}/admin/task/${id}`
+    // try {
+    //   const response = await axios.post(removeTask , {
+    //     headers: { Authorization: `Bearer ${accessToken}` },
+    //   })
+    //   console.log(response)
+    // } catch (error) {
+    //   console.log(error)
+    // }
   };
 
-  const handleMenuClick = (e, record) => {
-    if (e.key === "view") {
-      console.log("View", record);
-      // Handle view logic here
-    } else if (e.key === "edit") {
-      console.log("Edit", record);
-      // Handle edit logic here
-    } else if (e.key === "delete") {
-      console.log("Delete", record);
-      // Handle delete logic here
+  const viewTask = async (record) => {
+    const id = record.key;
+    const viewCut = `${baseUrl}/admin/task/${id}`;
+    try {
+      setLoading(true); // Start loading
+      const response = await axios.get(viewCut, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      console.log(response.data.cutlist);
+      const data = response.data.cutlist;
+      setPrevSingleCutlist(Array.isArray(data) ? data : []);
+      setSingleCutlist(true);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false); // End loading regardless of success or failure
     }
   };
+  
 
   const Tablecolumns = [
     {
@@ -317,7 +361,10 @@ const Cutlist = () => {
               {
                 key: "view",
                 label: (
-                  <span className="flex items-center">
+                  <span
+                    className="flex items-center"
+                    onClick={() => viewTask(record)}
+                  >
                     <img
                       src={view}
                       alt="View"
@@ -334,7 +381,10 @@ const Cutlist = () => {
               {
                 key: "edit",
                 label: (
-                  <span className="flex items-center">
+                  <span
+                    className="flex items-center"
+                    onClick={() => handleView(record)}
+                  >
                     <img
                       src={send}
                       alt="Edit"
@@ -351,7 +401,10 @@ const Cutlist = () => {
               {
                 key: "delete",
                 label: (
-                  <span className="flex items-center">
+                  <span
+                    className="flex items-center"
+                    onClick={() => deleteTasks(record)}
+                  >
                     <img
                       src={bin}
                       alt="Delete"
@@ -366,7 +419,6 @@ const Cutlist = () => {
                 ),
               },
             ],
-            onClick: (e) => handleMenuClick(e, record),
           }}
           trigger={["click"]}
         >
@@ -379,45 +431,6 @@ const Cutlist = () => {
           </Button>
         </Dropdown>
       ),
-    },
-  ];
-
-  const PrvData = [
-    {
-      title: "Frame Vertical",
-      dataIndex: "length",
-    },
-    {
-      title: "Frame Horizontal",
-      dataIndex: "fullName",
-    },
-    {
-      title: "Adjustment Vertical",
-      dataIndex: "fullName",
-    },
-    {
-      title: "Adjustment Horizontal",
-      dataIndex: "fullName",
-    },
-    {
-      title: "Architrave",
-      dataIndex: "fullName",
-    },
-    {
-      title: "Door Cap",
-      dataIndex: "fullName",
-    },
-    {
-      title: "Door Frame Supports",
-      dataIndex: "fullName",
-    },
-    {
-      title: "Door Leaf Final Cut",
-      dataIndex: "fullName",
-    },
-    {
-      title: "Door Leaf Rough Cut",
-      dataIndex: "fullName",
     },
   ];
 
@@ -485,7 +498,19 @@ const Cutlist = () => {
   const handleCategoryChange = (value, option) => {
     setSelectedCategory(value);
     form.resetFields();
-    setSelectedCategoryId(option.key); // Use the key as the category ID
+    setSelectedCategoryId(option.key);
+  };
+
+  const handleView = (record) => {
+    setSelectedCutlist({
+      cutType: record.cut_type,
+      projectName: record.name,
+      height: record.height,
+      width: record.width,
+      depth: record.depth,
+    });
+    setModalMode("Edit");
+    setSideModal(true);
   };
 
   return (
@@ -592,39 +617,112 @@ const Cutlist = () => {
           title="Preview Cutlist"
           open={previewCutlist}
           onCancel={() => setPreviewCutlist(false)}
-          footer={null}
-          width={1500}
+          footer={[
+            <div className="flex justify-center " key="footer">
+              <Button
+                htmlType="submit"
+                className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10"
+                onClick={() => setPreviewCutlist(false)}
+              >
+                Done
+              </Button>
+            </div>,
+          ]}
+          width={400}
+          className="custom-modal"
+          getContainer={false}
         >
-          <Table
-            columns={PrvData}
-            dataSource={
-              Array.isArray(previewData)
-                ? previewData.map((e) => ({
-                    key: e._id,
-                    part: e.part,
-                    length: e.length,
-                    width: e.width,
-                    quantity: e.quantity,
-                  }))
-                : []
-            }
-            size="small"
-            pagination={{
-              position: ["bottomCenter"],
-              className: "custom-pagination",
-            }}
-            className="custom-table"
-            scroll={{ x: "max-content" }}
-          />
+          <div>
+            {previewData.map((e) => (
+              <div className="mt-3 m-auto w-5/6" id={e._id} key={e._id}>
+                <span className="font-sm font-semibold">{e.part}</span>
+                <div className="flex justify-between items-center border-b-[.1rem]">
+                  <div className="flex items-center mt-1 pb-2">
+                    <span className="text-[#F2994A] font-semibold text-[.6rem]">
+                      L - &nbsp;
+                    </span>
+                    <p className="font-bold">{e.length}</p>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-[#F2994A] font-semibold text-[.6rem]">
+                      W - &nbsp;
+                    </span>
+                    <p className="font-bold">{e.width}</p>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-[#F2994A] font-semibold text-[.6rem]">
+                      Q - &nbsp;
+                    </span>
+                    <p className="font-bold">{e.quantity}</p>
+                    <img src={full_list} alt="" className="w-3 ml-2" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </Modal>
+
+        {/* view single cutlist */}
+        {loading ? (
+          <div className="fixed top-0 left-0 w-full h-full bg-gray-500 bg-opacity-50 flex items-center justify-center z-40">
+            {/* <div className="text-white">Loading...</div> */}
+          </div>
+        ) : (
+          <Modal
+            title="Preview Cutlist"
+            open={singleCutlist}
+            onCancel={() => setSingleCutlist(false)}
+            footer={[
+              <div className="flex justify-center " key="footer">
+                <Button
+                  htmlType="submit"
+                  className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10"
+                  onClick={() => setSingleCutlist(false)}
+                >
+                  Done
+                </Button>
+              </div>,
+            ]}
+            width={400}
+            className="custom-modal"
+            getContainer={false}
+          >
+            <div>
+              {Array.isArray(prevSingleCutlist) &&
+                prevSingleCutlist.map((e) => (
+                  <div className="mt-3 m-auto w-5/6" id={e._id} key={e._id}>
+                    <span className="font-sm font-semibold">{e.part}</span>
+                    <div className="flex justify-between items-center border-b-[.1rem]">
+                      <div className="flex items-center mt-1 pb-2">
+                        <span className="text-[#F2994A] font-semibold text-[.6rem]">
+                          L - &nbsp;
+                        </span>
+                        <p className="font-bold">{e.length}</p>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="text-[#F2994A] font-semibold text-[.6rem]">
+                          W - &nbsp;
+                        </span>
+                        <p className="font-bold">{e.width}</p>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="text-[#F2994A] font-semibold text-[.6rem]">
+                          Q - &nbsp;
+                        </span>
+                        <p className="font-bold">{e.quantity}</p>
+                        <img src={full_list} alt="" className="w-3 ml-2" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </Modal>
+        )}
+        {/* view single cutlist */}
 
         {/* create cutlist modal */}
         <Modal
-          title={
-            <div className="flex justify-center">
-              <span className="">Create Cut List</span>
-            </div>
-          }
+          title={<div className="flex justify-center">{getModalTitle()}</div>}
           width={400}
           open={sideModal}
           onCancel={closeSideBar}
@@ -662,7 +760,7 @@ const Cutlist = () => {
             <div className="mt-10">
               <Input
                 placeholder="Enter Project Name"
-                value={projectName}
+                value={selectedCutlist?.cutType || cutType}
                 onChange={(e) => setProjectName(e.target.value)}
               />
               <div className="flex items-center justify-between">
@@ -673,19 +771,19 @@ const Cutlist = () => {
                 <Input
                   placeholder="Height"
                   type="number"
-                  value={height}
+                  value={selectedCutlist?.height || height}
                   onChange={(e) => setHeight(e.target.value)}
                 />
                 <Input
-                  placeholder="Weight"
+                  placeholder="Width"
                   type="number"
-                  value={width}
+                  value={selectedCutlist?.width || width}
                   onChange={(e) => setWidth(e.target.value)}
                 />
                 <Input
                   placeholder="Depth"
                   type="number"
-                  value={depth}
+                  value={selectedCutlist?.depth || depth}
                   onChange={(e) => setDepth(e.target.value)}
                 />
               </div>

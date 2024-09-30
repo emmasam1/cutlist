@@ -13,16 +13,25 @@ export const ContextProvider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let isMounted = true; 
+
     const savedUser = Cookies.get("loggedInUser");
     const savedToken = Cookies.get("accessToken");
 
     if (savedUser && savedToken) {
+      console.log("started");
+
       try {
         const user = JSON.parse(savedUser);
+        console.log(savedUser, savedToken, user);
+
         if (user && user.phoneNumber) {
-          setLoggedInUser(user);
-          setAccessToken(savedToken);
-          setUserBlockedStatus(user.blockedStatus || "active");
+          console.log(user);
+          if (isMounted) {
+            setLoggedInUser(user);
+            setAccessToken(savedToken);
+            setUserBlockedStatus(user.blockedStatus || "active");
+          }
         } else {
           throw new Error("Invalid user data");
         }
@@ -30,14 +39,19 @@ export const ContextProvider = ({ children }) => {
         console.error("Error parsing saved user from cookies:", error);
         Cookies.remove("loggedInUser");
         Cookies.remove("accessToken");
-        navigate("/admin-login");
+        if (isMounted) navigate("/admin-login");
       }
+      console.log("ended");
     } else {
-      navigate("/admin-login");
+      if (isMounted) navigate("/admin-login");
     }
 
-    setIsLoading(false);
-  }, [navigate]);
+    if (isMounted) setIsLoading(false);
+
+    return () => {
+      isMounted = false; 
+    };
+  }, []); 
 
   const setCookie = (name, value, days) => {
     const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
@@ -62,10 +76,9 @@ export const ContextProvider = ({ children }) => {
     setUserBlockedStatus("active");
     Cookies.remove("loggedInUser");
     Cookies.remove("accessToken");
-    navigate("/admin-login"); // Redirect to admin-login after logout
+    navigate("/admin-login");
   };
 
-  // If still loading, don't render children
   if (isLoading) {
     return <div>Loading...</div>;
   }
