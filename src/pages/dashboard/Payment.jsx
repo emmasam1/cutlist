@@ -199,7 +199,11 @@ const Payment = () => {
             columns={columns}
             dataSource={tableData}
             size="small"
-            pagination={{ pageSize: 7, position: ["bottomCenter"] }}
+            pagination={{
+              pageSize: 5,
+              position: ["bottomCenter"],
+              className: "custom-pagination",
+            }}
             className="custom-table"
             scroll={{ x: "max-content" }}
           />

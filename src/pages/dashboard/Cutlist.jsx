@@ -44,7 +44,7 @@ const Cutlist = () => {
   const [loading, setLoading] = useState(false);
   const [modalMode, setModalMode] = useState("Create");
 
-  const { baseUrl, accessToken } = useContext(Context);
+  const { baseUrl, accessToken, apiCall } = useContext(Context);
   const [selectedRole, setSelectedRole] = useState(null);
   const [selectedCutlist, setSelectedCutlist] = useState(null);
   const [singleCutlist, setSingleCutlist] = useState(false);
@@ -141,12 +141,14 @@ const Cutlist = () => {
       setPreviewData(data);
     } catch (error) {
       console.error("Error creating cut list:", error);
-      message.error("Failed to create Cut List: " + (error.response ? error.response.data.message : error.message));
+      message.error(
+        "Failed to create Cut List: " +
+          (error.response ? error.response.data.message : error.message)
+      );
     } finally {
       setLoading(false);
     }
   };
-
 
   // const createCutlit = async () => {
   //   const cutListUrl = `${baseUrl}/task`;
@@ -295,18 +297,32 @@ const Cutlist = () => {
     setSelectedCategory("");
   };
 
-  const deleteTasks = async (record) => {
+  
+  const deleteTasks = (record) => {
     const id = record.key;
-    // const removeTask = `${baseUrl}/admin/task/${id}`
-    // try {
-    //   const response = await axios.post(removeTask , {
-    //     headers: { Authorization: `Bearer ${accessToken}` },
-    //   })
-    //   console.log(response)
-    // } catch (error) {
-    //   console.log(error)
-    // }
+    const removeTask = `${baseUrl}/admin/task/${id}`;
+  
+    Modal.confirm({
+      title: 'Are you sure you want to delete this task?',
+      content: 'This action cannot be undone.',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk: async () => {
+        try {
+          const response = await axios.delete(removeTask, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+          console.log(response);
+          // Optionally, handle successful deletion (e.g., refresh task list)
+        } catch (error) {
+          console.log(error);
+          // Optionally, handle error (e.g., show a notification)
+        }
+      },
+    });
   };
+  
 
   const viewTask = async (record) => {
     const id = record.key;
@@ -316,6 +332,7 @@ const Cutlist = () => {
       const response = await axios.get(viewCut, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
+      
       console.log(response.data.cutlist);
       const data = response.data.cutlist;
       setPrevSingleCutlist(Array.isArray(data) ? data : []);
@@ -326,7 +343,6 @@ const Cutlist = () => {
       setLoading(false); // End loading regardless of success or failure
     }
   };
-  
 
   const Tablecolumns = [
     {
@@ -816,81 +832,98 @@ const Cutlist = () => {
           </div>
         </Modal> */}
 
-<Modal
-      title={<div className="flex justify-center">{/* Your modal title */}</div>}
-      width={400}
-      open={sideModal}
-      onCancel={closeSideBar}
-      footer={[
-        <div className="flex justify-center" key="footer">
-          <Button
-            loading={loading}
-            htmlType="submit"
-            className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10"
-            onClick={async () => await createCutlit()}
-          >
-            {loading ? "Please wait..." : "Create Cutlist"}
-            <img src="path/to/arrow.png" alt="" className="h-4 w-4 ml-1" />
-          </Button>
-        </div>,
-      ]}
-      className="custom-modal"
-      getContainer={false}
-    >
-      <div>
-        <div>
-          <h2 className="font-semibold">Cut Type</h2>
-          <div className="flex gap-6 mt-1">
-            <Button className="rounded-full bg-[#F2C94C] hover:!bg-[#F2C94C] border-none hover:!text-black">Door Cut</Button>
-            <Button className="rounded-full bg-[#fcfcfca4] hover:!bg-[#fcfcfca4] hover:!text-black border-none">Window Cut</Button>
-            <Button className="rounded-full bg-[#fcfcfca4] hover:!bg-[#fcfcfca4] hover:!text-black border-none">Bed Cut</Button>
-          </div>
-        </div>
-        <div className="mt-10">
-          <Input
-            placeholder="Enter Project Name"
-            value={selectedCutlist?.cutType || projectName}
-            onChange={(e) => setProjectName(e.target.value)}
-          />
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold">Measurement</h2>
-            <span className="text-[#f2994a]">(2 Long)</span>
-          </div>
-          <div className="flex gap-6 mt-1">
-            <Input
-              placeholder="Height"
-              type="number"
-              value={selectedCutlist?.height || height}
-              onChange={(e) => setHeight(e.target.value)}
-            />
-            <Input
-              placeholder="Width"
-              type="number"
-              value={selectedCutlist?.width || width}
-              onChange={(e) => setWidth(e.target.value)}
-            />
-            <Input
-              placeholder="Depth"
-              type="number"
-              value={selectedCutlist?.depth || depth}
-              onChange={(e) => setDepth(e.target.value)}
-            />
-          </div>
-        </div>
+        <Modal
+          title={
+            <div className="flex justify-center">{/* Your modal title */}</div>
+          }
+          width={400}
+          open={sideModal}
+          onCancel={closeSideBar}
+          footer={[
+            <div className="flex justify-center" key="footer">
+              <Button
+                loading={loading}
+                htmlType="submit"
+                className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10"
+                onClick={async () => await createCutlit()}
+              >
+                {loading ? "Please wait..." : "Create Cutlist"}
+                <img src="path/to/arrow.png" alt="" className="h-4 w-4 ml-1" />
+              </Button>
+            </div>,
+          ]}
+          className="custom-modal"
+          getContainer={false}
+        >
+          <div>
+            <div>
+              <h2 className="font-semibold">Cut Type</h2>
+              <div className="flex gap-6 mt-1">
+                <Button className="rounded-full bg-[#F2C94C] hover:!bg-[#F2C94C] border-none hover:!text-black">
+                  Door Cut
+                </Button>
+                <Button className="rounded-full bg-[#fcfcfca4] hover:!bg-[#fcfcfca4] hover:!text-black border-none">
+                  Window Cut
+                </Button>
+                <Button className="rounded-full bg-[#fcfcfca4] hover:!bg-[#fcfcfca4] hover:!text-black border-none">
+                  Bed Cut
+                </Button>
+              </div>
+            </div>
+            <div className="mt-10">
+              <Input
+                placeholder="Enter Project Name"
+                value={selectedCutlist?.cutType || projectName}
+                onChange={(e) => setProjectName(e.target.value)}
+              />
+              <div className="flex items-center justify-between">
+                <h2 className="font-semibold">Measurement</h2>
+                <span className="text-[#f2994a]">(2 Long)</span>
+              </div>
+              <div className="flex gap-6 mt-1">
+                <Input
+                  placeholder="Height"
+                  type="number"
+                  value={selectedCutlist?.height || height}
+                  onChange={(e) => setHeight(e.target.value)}
+                />
+                <Input
+                  placeholder="Width"
+                  type="number"
+                  value={selectedCutlist?.width || width}
+                  onChange={(e) => setWidth(e.target.value)}
+                />
+                <Input
+                  placeholder="Depth"
+                  type="number"
+                  value={selectedCutlist?.depth || depth}
+                  onChange={(e) => setDepth(e.target.value)}
+                />
+              </div>
+            </div>
 
-        <div className="mt-52 border-t-[.1rem]">
-          <p className="mt-3">
-            <span className="text-[#F2994A] font-semibold text-lg">LNG &nbsp;</span> - Means (Long).
-          </p>
-          <p>
-            <span className="text-[#F2994A] font-semibold text-lg">F-E-T&nbsp;</span> - Means (Long).
-          </p>
-          <p>
-            <span className="text-[#F2994A] font-semibold text-lg">& &nbsp;</span> - Means (And).
-          </p>
-        </div>
-      </div>
-    </Modal>
+            <div className="mt-52 border-t-[.1rem]">
+              <p className="mt-3">
+                <span className="text-[#F2994A] font-semibold text-lg">
+                  LNG &nbsp;
+                </span>{" "}
+                - Means (Long).
+              </p>
+              <p>
+                <span className="text-[#F2994A] font-semibold text-lg">
+                  F-E-T&nbsp;
+                </span>{" "}
+                - Means (Long).
+              </p>
+              <p>
+                <span className="text-[#F2994A] font-semibold text-lg">
+                  & &nbsp;
+                </span>{" "}
+                - Means (And).
+              </p>
+            </div>
+          </div>
+        </Modal>
         {/* create cutlist modal */}
 
         <Modal

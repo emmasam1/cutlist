@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { Table, Button, Input, Dropdown, Menu } from "antd";
+import React, { useState, useContext, useEffect } from "react";
+import { Table, Button, Input, Dropdown, Menu, message } from "antd";
+import { Context } from "../../context/Context";
 import { Link } from "react-router-dom";
 
 import dots from "../../assets/images/icons/dots.png";
@@ -10,6 +11,7 @@ import edit from "../../assets/images/icons/edit_outline.png";
 import bin from "../../assets/images/icons/bin.png";
 import archive from "../../assets/images/icons/archive.png";
 import archive_btn from "../../assets/images/icons/archive_btn.png";
+import axios from "axios";
 
 const fullDataSource = [
   {
@@ -104,10 +106,37 @@ const Feedback = () => {
   const [searchText, setSearchText] = useState("");
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const { baseUrl, accessToken } = useContext(Context);
 
   const onSearch = (value) => {
     setSearchText(value);
   };
+
+  const getFeedBack = async () => {
+    setLoading(true);
+    const feedBackUrl = `${baseUrl}/feedback/all-feedback`;
+
+    try {
+      const response = await axios.get(feedBackUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      message.success('Got all feedbacks')
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+      message.error(response.data.msg)
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getFeedBack();
+  }, []);
 
   const filteredDataSource = fullDataSource.filter(
     (item) =>
@@ -246,7 +275,11 @@ const Feedback = () => {
           columns={columns}
           dataSource={filteredDataSource}
           size="small"
-          pagination={{ pageSize: 7, position: ["bottomCenter"] }}
+          pagination={{
+            pageSize: 5,
+            position: ["bottomCenter"],
+            className: "custom-pagination",
+          }}
           className="custom-table"
           scroll={{ x: "max-content" }}
           rowSelection={{

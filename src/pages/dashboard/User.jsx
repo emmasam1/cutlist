@@ -48,6 +48,8 @@ const User = () => {
   const [dataSource, setDataSource] = useState([]);
   const [userStatus, setUserStatus] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
+  const [avatar, setAvatar] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const { baseUrl, accessToken, loggedInUser, setUserBlockedStatus, logout } =
     useContext(Context);
@@ -56,84 +58,131 @@ const User = () => {
   const [form] = Form.useForm(); // Form instance for Add User
   const [updateForm] = Form.useForm(); // Form instance for Update User
 
-  useEffect(() => {
-    if (!accessToken) return;
+  // useEffect(() => {
+  //   if (!accessToken) return;
 
-    const getUsers = async () => {
-      const allUsers = `${baseUrl}/user/all`;
-    
-      setLoading(true);
-      try {
-        const response = await axios.get(allUsers, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        // console.log(response.data.data)
-        const sourcedData = response.data.data.map((user) => ({
-          key: user._id,
-          fullName: user.fullName,
-          phoneNumber: user.phoneNumber.replace(/^(\+234)/, ''), // Remove the +234 prefix
-          status: user.status,
-          isVerified: user.isVerified,
-          email: user.email,
-          credits: user.credits,
-          projects: user.projects
-          // Add other fields as needed
-        }));
-        setDataSource(sourcedData);
-      } catch (error) {
-        console.error("Error while getting records:", error);
-        message.error("Failed to fetch users.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    
+  //   const getUsers = async () => {
+  //     const allUsers = `${baseUrl}/user/all`;
 
-    getUsers();
-  }, [baseUrl, accessToken]);
+  //     setLoading(true);
+  //     try {
+  //       const response = await axios.get(allUsers, {
+  //         headers: {
+  //           Authorization: `Bearer ${accessToken}`,
+  //         },
+  //       });
+  //       // console.log(response.data.data)
+  //       const sourcedData = response.data.data.map((user) => ({
+  //         key: user._id,
+  //         fullName: user.fullName,
+  //         phoneNumber: user.phoneNumber.replace(/^(\+234)/, ""), // Remove the +234 prefix
+  //         status: user.status,
+  //         isVerified: user.isVerified,
+  //         email: user.email,
+  //         credits: user.credits,
+  //         projects: user.projects,
+  //         // Add other fields as needed
+  //       }));
+  //       setDataSource(sourcedData);
+  //     } catch (error) {
+  //       console.error("Error while getting records:", error);
+  //       message.error("Failed to fetch users.");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   getUsers();
+  // }, [baseUrl, accessToken]);
+
+  // const onFinish = async (values) => {
+  //   setLoading(true);
+  //   const userRegUrl = `${baseUrl}/account/admin/register-user`;
+  //   const phoneNumberWithPrefix = `+234${values.phoneNumber.trim()}`;
+  //   const payload = {
+  //     ...values,
+  //     phoneNumber: phoneNumberWithPrefix,
+  //   };
+
+  //   // console.log("API URL:", userRegUrl);
+  //   // console.log("Values before modification:", values);
+  //   // console.log("Payload being sent:", payload);
+
+  //   // console.log("Access Token:", accessToken);
+  //   try {
+  //     const response = await axios.post(userRegUrl, payload, {
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`,
+  //       },
+  //     });
+
+  //     console.log("User registered:", response.data);
+  //     message.success("User created successfully");
+  //     setIsOpen(false);
+  //     form.resetFields();
+  //   } catch (error) {
+  //     console.error(
+  //       "Error registering user:",
+  //       error.response ? error.response.data : error.message
+  //     );
+  //     if (error.response) {
+  //       console.error("Response status:", error.response.status);
+  //       console.error("Response headers:", error.response.headers);
+  //     }
+  //     message.error("Failed to create user");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const onFinish = async (values) => {
     setLoading(true);
     const userRegUrl = `${baseUrl}/account/admin/register-user`;
     const phoneNumberWithPrefix = `+234${values.phoneNumber.trim()}`;
-    const payload = {
-      ...values,
-      phoneNumber: phoneNumberWithPrefix,
-    };
 
-    // console.log("API URL:", userRegUrl);
-    // console.log("Values before modification:", values);
-    // console.log("Payload being sent:", payload);
+    const formData = new FormData();
+    formData.append("fullName", values.fullName);
+    formData.append("email", values.email);
+    formData.append("phoneNumber", phoneNumberWithPrefix);
+    formData.append("password", values.password);
 
-    // console.log("Access Token:", accessToken);
+    // Append the avatar from the state
+    if (avatar) {
+      // console.log("Avatar:", avatar);
+      formData.append("avatar", avatar);
+    }
+
+    // Log formData
+    for (const [key, value] of formData.entries()) {
+      if (key === "avatar") {
+        console.log(key, value.name); // Log file name if avatar exists
+      } else {
+        // console.log(key, value);
+      }
+    }
+
     try {
-      const response = await axios.post(userRegUrl, payload, {
+      const response = await axios.post(userRegUrl, formData, {
         headers: {
+          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${accessToken}`,
         },
       });
-
-      console.log("User registered:", response.data);
+      // console.log("Response:", response);
       message.success("User created successfully");
+      await getUsers()
       setIsOpen(false);
       form.resetFields();
     } catch (error) {
       console.error(
-        "Error registering user:",
+        "Error response:",
         error.response ? error.response.data : error.message
       );
-      if (error.response) {
-        console.error("Response status:", error.response.status);
-        console.error("Response headers:", error.response.headers);
-      }
       message.error("Failed to create user");
     } finally {
       setLoading(false);
     }
   };
-
 
   // const onFinish = async (values) => {
   //   setLoading(true);
@@ -243,7 +292,7 @@ const User = () => {
 
   const getUsers = async () => {
     const allUsers = `${baseUrl}/user/all`;
-  
+
     setLoading(true);
     try {
       const response = await axios.get(allUsers, {
@@ -251,27 +300,31 @@ const User = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      console.log(response.data.data)
+      // console.log(response.data.data);
       const sourcedData = response.data.data.map((user) => ({
         key: user._id,
+        avatar: user.avatar,
         fullName: user.fullName,
-        phoneNumber: user.phoneNumber.replace(/^(\+234)/, ''), // Remove the +234 prefix
+        phoneNumber: user.phoneNumber.replace(/^(\+234)/, ""), // Remove the +234 prefix
         status: user.status,
         isVerified: user.isVerified,
         email: user.email,
         credits: user.credits,
-        projects: user.projects
+        projects: user.projects,
         // Add other fields as needed
       }));
       setDataSource(sourcedData);
     } catch (error) {
-      console.error("Error while getting records:", error);
+      // console.error("Error while getting records:", error);
       message.error("Failed to fetch users.");
     } finally {
       setLoading(false);
     }
   };
-  
+
+  useEffect(() => {
+    getUsers();
+  }, []);
 
   const handleCancelUpdate = () => {
     setIsUpdateOpen(false);
@@ -295,6 +348,7 @@ const User = () => {
   const handleCancelUserModal = () => {
     setIsOpen(false);
     form.resetFields();
+    setImagePreview(null)
   };
 
   const rowSelection = {
@@ -620,7 +674,11 @@ const User = () => {
                 user.phoneNumber.includes(searchText)
             )}
             size="small"
-            pagination={{ pageSize: 7, position: ["bottomCenter"], className: "custom-pagination"  }}
+            pagination={{
+              pageSize: 7,
+              position: ["bottomCenter"],
+              className: "custom-pagination",
+            }}
             className="custom-table"
             scroll={{ x: "max-content" }}
           />
@@ -708,11 +766,53 @@ const User = () => {
             </Form.Item>
 
             <Form.Item label="Image" name="avatar" className="mb-2">
-              <Upload {...uploadProps}>
+              <Upload
+                accept="image/*" // Optional: restrict file types
+                showUploadList={false} // Hide default upload list if you want
+                beforeUpload={(file) => {
+                  // Set the file in the form state and in the avatar state
+                  setAvatar(file);
+                  form.setFieldsValue({ avatar: file });
+
+                  // Create a preview URL
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    setImagePreview(reader.result); // Set the preview URL
+                  };
+                  reader.readAsDataURL(file);
+
+                  return false; // Prevent automatic upload
+                }}
+                onChange={(info) => {
+                  // Optional: handle the change to show success/error messages
+                  if (info.file.status === "done") {
+                    message.success(
+                      `${info.file.name} file uploaded successfully`
+                    );
+                  } else if (info.file.status === "error") {
+                    message.error(`${info.file.name} file upload failed.`);
+                  }
+                }}
+              >
                 <Button icon={<UploadOutlined />} className="w-full">
                   Click to Upload
                 </Button>
               </Upload>
+
+              {/* Show the image preview if available */}
+              {imagePreview && (
+                <div className="mt-2">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    style={{
+                      width: "100px",
+                      height: "100px",
+                      borderRadius: "8px",
+                    }} // Adjust styles as needed
+                  />
+                </div>
+              )}
             </Form.Item>
 
             <div className="flex justify-end mt-4">
