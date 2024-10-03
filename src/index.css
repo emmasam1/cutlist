@@ -92,3 +92,24 @@
   color: #FFFFFF !important;
   font-weight: bold;
 }
+
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes slideIn {
+  0% { transform: translateY(-20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.logo {
+  width: 44px; /* Set the logo size */
+  animation: fadeIn 1s ease forwards; /* Fade-in animation */
+}
+
+h2 {
+  animation: slideIn 1s ease forwards; /* Slide-in animation for text */
+}
+

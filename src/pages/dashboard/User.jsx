@@ -55,8 +55,8 @@ const User = () => {
     useContext(Context);
   const navigate = useNavigate();
 
-  const [form] = Form.useForm(); // Form instance for Add User
-  const [updateForm] = Form.useForm(); // Form instance for Update User
+  const [form] = Form.useForm(); 
+  const [updateForm] = Form.useForm();
 
   // useEffect(() => {
   //   if (!accessToken) return;
@@ -146,16 +146,14 @@ const User = () => {
     formData.append("phoneNumber", phoneNumberWithPrefix);
     formData.append("password", values.password);
 
-    // Append the avatar from the state
     if (avatar) {
       // console.log("Avatar:", avatar);
       formData.append("avatar", avatar);
     }
 
-    // Log formData
     for (const [key, value] of formData.entries()) {
       if (key === "avatar") {
-        console.log(key, value.name); // Log file name if avatar exists
+        console.log(key, value.name); 
       } else {
         // console.log(key, value);
       }
@@ -300,6 +298,16 @@ const User = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
+
+      const err = response.data
+      console.log(err)
+
+      if (err === "login credentials not authentic") {
+        message.error('Session expired, please log in again.');
+        setTimeout(() => {
+            history.push('/admin-login');
+        }, 3000); 
+    }
       // console.log(response.data.data);
       const sourcedData = response.data.data.map((user) => ({
         key: user._id,
@@ -314,8 +322,11 @@ const User = () => {
         // Add other fields as needed
       }));
       setDataSource(sourcedData);
+
+      
+
     } catch (error) {
-      // console.error("Error while getting records:", error);
+      console.error("Error while getting records:", error);
       message.error("Failed to fetch users.");
     } finally {
       setLoading(false);
@@ -754,7 +765,7 @@ const User = () => {
               />
             </Form.Item>
 
-            <Form.Item
+            {/* <Form.Item
               label="Password"
               name="password"
               className="mb-2"
@@ -763,7 +774,7 @@ const User = () => {
               ]}
             >
               <Input.Password placeholder="Enter your password" />
-            </Form.Item>
+            </Form.Item> */}
 
             <Form.Item label="Image" name="avatar" className="mb-2">
               <Upload

@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import logo from "../assets/logo.png";
 
 export const Context = createContext();
 
@@ -13,20 +14,15 @@ export const ContextProvider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    let isMounted = true; 
+    let isMounted = true;
 
     const savedUser = Cookies.get("loggedInUser");
     const savedToken = Cookies.get("accessToken");
 
     if (savedUser && savedToken) {
-      console.log("started");
-
       try {
         const user = JSON.parse(savedUser);
-        console.log(savedUser, savedToken, user);
-
         if (user && user.phoneNumber) {
-          console.log(user);
           if (isMounted) {
             setLoggedInUser(user);
             setAccessToken(savedToken);
@@ -36,22 +32,23 @@ export const ContextProvider = ({ children }) => {
           throw new Error("Invalid user data");
         }
       } catch (error) {
-        console.error("Error parsing saved user from cookies:", error);
         Cookies.remove("loggedInUser");
         Cookies.remove("accessToken");
         if (isMounted) navigate("/admin-login");
       }
-      console.log("ended");
     } else {
       if (isMounted) navigate("/admin-login");
     }
 
-    if (isMounted) setIsLoading(false);
+    // Set loading to false after user check
+    if (isMounted) {
+      setIsLoading(false);
+    }
 
     return () => {
-      isMounted = false; 
+      isMounted = false;
     };
-  }, []); 
+  }, [navigate]);
 
   const setCookie = (name, value, days) => {
     const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
@@ -79,8 +76,17 @@ export const ContextProvider = ({ children }) => {
     navigate("/admin-login");
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
+  // Show loader only if user is null and loading is true
+  if (isLoading && loggedInUser === null) {
+    return (
+      <div className="w-full h-screen flex justify-center items-center flex-col">
+        <div className="p-4 text-xl font-bold flex items-center">
+          <img src={logo} alt="" className="logo animate-fadeIn" />
+          <h2 className="text-[2rem] ml-2 animate-slideIn">Cutlist</h2>
+        </div>
+        <div className="loader"></div> {/* Loader */}
+      </div>
+    );
   }
 
   return (
