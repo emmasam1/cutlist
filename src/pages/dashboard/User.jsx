@@ -144,7 +144,7 @@ const User = () => {
     formData.append("fullName", values.fullName);
     formData.append("email", values.email);
     formData.append("phoneNumber", phoneNumberWithPrefix);
-    formData.append("password", values.password);
+    // formData.append("password", values.password);
 
     if (avatar) {
       // console.log("Avatar:", avatar);
