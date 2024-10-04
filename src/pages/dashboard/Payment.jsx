@@ -1,11 +1,59 @@
-import React from "react";
-import { Table } from "antd";
+import React, { useState, useEffect, useContext } from "react";
+import { message, Table } from "antd";
 import { PrinterOutlined } from "@ant-design/icons";
+import { Context } from "../../context/Context";
+import { ThreeDots } from "react-loader-spinner";
 
 import LineChart from "../../components/chart/LineChart";
 import LineChart2 from "../../components/chart/LinChart2";
+import axios from "axios";
 
 const Payment = () => {
+  const [loading, setLoading] = useState(false);
+  const [sourcedData, setSourcedData] = useState([])
+
+  const { baseUrl, accessToken } = useContext(Context);
+
+  const getPayments = async () => {
+    const paymentUrl = `${baseUrl}/payments/admin`;
+    setLoading(true);
+    try {
+      const response = await axios.get(paymentUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      message.success(response.data.message);
+
+      const sourcedData = response.data.payments.map((payment) => ({
+        key: payment._id,
+        customer_name: payment.user.fullName,
+        status: payment.status,
+        date: new Date(payment.paymentDate).toLocaleDateString(),
+        credits: payment.credits,
+        amount: payment.amount,
+        invoice: payment.paymentId,
+      }));
+
+      setSourcedData(sourcedData);
+      console.log(sourcedData);
+      
+    } catch (error) {
+      console.log(error);
+      message.error("Error fetching payments");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // The rest of your table columns remain unchanged
+  
+
+  useEffect(()=> {
+    getPayments()
+  },[])
+
   const data = [
     {
       id: 1,
@@ -65,13 +113,13 @@ const Payment = () => {
       render: (text) => {
         let color = "";
         let bgColor = "";
-
+  
         switch (text) {
           case "pending":
             color = "#127CDD";
             bgColor = "#D0E8FF";
             break;
-          case "paid":
+          case "successful":
             color = "#1F7700";
             bgColor = "#5EDA79";
             break;
@@ -82,7 +130,7 @@ const Payment = () => {
           default:
             break;
         }
-
+  
         return (
           <span
             style={{
@@ -104,8 +152,9 @@ const Payment = () => {
     },
     {
       title: "Credit Package",
-      dataIndex: "credit_package",
-      key: "credit_package",
+      dataIndex: "credits",
+      key: "credits",
+      render: (text) => `${text} Credits`,
     },
     {
       title: "Amount",
@@ -126,12 +175,13 @@ const Payment = () => {
           }}
           onClick={() => handlePrint(record)}
         >
-          <PrinterOutlined style={{ fontSize: "18px", marginRight: "5px" }} />{" "}
+          <PrinterOutlined style={{ fontSize: "18px", marginRight: "5px" }} />
           Printer
         </span>
       ),
     },
   ];
+  
 
   const tableData = [
     {
@@ -194,10 +244,23 @@ const Payment = () => {
           </div>
         </div>
 
-        <div>
-          <Table
+          {loading ? (
+              <div className="flex justify-center items-center h-64">
+              <ThreeDots
+                visible={true}
+                height="80"
+                width="80"
+                color="#F1B31C"
+                radius="9"
+                ariaLabel="three-dots-loading"
+                wrapperStyle={{}}
+                wrapperClass="three-dots-loading"
+              />
+            </div>
+          ) : (
+            <Table
             columns={columns}
-            dataSource={tableData}
+            dataSource={sourcedData}
             size="small"
             pagination={{
               pageSize: 5,
@@ -207,7 +270,8 @@ const Payment = () => {
             className="custom-table"
             scroll={{ x: "max-content" }}
           />
-        </div>
+          )}
+        
       </div>
     </div>
   );
