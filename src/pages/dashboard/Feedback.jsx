@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Table, Button, Input, Dropdown, Menu, message } from "antd";
 import { Context } from "../../context/Context";
-import { Link } from "react-router-dom";
+import Cookies from 'js-cookie';
 
 import dots from "../../assets/images/icons/dots.png";
 import user_2 from "../../assets/images/user_2.png";
@@ -12,6 +12,8 @@ import bin from "../../assets/images/icons/bin.png";
 import archive from "../../assets/images/icons/archive.png";
 import archive_btn from "../../assets/images/icons/archive_btn.png";
 import axios from "axios";
+
+import user from "../../assets/user.png";
 
 const fullDataSource = [
   {
@@ -107,12 +109,14 @@ const Feedback = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [sourcedData, setSourcedData] = useState([])
 
   const { baseUrl, accessToken } = useContext(Context);
 
   const onSearch = (value) => {
     setSearchText(value);
   };
+
 
   const getFeedBack = async () => {
     setLoading(true);
@@ -124,25 +128,71 @@ const Feedback = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      message.success('Got all feedbacks')
-      console.log(response);
+
+      message.success('Got all feedbacks');
+      console.log('Response Data:', response.data);
+
+      const feedbackArray = response.data.feedback;
+
+      if (!Array.isArray(feedbackArray)) {
+        throw new Error('Feedback data is not an array');
+      }
+
+      const sourcedData = feedbackArray.map((feedback) => {
+        const createdAt = new Date(feedback.createdAt);
+        const dateTime = `${createdAt.toLocaleDateString()} ${createdAt.toLocaleTimeString()}`;
+
+        return {
+          key: feedback._id,
+          message: feedback.message,
+          fullName: feedback.sender.fullName,
+          createdAt: feedback.createdAt,
+          avatar: feedback.sender.avatar || user,
+          phoneNumber: feedback.sender.phoneNumber,
+          dateTime, 
+        };
+      });
+
+      console.log('Sourced Data:', sourcedData);
+      setSourcedData(sourcedData);
+
     } catch (error) {
       console.log(error);
-      message.error(response.data.msg)
+      const errorMessage = error.response?.data?.msg || 'An error occurred';
+
+      if (errorMessage === 'Login credentials not authentic') {
+        console.log('Clearing cookies:', {
+          accessToken: Cookies.get('accessToken'),
+          loggedInUser: Cookies.get('loggedInUser'),
+        });
+
+        Cookies.remove('accessToken');
+        Cookies.remove('loggedInUser');
+
+        window.location.href = '/admin-login';
+      }
+
+      message.error(errorMessage);
+
     } finally {
       setLoading(false);
     }
   };
 
+  
+  
+  
+  
+
   useEffect(() => {
     getFeedBack();
   }, []);
 
-  const filteredDataSource = fullDataSource.filter(
-    (item) =>
-      item.user_name.toLowerCase().includes(searchText.toLowerCase()) ||
-      item.email.toLowerCase().includes(searchText.toLowerCase())
-  );
+  // const filteredDataSource = fullDataSource.filter(
+  //   (item) =>
+  //     item.user_name.toLowerCase().includes(searchText.toLowerCase()) ||
+  //     item.email.toLowerCase().includes(searchText.toLowerCase())
+  // );
 
   const columns = [
     {
@@ -159,7 +209,7 @@ const Feedback = () => {
       render: (text, record) => (
         <div style={{ display: "flex", alignItems: "center" }}>
           <img
-            src={record.user_img}
+            src={record.avatar || user}
             alt="User"
             style={{
               width: 30,
@@ -168,18 +218,18 @@ const Feedback = () => {
               marginRight: 8,
             }}
           />
-          <span>{record.user_name}</span>
+          <span>{record.fullName}</span>
         </div>
       ),
-      dataIndex: "user_name",
-    },
+    }, 
+    
     {
       title: "Phone Number",
-      dataIndex: "email",
+      dataIndex: "phoneNumber",
     },
     {
       title: "",
-      dataIndex: "time",
+      dataIndex: "dateTime",
     },
 
     {
@@ -273,7 +323,7 @@ const Feedback = () => {
         </div>
         <Table
           columns={columns}
-          dataSource={filteredDataSource}
+          dataSource={sourcedData}
           size="small"
           pagination={{
             pageSize: 5,

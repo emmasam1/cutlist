@@ -289,7 +289,7 @@ const User = () => {
   };
 
   const getUsers = async () => {
-    const allUsers = `${baseUrl}/user/all`;
+    const allUsers = `${baseUrl}/admin/all-users`;
 
     setLoading(true);
     try {

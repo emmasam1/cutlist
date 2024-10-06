@@ -82,7 +82,7 @@ export const ContextProvider = ({ children }) => {
       <div className="w-full h-screen flex justify-center items-center flex-col">
         <div className="p-4 text-xl font-bold flex items-center">
           <img src={logo} alt="" className="logo animate-fadeIn" />
-          <h2 className="text-[2rem] ml-2 animate-slideIn">Cutlist</h2>
+          <h2 className="text-[2rem] ml-2 animate-slideIn cutlist">Cutlist</h2>
         </div>
         <div className="loader"></div> {/* Loader */}
       </div>

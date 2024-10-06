@@ -109,7 +109,7 @@
   animation: fadeIn 1s ease forwards; /* Fade-in animation */
 }
 
-h2 {
+.cutlist {
   animation: slideIn 1s ease forwards; /* Slide-in animation for text */
 }
 
