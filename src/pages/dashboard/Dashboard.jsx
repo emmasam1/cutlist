@@ -33,21 +33,18 @@ const Dashboard = () => {
           },
         });
   
-        // Ensure data exists and is an array
         const users = response.data.data;
         if (Array.isArray(users)) {
           setTotalUser(users.length);
   
-          // Get today's date range
           const todayStart = new Date();
           todayStart.setHours(0, 0, 0, 0);
   
           const todayEnd = new Date();
           todayEnd.setHours(23, 59, 59, 999);
   
-          // Count users who registered today using the createdAt field
           const registeredTodayCount = users.reduce((count, user) => {
-            const createdAtDate = new Date(user.createdAt); // Use createdAt instead of registrationDate
+            const createdAtDate = new Date(user.createdAt); 
             return (createdAtDate >= todayStart && createdAtDate <= todayEnd) ? count + 1 : count;
           }, 0);
   
@@ -81,9 +78,8 @@ const Dashboard = () => {
     getCategory();
   }, [accessToken]);
 
-  // Logging totalUser when it changes
+
   useEffect(() => {
-    // console.log(totalUser);
   }, [totalUser]);
 
   function formatDate(date) {

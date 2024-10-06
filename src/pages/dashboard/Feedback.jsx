@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Table, Button, Input, Dropdown, Menu, message } from "antd";
 import { Context } from "../../context/Context";
+import { ThreeDots } from "react-loader-spinner";
 import Cookies from 'js-cookie';
 
 import dots from "../../assets/images/icons/dots.png";
@@ -321,21 +322,35 @@ const Feedback = () => {
             Archived
           </Button>
         </div>
-        <Table
-          columns={columns}
-          dataSource={sourcedData}
-          size="small"
-          pagination={{
-            pageSize: 5,
-            position: ["bottomCenter"],
-            className: "custom-pagination",
-          }}
-          className="custom-table"
-          scroll={{ x: "max-content" }}
-          rowSelection={{
-            onChange: (selectedRowKeys) => setSelectedRowKeys(selectedRowKeys),
-          }}
-        />
+        {loading ? ( <div className="flex justify-center items-center h-64">
+            <ThreeDots
+              visible={true}
+              height="80"
+              width="80"
+              color="#F1B31C"
+              radius="9"
+              ariaLabel="three-dots-loading"
+              wrapperStyle={{}}
+              wrapperClass="three-dots-loading"
+            />
+          </div>) : (
+             <Table
+             columns={columns}
+             dataSource={sourcedData}
+             size="small"
+             pagination={{
+               pageSize: 5,
+               position: ["bottomCenter"],
+               className: "custom-pagination",
+             }}
+             className="custom-table"
+             scroll={{ x: "max-content" }}
+             rowSelection={{
+               onChange: (selectedRowKeys) => setSelectedRowKeys(selectedRowKeys),
+             }}
+           />
+          )}
+       
       </div>
     </div>
   );
