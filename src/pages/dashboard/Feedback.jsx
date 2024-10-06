@@ -148,7 +148,7 @@ const Feedback = () => {
           fullName: feedback.sender.fullName,
           createdAt: feedback.createdAt,
           avatar: feedback.sender.avatar || user,
-          phoneNumber: feedback.sender.phoneNumber,
+          email: feedback.sender.email,
           dateTime, 
         };
       });
@@ -201,11 +201,7 @@ const Feedback = () => {
       width: 70,
     },
     {
-      title: "Feedbacks",
-      dataIndex: "id",
-    },
-    {
-      title: "User Profile",
+      title: "Name",
       render: (text, record) => (
         <div style={{ display: "flex", alignItems: "center" }}>
           <img
@@ -214,7 +210,7 @@ const Feedback = () => {
             style={{
               width: 30,
               height: 30,
-              borderRadius: "50%",
+              // borderRadius: "50%",
               marginRight: 8,
             }}
           />
@@ -224,11 +220,15 @@ const Feedback = () => {
     }, 
     
     {
-      title: "Phone Number",
+      title: "Subject",
       dataIndex: "phoneNumber",
     },
     {
-      title: "",
+      title: "Email",
+      dataIndex: "email",
+    },
+    {
+      title: "Time",
       dataIndex: "dateTime",
     },
 
