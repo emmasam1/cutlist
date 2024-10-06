@@ -17,33 +17,49 @@ const Dashboard = () => {
 
   const { baseUrl, accessToken } = useContext(Context);
   const [totalUser, setTotalUser] = useState(0)
+  const [newUsers, setNewUsers] = useState(0)
   const [totalCutList, setTotalCutList] = useState(0)
 
   useEffect(() => {
-    if (!accessToken) return; 
-
+    if (!accessToken) return;
+  
     const getUsers = async () => {
       const allUsersUrl = `${baseUrl}/admin/all-users`;
-
+  
       try {
         const response = await axios.get(allUsersUrl, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-
+  
         // Ensure data exists and is an array
         const users = response.data.data;
         if (Array.isArray(users)) {
           setTotalUser(users.length);
+  
+          // Get today's date range
+          const todayStart = new Date();
+          todayStart.setHours(0, 0, 0, 0);
+  
+          const todayEnd = new Date();
+          todayEnd.setHours(23, 59, 59, 999);
+  
+          // Count users who registered today using the createdAt field
+          const registeredTodayCount = users.reduce((count, user) => {
+            const createdAtDate = new Date(user.createdAt); // Use createdAt instead of registrationDate
+            return (createdAtDate >= todayStart && createdAtDate <= todayEnd) ? count + 1 : count;
+          }, 0);
+  
+          setNewUsers(registeredTodayCount);
         } else {
           console.error("Data is not in expected format:", response.data);
         }
       } catch (error) {
         console.error("Error while getting records:", error);
-      } 
+      }
     };
-
+  
     getUsers();
   }, [accessToken]);
 
@@ -107,8 +123,8 @@ const Dashboard = () => {
     {
       id: 2,
       title: "recent registration",
-      amount: 16,
-      dec: "Amount od recent registration",
+      amount: newUsers,
+      dec: "Number of recent registration",
       bg_color: "#FBECC4",
       img: user,
     },
