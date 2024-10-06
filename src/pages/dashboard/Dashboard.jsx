@@ -23,7 +23,7 @@ const Dashboard = () => {
     if (!accessToken) return; 
 
     const getUsers = async () => {
-      const allUsersUrl = `${baseUrl}/user/all`;
+      const allUsersUrl = `${baseUrl}/admin/all-users`;
 
       try {
         const response = await axios.get(allUsersUrl, {
