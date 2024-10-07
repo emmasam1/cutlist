@@ -34,6 +34,8 @@ import { Context } from "../../context/Context";
 import { ThreeDots } from "react-loader-spinner";
 import debounce from "lodash.debounce";
 
+import user from "../../components/user/UserDetails";
+
 const { confirm } = Modal;
 
 const User = () => {
@@ -55,7 +57,7 @@ const User = () => {
     useContext(Context);
   const navigate = useNavigate();
 
-  const [form] = Form.useForm(); 
+  const [form] = Form.useForm();
   const [updateForm] = Form.useForm();
 
   // useEffect(() => {
@@ -153,7 +155,7 @@ const User = () => {
 
     for (const [key, value] of formData.entries()) {
       if (key === "avatar") {
-        console.log(key, value.name); 
+        console.log(key, value.name);
       } else {
         // console.log(key, value);
       }
@@ -168,7 +170,7 @@ const User = () => {
       });
       // console.log("Response:", response);
       message.success("User created successfully");
-      await getUsers()
+      await getUsers();
       setIsOpen(false);
       form.resetFields();
     } catch (error) {
@@ -299,15 +301,15 @@ const User = () => {
         },
       });
 
-      const err = response.data
-      console.log(err)
+      const err = response.data;
+      console.log(err);
 
       if (err === "login credentials not authentic") {
-        message.error('Session expired, please log in again.');
+        message.error("Session expired, please log in again.");
         setTimeout(() => {
-            history.push('/admin-login');
-        }, 3000); 
-    }
+          history.push("/admin-login");
+        }, 3000);
+      }
       // console.log(response.data.data);
       const sourcedData = response.data.data.map((user) => ({
         key: user._id,
@@ -322,9 +324,6 @@ const User = () => {
         // Add other fields as needed
       }));
       setDataSource(sourcedData);
-
-      
-
     } catch (error) {
       console.error("Error while getting records:", error);
       message.error("Failed to fetch users.");
@@ -359,7 +358,7 @@ const User = () => {
   const handleCancelUserModal = () => {
     setIsOpen(false);
     form.resetFields();
-    setImagePreview(null)
+    setImagePreview(null);
   };
 
   const rowSelection = {
@@ -429,93 +428,109 @@ const User = () => {
       key: "operations",
       render: (_, record) => (
         <Dropdown
-          overlay={
-            <Menu>
-              <Menu.Item key="view">
-                <Link
-                  to={`/user/${record.key}`}
-                  state={{ record }}
-                  className="flex items-center"
-                >
-                  <img
-                    src={userIcon}
-                    alt="View"
-                    style={{
-                      width: "17px",
-                      height: "17px",
-                      marginRight: "8px",
-                    }}
-                  />
-                  View Profile
-                </Link>
-              </Menu.Item>
-              <Menu.Item key="edit">
-                <span
-                  className="flex items-center"
-                  onClick={() => updateUser(record)}
-                >
-                  <img
-                    src={edit}
-                    alt="Edit"
-                    style={{
-                      width: "17px",
-                      height: "17px",
-                      marginRight: "8px",
-                    }}
-                  />
-                  Update
-                </span>
-              </Menu.Item>
-              <Menu.Item key="block">
-                <span
-                  className="flex items-center cursor-pointer"
-                  onClick={() => blockUser(record)}
-                >
-                  <img
-                    src={no_data}
-                    alt="Block/Unblock"
-                    style={{
-                      width: "17px",
-                      height: "17px",
-                      marginRight: "8px",
-                    }}
-                  />
-                  {record.status === "active" ? "Block" : "Unblock"}
-                </span>
-              </Menu.Item>
-              <Menu.Item key="notification">
-                <span className="flex items-center">
-                  <img
-                    src={notificationImg}
-                    alt="Notification"
-                    style={{
-                      width: "17px",
-                      height: "17px",
-                      marginRight: "8px",
-                    }}
-                  />
-                  Send Notification
-                </span>
-              </Menu.Item>
-              <Menu.Item key="delete">
-                <span
-                  className="flex items-center"
-                  onClick={() => deleteUser(record)}
-                >
-                  <img
-                    src={bin}
-                    alt="Delete"
-                    style={{
-                      width: "17px",
-                      height: "17px",
-                      marginRight: "8px",
-                    }}
-                  />
-                  Delete
-                </span>
-              </Menu.Item>
-            </Menu>
-          }
+          menu={{
+            items: [
+              {
+                key: "view",
+                label: (
+                  <Link
+                    to={`/user/${record.key}`}
+                    state={{ record }}
+                    className="flex items-center"
+                  >
+                    <img
+                      src={userIcon}
+                      alt="View"
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
+                    />
+                    View Profile
+                  </Link>
+                ),
+              },
+              {
+                key: "edit",
+                label: (
+                  <span
+                    className="flex items-center"
+                    onClick={() => updateUser(record)}
+                  >
+                    <img
+                      src={edit}
+                      alt="Edit"
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
+                    />
+                    Update
+                  </span>
+                ),
+              },
+              {
+                key: "block",
+                label: (
+                  <span
+                    className="flex items-center cursor-pointer"
+                    onClick={() => blockUser(record)}
+                  >
+                    <img
+                      src={no_data}
+                      alt="Block/Unblock"
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
+                    />
+                    {record.status === "active" ? "Block" : "Unblock"}
+                  </span>
+                ),
+              },
+              {
+                key: "notification",
+                label: (
+                  <span className="flex items-center">
+                    <img
+                      src={notificationImg}
+                      alt="Notification"
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
+                    />
+                    Send Notification
+                  </span>
+                ),
+              },
+              {
+                key: "delete",
+                label: (
+                  <span
+                    className="flex items-center"
+                    onClick={() => deleteUser(record)}
+                  >
+                    <img
+                      src={bin}
+                      alt="Delete"
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                        marginRight: "8px",
+                      }}
+                    />
+                    Delete
+                  </span>
+                ),
+              },
+            ],
+            // onClick: (e) => handleMenuClick(e, record), // Optional: if you need to handle click events
+          }}
           trigger={["click"]}
         >
           <Button>

@@ -39,14 +39,22 @@ const Dashboard = () => {
   
           const todayStart = new Date();
           todayStart.setHours(0, 0, 0, 0);
-  
           const todayEnd = new Date();
           todayEnd.setHours(23, 59, 59, 999);
   
           const registeredTodayCount = users.reduce((count, user) => {
-            const createdAtDate = new Date(user.createdAt); 
+            const createdAtDate = new Date(user.createdAt);
             return (createdAtDate >= todayStart && createdAtDate <= todayEnd) ? count + 1 : count;
           }, 0);
+  
+          // Store count in local storage with expiration
+          const today = new Date();
+          const expiryDate = new Date(today);
+          expiryDate.setDate(today.getDate() + 7); // Set expiry for 7 days
+          localStorage.setItem('newUsers', JSON.stringify({
+            count: registeredTodayCount,
+            expiry: expiryDate.toISOString(),
+          }));
   
           setNewUsers(registeredTodayCount);
         } else {
@@ -57,8 +65,26 @@ const Dashboard = () => {
       }
     };
   
-    getUsers();
+    // Check local storage first
+    const storedData = localStorage.getItem('newUsers');
+    if (storedData) {
+      const parsedData = JSON.parse(storedData);
+      const expiry = new Date(parsedData.expiry);
+      const now = new Date();
+  
+      if (now < expiry) {
+        // Use stored count if not expired
+        setNewUsers(parsedData.count);
+      } else {
+        // Expired, fetch new data
+        getUsers();
+      }
+    } else {
+      // No stored data, fetch new data
+      getUsers();
+    }
   }, [accessToken]);
+  
 
   useEffect(() => {
     const getCategory = async () => {

@@ -11,7 +11,7 @@ import red_bin from "../../assets/images/icons/red_bin.png";
 import policy from "../../assets/images/icons/policy.png";
 import user from "../../assets/user.png";
 
-const UserDetailsPage = () => {
+const UserDetails = () => {
   const location = useLocation();
   const { userId } = useParams();
   const { state } = location;
@@ -268,4 +268,4 @@ const UserDetailsPage = () => {
   );
 };
 
-export default UserDetailsPage;
+export default UserDetails;

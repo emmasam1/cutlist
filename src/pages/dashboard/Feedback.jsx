@@ -15,6 +15,7 @@ import archive_btn from "../../assets/images/icons/archive_btn.png";
 import axios from "axios";
 
 import user from "../../assets/user.png";
+import { Link } from "react-router-dom";
 
 const fullDataSource = [
   {
@@ -146,6 +147,7 @@ const Feedback = () => {
         return {
           key: feedback._id,
           message: feedback.message,
+          subject: feedback.subject,
           fullName: feedback.sender.fullName,
           createdAt: feedback.createdAt,
           avatar: feedback.sender.avatar || user,
@@ -222,7 +224,7 @@ const Feedback = () => {
     
     {
       title: "Subject",
-      dataIndex: "phoneNumber",
+      dataIndex: "subject",
     },
     {
       title: "Email",
@@ -243,7 +245,8 @@ const Feedback = () => {
               {
                 key: "reply",
                 label: (
-                  <span className="flex items-center">
+                 <Link to={`/feedback/${record.key}`} state={{ record }}>
+                   <span className="flex items-center">
                     <img
                       src={edit}
                       alt="Reply"
@@ -253,8 +256,9 @@ const Feedback = () => {
                         marginRight: "8px",
                       }}
                     />
-                    Reply
+                    Reply 
                   </span>
+                 </Link>
                 ),
               },
               {
