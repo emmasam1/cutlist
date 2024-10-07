@@ -17,40 +17,6 @@ import axios from "axios";
 import user from "../../assets/user.png";
 import { Link } from "react-router-dom";
 
-const fullDataSource = [
-  {
-    key: 0,
-    id: "FBK004-17-24AUG",
-    user_name: "Rory Mcllroy",
-    user_img: user_2,
-    email: "rorymcllrory24@gmail.com",
-    time: "01:00pm",
-  },
-  {
-    key: 1,
-    id: "FBK003-14-24AUG",
-    user_name: "Manuel Ugate",
-    user_img: user_3,
-    email: "emanuelUgate@utd.org",
-    time: "Yesterday",
-  },
-  {
-    key: 2,
-    id: "FBK002-10-24AUG",
-    user_name: "Alxis Sanchez",
-    user_img: user_1,
-    email: "alexisanchez09@gmail.com",
-    time: "Tuesday",
-  },
-  {
-    key: 3,
-    id: "FBK001-02-24AUG",
-    user_name: "Micah Richards",
-    user_img: user_2,
-    email: "micrichards1995@gmail.com",
-    time: "Tuesday",
-  },
-];
 
 const handleMenuClick = (e, record) => {
   if (e.key === "reply") {
@@ -125,62 +91,71 @@ const Feedback = () => {
     const feedBackUrl = `${baseUrl}/feedback/all-feedback`;
 
     try {
-      const response = await axios.get(feedBackUrl, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      message.success('Got all feedbacks');
-      console.log('Response Data:', response.data);
-
-      const feedbackArray = response.data.feedback;
-
-      if (!Array.isArray(feedbackArray)) {
-        throw new Error('Feedback data is not an array');
-      }
-
-      const sourcedData = feedbackArray.map((feedback) => {
-        const createdAt = new Date(feedback.createdAt);
-        const dateTime = `${createdAt.toLocaleDateString()} ${createdAt.toLocaleTimeString()}`;
-
-        return {
-          key: feedback._id,
-          message: feedback.message,
-          subject: feedback.subject,
-          fullName: feedback.sender.fullName,
-          createdAt: feedback.createdAt,
-          avatar: feedback.sender.avatar || user,
-          email: feedback.sender.email,
-          dateTime, 
-        };
-      });
-
-      console.log('Sourced Data:', sourcedData);
-      setSourcedData(sourcedData);
-
-    } catch (error) {
-      console.log(error);
-      const errorMessage = error.response?.data?.msg || 'An error occurred';
-
-      if (errorMessage === 'Login credentials not authentic') {
-        console.log('Clearing cookies:', {
-          accessToken: Cookies.get('accessToken'),
-          loggedInUser: Cookies.get('loggedInUser'),
+        const response = await axios.get(feedBackUrl, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
         });
 
-        Cookies.remove('accessToken');
-        Cookies.remove('loggedInUser');
+        message.success('Got all feedbacks');
+        console.log('Response Data:', response.data);
 
-        window.location.href = '/admin-login';
-      }
+        const feedbackArray = response.data.feedback;
 
-      message.error(errorMessage);
+        if (!Array.isArray(feedbackArray)) {
+            throw new Error('Feedback data is not an array');
+        }
+
+        const sourcedData = feedbackArray.map((feedback) => {
+            const createdAt = new Date(feedback.createdAt);
+            const dateTime = `${createdAt.toLocaleDateString()} ${createdAt.toLocaleTimeString()}`;
+
+            // Format replies
+            const replies = feedback.replies ? feedback.replies.map(reply => ({
+                message: reply.message,
+                createdAt: new Date(reply.createdAt),
+                // Add any other fields from the reply you need
+            })) : [];
+
+            return {
+                key: feedback._id,
+                message: feedback.message,
+                subject: feedback.subject,
+                fullName: feedback.sender.fullName,
+                createdAt: feedback.createdAt,
+                avatar: feedback.sender.avatar || user,
+                email: feedback.sender.email,
+                dateTime,
+                replies, // Add replies here
+            };
+        });
+
+        console.log('Sourced Data with Replies:', sourcedData);
+        setSourcedData(sourcedData);
+
+    } catch (error) {
+        console.log(error);
+        const errorMessage = error.response?.data?.msg || 'An error occurred';
+
+        if (errorMessage === 'Login credentials not authentic') {
+            console.log('Clearing cookies:', {
+                accessToken: Cookies.get('accessToken'),
+                loggedInUser: Cookies.get('loggedInUser'),
+            });
+
+            Cookies.remove('accessToken');
+            Cookies.remove('loggedInUser');
+
+            window.location.href = '/admin-login';
+        }
+
+        message.error(errorMessage);
 
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
+
 
   
   
