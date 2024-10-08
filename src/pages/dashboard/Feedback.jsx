@@ -114,8 +114,9 @@ const Feedback = () => {
             const replies = feedback.replies ? feedback.replies.map(reply => ({
                 message: reply.message,
                 createdAt: new Date(reply.createdAt),
-                // Add any other fields from the reply you need
             })) : [];
+
+            console.log(replies)
 
             return {
                 key: feedback._id,
@@ -126,7 +127,7 @@ const Feedback = () => {
                 avatar: feedback.sender.avatar || user,
                 email: feedback.sender.email,
                 dateTime,
-                replies, // Add replies here
+                // replies, // Add replies here
             };
         });
 
@@ -188,8 +189,9 @@ const Feedback = () => {
             style={{
               width: 30,
               height: 30,
-              // borderRadius: "50%",
+              borderRadius: "50%",
               marginRight: 8,
+              objectFit: "cover"
             }}
           />
           <span>{record.fullName}</span>
