@@ -35,7 +35,7 @@
   position: fixed !important;
   top: 0;
   right: 0;
-  height: 100vh !important; /* Full height */
+  /* height: 100vh !important; Full height */
   border-radius: 0 !important; /* Remove rounded corners */
   width: 400px; /* Adjust the width as needed */
 }

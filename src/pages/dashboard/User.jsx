@@ -600,7 +600,7 @@ const User = () => {
     }
 
     setConfirmLoading(true);
-    const updateUserUrl = `${baseUrl}/user/admin-update-user/${selectedUser.key}`; // Adjust the endpoint as per your API
+    const updateUserUrl = `${baseUrl}/admin/admin-update-user/${selectedUser.key}`; // Adjust the endpoint as per your API
     console.log(updateUserUrl);
     try {
       const response = await axios.put(updateUserUrl, values, {

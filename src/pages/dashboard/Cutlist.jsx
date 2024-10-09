@@ -68,21 +68,21 @@ const Cutlist = () => {
     setSearchText(value);
   };
 
+  const getCutList = async () => {
+    const cutList = `${baseUrl}/admin/tasks`;
+    try {
+      const response = await axios.get(cutList, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      // console.log(response.data);
+      setTabledata(response.data);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
   useEffect(() => {
-    const getCutList = async () => {
-      const cutList = `${baseUrl}/admin/tasks`;
-      try {
-        const response = await axios.get(cutList, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        // console.log(response.data);
-        setTabledata(response.data);
-      } catch (error) {
-        console.log("error", error);
-      }
-    };
     getCutList();
   }, [accessToken, baseUrl]);
 
@@ -330,7 +330,7 @@ const Cutlist = () => {
 
   const deleteTasks = (record) => {
     const id = record.key;
-    const removeTask = `${baseUrl}/admin/task/${id}`;
+    const removeTask = `${baseUrl}/tasks/${id}`;
 
     Modal.confirm({
       title: "Are you sure you want to delete this task?",
@@ -344,10 +344,13 @@ const Cutlist = () => {
             headers: { Authorization: `Bearer ${accessToken}` },
           });
           console.log(response);
+          message.success(response.data.message)
+          getCutList()
           // Optionally, handle successful deletion (e.g., refresh task list)
         } catch (error) {
           console.log(error);
           // Optionally, handle error (e.g., show a notification)
+          message.error(error.message)
         }
       },
     });
@@ -1057,6 +1060,8 @@ const Cutlist = () => {
               position: ["bottomCenter"],
               className: "custom-pagination",
             }}
+            className="custom-table"
+            scroll={{ x: "max-content" }}
           />
         </Modal>
         {/* select user modal */}
