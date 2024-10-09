@@ -30,7 +30,7 @@ import Users from "../../components/allUsers/AllUsers";
 const Cutlist = () => {
   const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [previewCutlist, setPreviewCutlist] = useState(false);
+  // const [previewCutlist, setPreviewCutlist] = useState(false);
   const [previewData, setPreviewData] = useState([]);
   const [sideModal, setSideModal] = useState(false);
   const [allUsers, setAllUsers] = useState(false);
@@ -48,7 +48,9 @@ const Cutlist = () => {
   const [selectedRole, setSelectedRole] = useState(null);
   const [selectedCutlist, setSelectedCutlist] = useState(null);
   const [singleCutlist, setSingleCutlist] = useState(false);
+  const [previewTask, setPreviewTask] = useState(false);
   const [prevSingleCutlist, setPrevSingleCutlist] = useState([]);
+  const [task, setTask] = useState([]);
 
   const [cutType, setCutType] = useState("Door Cut");
   const [projectName, setProjectName] = useState("");
@@ -105,6 +107,35 @@ const Cutlist = () => {
     getCategory();
   }, [accessToken, baseUrl]);
 
+  const perviewCut = async () => {
+    setLoading(true);
+    const preUrl = `${baseUrl}/task/preview`;
+    const cutListData = {
+      categoryId: selectedCategoryId,
+      userId: user,
+      name: projectName,
+      measurement: { height, width, depth },
+      material: "MDF",
+    };
+
+    try {
+      const response = await axios.post(preUrl, cutListData, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      setPreviewTask(true);
+      setSideModal(false);
+      const data = response.data.task;
+      setTask(data.cutlist);
+      console.log(response.data.task._id);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const createCutlit = async () => {
     const cutListUrl = `${baseUrl}/task`;
     const cutListData = {
@@ -126,7 +157,7 @@ const Cutlist = () => {
         },
       });
       message.success("Cut List Created");
-      setPreviewCutlist(true);
+      // setPreviewCutlist(true);
       setSideModal(false);
 
       // Reset input fields
@@ -195,7 +226,7 @@ const Cutlist = () => {
     if (!accessToken) return;
 
     const getUsers = async () => {
-      const allUsers = `${baseUrl}/user/all`;
+      const allUsers = `${baseUrl}/admin/all-users`;
 
       setLoading(true);
       try {
@@ -272,7 +303,7 @@ const Cutlist = () => {
 
   const createCut = () => {
     createCutList();
-    setPreviewCutlist(true);
+    // setPreviewCutlist(true);
   };
 
   const handleModal = () => {
@@ -282,7 +313,7 @@ const Cutlist = () => {
 
   const closeSideBar = () => {
     setSideModal(false);
-    setPreviewCutlist(false);
+    // setPreviewCutlist(false);
 
     setProjectName("");
     setHeight("");
@@ -297,17 +328,16 @@ const Cutlist = () => {
     setSelectedCategory("");
   };
 
-  
   const deleteTasks = (record) => {
     const id = record.key;
     const removeTask = `${baseUrl}/admin/task/${id}`;
-  
+
     Modal.confirm({
-      title: 'Are you sure you want to delete this task?',
-      content: 'This action cannot be undone.',
-      okText: 'Yes',
-      okType: 'danger',
-      cancelText: 'No',
+      title: "Are you sure you want to delete this task?",
+      content: "This action cannot be undone.",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
       onOk: async () => {
         try {
           const response = await axios.delete(removeTask, {
@@ -322,7 +352,6 @@ const Cutlist = () => {
       },
     });
   };
-  
 
   const viewTask = async (record) => {
     const id = record.key;
@@ -332,7 +361,7 @@ const Cutlist = () => {
       const response = await axios.get(viewCut, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      
+
       console.log(response.data.cutlist);
       const data = response.data.cutlist;
       setPrevSingleCutlist(Array.isArray(data) ? data : []);
@@ -635,6 +664,55 @@ const Cutlist = () => {
 
         <Modal
           title="Preview Cutlist"
+          open={previewTask}
+          onCancel={() => setPreviewTask(false)}
+          footer={[
+            <div className="flex justify-center " key="footer">
+              <Button
+                htmlType="submit"
+                className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10"
+                onClick={() => createCutlit()}
+              >
+                Save Cut List
+              </Button>
+            </div>,
+          ]}
+          width={400}
+          className="custom-modal"
+          getContainer={false}
+        >
+          <div>
+            {task.map((e) => (
+              <div className="mt-3 m-auto w-5/6" id={e._id}>
+                <span className="font-sm font-semibold">{e.part}</span>
+                <div className="flex justify-between items-center border-b-[.1rem]">
+                  <div className="flex items-center mt-1 pb-2">
+                    <span className="text-[#F2994A] font-semibold text-[.6rem]">
+                      L - &nbsp;
+                    </span>
+                    <p className="font-bold">{e.length}</p>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-[#F2994A] font-semibold text-[.6rem]">
+                      W - &nbsp;
+                    </span>
+                    <p className="font-bold">{e.width}</p>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-[#F2994A] font-semibold text-[.6rem]">
+                      Q - &nbsp;
+                    </span>
+                    <p className="font-bold">{e.quantity}</p>
+                    <img src={full_list} alt="" className="w-3 ml-2" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Modal>
+
+        {/* <Modal
+          title="Preview Cutlist"
           open={previewCutlist}
           onCancel={() => setPreviewCutlist(false)}
           footer={[
@@ -680,7 +758,7 @@ const Cutlist = () => {
               </div>
             ))}
           </div>
-        </Modal>
+        </Modal> */}
 
         {/* view single cutlist */}
         {loading ? (
@@ -845,9 +923,9 @@ const Cutlist = () => {
                 loading={loading}
                 htmlType="submit"
                 className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10"
-                onClick={async () => await createCutlit()}
+                onClick={async () => await perviewCut()}
               >
-                {loading ? "Please wait..." : "Create Cutlist"}
+                {loading ? "Please wait..." : "Preview Cutlist"}
                 <img src="path/to/arrow.png" alt="" className="h-4 w-4 ml-1" />
               </Button>
             </div>,
@@ -948,6 +1026,7 @@ const Cutlist = () => {
           <Users />
         </Modal>
 
+        {/* select user modal */}
         <Modal
           title="Select a user"
           open={userModal}
@@ -980,6 +1059,7 @@ const Cutlist = () => {
             }}
           />
         </Modal>
+        {/* select user modal */}
       </div>
     </div>
   );
