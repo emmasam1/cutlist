@@ -54,6 +54,7 @@ const UserFeedback = () => {
     getFeedBack();
   }, [record, baseUrl, accessToken]);
 
+
   const feedbackReply = async () => {
     if (!record || !record.key) {
       message.error("Invalid feedback record. Please refresh and try again.");
@@ -67,6 +68,8 @@ const UserFeedback = () => {
       files: [],
     };
 
+    setLoading(true); // Set sending to true when starting to send
+
     try {
       const response = await axios.post(replyUrl, payload, {
         headers: {
@@ -74,7 +77,6 @@ const UserFeedback = () => {
         },
       });
 
-      // Assuming response.data contains the newly created reply
       const newReply = response.data; // Adjust based on your API's response
 
       let len = newReply.feedback.replies.length;
@@ -85,14 +87,55 @@ const UserFeedback = () => {
 
       setReplies((prevReplies) => [...prevReplies, record]);
 
-      console.log("testing", newReply);
       setReply(""); // Clear the input field
     } catch (error) {
       const errorMessage =
         error.response?.data?.error || "Error sending reply. Please try again.";
       message.error(errorMessage);
+    } finally {
+      setLoading(false); // Reset sending status
     }
   };
+
+//   const feedbackReply = async () => {
+//     if (!record || !record.key) {
+//       message.error("Invalid feedback record. Please refresh and try again.");
+//       return;
+//     }
+
+//     const replyUrl = `${baseUrl}/feedback/admin-reply`;
+//     const payload = {
+//       feedbackId: record.key,
+//       message: reply,
+//       files: [],
+//     };
+
+//     try {
+//       const response = await axios.post(replyUrl, payload, {
+//         headers: {
+//           Authorization: `Bearer ${accessToken}`,
+//         },
+//       });
+
+//       // Assuming response.data contains the newly created reply
+//       const newReply = response.data; // Adjust based on your API's response
+
+//       let len = newReply.feedback.replies.length;
+//       let record = {
+//         message: newReply.feedback.replies[len - 1].message,
+//         createdAt: newReply.feedback.replies[len - 1].createdAt,
+//       };
+
+//       setReplies((prevReplies) => [...prevReplies, record]);
+
+//       console.log("testing", newReply);
+//       setReply(""); // Clear the input field
+//     } catch (error) {
+//       const errorMessage =
+//         error.response?.data?.error || "Error sending reply. Please try again.";
+//       message.error(errorMessage);
+//     }
+//   };
 
   return (
     <div className="relative top-14">
@@ -113,7 +156,9 @@ const UserFeedback = () => {
           </Link>
         </div>
 
-        <div className="p-4">
+        <div className="overflow-y-auto max-h-96 p-4">
+          {" "}
+          {/* Add scroll functionality */}
           <div className="p-2">
             <Card className="bg-[#F5F5F5] shadow-lg rounded-tr-lg rounded-br-lg rounded-bl-none w-96 max-w-full">
               <p>{record.message}</p>
@@ -128,7 +173,6 @@ const UserFeedback = () => {
               </div>
             </Card>
           </div>
-
           {replies.length > 0 ? (
             replies.map((reply, index) => (
               <div key={index} className="p-2 flex justify-end">
@@ -153,31 +197,30 @@ const UserFeedback = () => {
               </Card>
             </div>
           )}
+        </div>
 
-          <div className="mt-10">
-            <Input
-              placeholder="Write a reply..."
-              value={reply}
-              onChange={(e) => setReply(e.target.value)}
-              onPressEnter={feedbackReply}
-              addonAfter={
-                <Button
-                  type="primary"
-                  onClick={feedbackReply}
-                  style={{ borderRadius: "0" }}
-                >
-                  Send
-                </Button>
-              }
-              addonBefore={
-                <Button
-                  icon={<UploadOutlined />}
-                  style={{ borderRadius: "0" }}
-                />
-              }
-              style={{ borderRadius: "5px" }}
-            />
-          </div>
+        <div className="mt-10">
+          <Input
+            placeholder="Write a reply..."
+            value={reply}
+            onChange={(e) => setReply(e.target.value)}
+            onPressEnter={feedbackReply}
+            addonAfter={
+              <Button
+                type="primary"
+                onClick={feedbackReply}
+                style={{ borderRadius: "0" }}
+                disabled={loading} // Disable button while sending
+              >
+                {loading ? "Sending..." : "Send"}{" "}
+                {/* Show 'Sending...' when in sending state */}
+              </Button>
+            }
+            addonBefore={
+              <Button icon={<UploadOutlined />} style={{ borderRadius: "0" }} />
+            }
+            style={{ borderRadius: "5px" }}
+          />
         </div>
       </div>
     </div>

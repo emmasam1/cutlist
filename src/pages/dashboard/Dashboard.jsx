@@ -25,29 +25,32 @@ const Dashboard = () => {
   
     const getUsers = async () => {
       const allUsersUrl = `${baseUrl}/admin/all-users`;
-  
+    
       try {
         const response = await axios.get(allUsersUrl, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-  
+    
         const users = response.data.data;
-        if (Array.isArray(users)) {
-          setTotalUser(users.length);
-  
+
+      if (Array.isArray(users)) {
+        console.log("Users Array:", users);
+        setTotalUser(users.length);
+    
           const todayStart = new Date();
           todayStart.setHours(0, 0, 0, 0);
           const todayEnd = new Date();
           todayEnd.setHours(23, 59, 59, 999);
-  
+    
           const registeredTodayCount = users.reduce((count, user) => {
             const createdAtDate = new Date(user.createdAt);
             return (createdAtDate >= todayStart && createdAtDate <= todayEnd) ? count + 1 : count;
           }, 0);
-  
-          // Store count in local storage with expiration
+    
+          console.log("Registered Today Count:", registeredTodayCount); // Debugging line
+    
           const today = new Date();
           const expiryDate = new Date(today);
           expiryDate.setDate(today.getDate() + 7); // Set expiry for 7 days
@@ -55,7 +58,7 @@ const Dashboard = () => {
             count: registeredTodayCount,
             expiry: expiryDate.toISOString(),
           }));
-  
+    
           setNewUsers(registeredTodayCount);
         } else {
           console.error("Data is not in expected format:", response.data);
@@ -64,6 +67,7 @@ const Dashboard = () => {
         console.error("Error while getting records:", error);
       }
     };
+    
   
     // Check local storage first
     const storedData = localStorage.getItem('newUsers');
