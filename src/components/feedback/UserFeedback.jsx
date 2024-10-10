@@ -136,41 +136,49 @@ const UserFeedback = () => {
               </div>
             </Card>
           </div>
-          {replies.length > 0 ? (
-            replies.map((reply, index) => (
-              <div
-                key={index}
-                className={`p-2 flex ${
-                  reply.sender._id === loggedInUser._id
-                    ? "justify-end"
-                    : "justify-start"
-                }`}
-              >
-                <Card className="bg-[#F5F5F5] shadow-lg rounded-tr-lg rounded-br-lg rounded-bl-none w-full max-w-xs sm:max-w-md md:max-w-lg">
-                  <p className="break-words">{reply.message}</p>
-                  <div className="flex justify-end">
-                    <span className="text-xs">
-                      {new Date(reply.createdAt).toLocaleTimeString("en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: true,
-                      })}
-                    </span>
-                  </div>
+          <div className="flex flex-col">
+            {replies.length > 0 ? (
+              replies.map((reply, index) => (
+                <div
+                  key={index}
+                  className={`flex ${
+                    reply.sender._id === loggedInUser._id
+                      ? "justify-end"
+                      : "justify-start"
+                  } mb-2`}
+                >
+                  <Card
+                    className={`${
+                      reply.sender._id === loggedInUser._id
+                        ? "bg-blue-100"
+                        : "bg-gray-200"
+                    } shadow-lg rounded-tr-lg rounded-br-lg rounded-bl-none w-full max-w-xs sm:max-w-md md:max-w-lg`}
+                  >
+                    <p className="break-words">{reply.message}</p>
+                    <div className="flex justify-end">
+                      <span className="text-xs">
+                        {new Date(reply.createdAt).toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true,
+                        })}
+                      </span>
+                    </div>
+                  </Card>
+                </div>
+              ))
+            ) : (
+              <div className="flex justify-end">
+                <Card className="bg-[#F5F5F5] shadow-lg rounded-tr-lg rounded-br-lg rounded-bl-none w-full max-w-xs sm:max-w-md md:max-w-lg flex items-center justify-center">
+                  {loading ? (
+                    <div className="loader">Loading replies...</div> // Add your loader component here
+                  ) : (
+                    ""
+                  )}
                 </Card>
               </div>
-            ))
-          ) : (
-            <div className="p-2 flex justify-end">
-              <Card className="bg-[#F5F5F5] shadow-lg rounded-tr-lg rounded-br-lg rounded-bl-none w-full max-w-xs sm:max-w-md md:max-w-lg flex items-center justify-center">
-                {loading ? (
-                  <div className="loader">Loading replies...</div> // Add your loader component here
-                ) : (
-                  ""
-                )}
-              </Card>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         <div className="mt-10">
