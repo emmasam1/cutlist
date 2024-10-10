@@ -14,34 +14,33 @@ const UserFeedback = () => {
   const [reply, setReply] = useState("");
   const [replies, setReplies] = useState(record?.replies || []);
 
-
   useEffect(() => {
     const getFeedBack = async () => {
       if (!record) return;
-  
+
       setLoading(true);
       const feedBackUrl = `${baseUrl}/feedback/all-feedback`;
-  
+
       try {
         const response = await axios.get(feedBackUrl, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-  
+
         console.log("for testing", response.data.feedback.replies);
-  
+
         const feedbackArray = response.data.feedback || [];
         const sourcedData = feedbackArray.find(
           (feedback) => feedback._id === record.key
         );
-  
+
         if (sourcedData) {
           const replies = sourcedData.replies || [];
           setReplies(replies);
-  
+
           // Extract all sender._id values
-          const senderIds = replies.map(reply => reply.sender._id);
+          const senderIds = replies.map((reply) => reply.sender._id);
           console.log("Sender IDs:", senderIds);
         } else {
           message.error("Feedback record not found.");
@@ -53,10 +52,9 @@ const UserFeedback = () => {
         setLoading(false);
       }
     };
-  
+
     getFeedBack();
   }, [record, baseUrl, accessToken]);
-  
 
   const feedbackReply = async () => {
     if (!record || !record.key) {
@@ -101,8 +99,6 @@ const UserFeedback = () => {
     }
   };
 
-  // const currentUserId = record.userIds;
-  // console.log(currentUserId);
   console.log("current user", record.senderId);
   console.log("admin id", loggedInUser._id);
 
@@ -144,14 +140,14 @@ const UserFeedback = () => {
             replies.map((reply, index) => (
               <div
                 key={index}
-                className={`p-2 ${
+                className={`p-2 flex ${
                   reply.sender._id === loggedInUser._id
-                    ? "flex justify-end"
-                    : "flex justify-start"
+                    ? "justify-end"
+                    : "justify-start"
                 }`}
               >
-                <Card className="bg-[#F5F5F5] shadow-lg rounded-tr-lg rounded-br-lg rounded-bl-none w-96 max-w-full">
-                  <p>{reply.message}</p>
+                <Card className="bg-[#F5F5F5] shadow-lg rounded-tr-lg rounded-br-lg rounded-bl-none w-full max-w-xs sm:max-w-md md:max-w-lg">
+                  <p className="break-words">{reply.message}</p>
                   <div className="flex justify-end">
                     <span className="text-xs">
                       {new Date(reply.createdAt).toLocaleTimeString("en-US", {
@@ -166,8 +162,12 @@ const UserFeedback = () => {
             ))
           ) : (
             <div className="p-2 flex justify-end">
-              <Card className="bg-[#F5F5F5] shadow-lg rounded-tr-lg rounded-br-lg rounded-bl-none w-96 max-w-full">
-                <p>No replies yet</p>
+              <Card className="bg-[#F5F5F5] shadow-lg rounded-tr-lg rounded-br-lg rounded-bl-none w-full max-w-xs sm:max-w-md md:max-w-lg flex items-center justify-center">
+                {loading ? (
+                  <div className="loader">Loading replies...</div> // Add your loader component here
+                ) : (
+                  ""
+                )}
               </Card>
             </div>
           )}
