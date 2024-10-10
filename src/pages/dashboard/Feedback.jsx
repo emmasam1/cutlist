@@ -98,13 +98,17 @@ const Feedback = () => {
         });
 
         message.success('Got all feedbacks');
-        console.log('Response Data:', response.data);
+        console.log('Response Data:', response.data.feedback.sender);
 
         const feedbackArray = response.data.feedback;
 
         if (!Array.isArray(feedbackArray)) {
             throw new Error('Feedback data is not an array');
         }
+
+        // Map _id to userId
+        const userIds = feedbackArray.map(feedback => feedback.sender._id);
+        console.log('User IDs:', userIds);
 
         const sourcedData = feedbackArray.map((feedback) => {
             const createdAt = new Date(feedback.createdAt);
@@ -116,18 +120,18 @@ const Feedback = () => {
                 createdAt: new Date(reply.createdAt),
             })) : [];
 
-            console.log(replies)
-
             return {
                 key: feedback._id,
                 message: feedback.message,
                 subject: feedback.subject,
                 fullName: feedback.sender.fullName,
+                senderId: feedback.sender._id,
                 createdAt: feedback.createdAt,
                 avatar: feedback.sender.avatar || user,
                 email: feedback.sender.email,
                 dateTime,
-                // replies, // Add replies here
+                userIds
+                // replies, // Include replies here if needed
             };
         });
 

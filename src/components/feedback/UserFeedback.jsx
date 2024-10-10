@@ -9,37 +9,40 @@ import { Context } from "../../context/Context";
 const UserFeedback = () => {
   const location = useLocation();
   const record = location.state?.record || null;
-  const { baseUrl, accessToken } = useContext(Context);
+  const { baseUrl, accessToken, loggedInUser } = useContext(Context);
   const [loading, setLoading] = useState(false);
   const [reply, setReply] = useState("");
   const [replies, setReplies] = useState(record?.replies || []);
 
+
   useEffect(() => {
     const getFeedBack = async () => {
       if (!record) return;
-
+  
       setLoading(true);
       const feedBackUrl = `${baseUrl}/feedback/all-feedback`;
-
+  
       try {
         const response = await axios.get(feedBackUrl, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-
-        console.log("API Response:", response.data);
-
+  
+        console.log("for testing", response.data.feedback.replies);
+  
         const feedbackArray = response.data.feedback || [];
-        console.log("Feedback Array:", feedbackArray);
-
         const sourcedData = feedbackArray.find(
           (feedback) => feedback._id === record.key
         );
-        console.log("Sourced Data:", sourcedData.replies);
-
+  
         if (sourcedData) {
-          setReplies(sourcedData.replies || []);
+          const replies = sourcedData.replies || [];
+          setReplies(replies);
+  
+          // Extract all sender._id values
+          const senderIds = replies.map(reply => reply.sender._id);
+          console.log("Sender IDs:", senderIds);
         } else {
           message.error("Feedback record not found.");
         }
@@ -50,10 +53,10 @@ const UserFeedback = () => {
         setLoading(false);
       }
     };
-
+  
     getFeedBack();
   }, [record, baseUrl, accessToken]);
-
+  
 
   const feedbackReply = async () => {
     if (!record || !record.key) {
@@ -68,7 +71,7 @@ const UserFeedback = () => {
       files: [],
     };
 
-    setLoading(true); // Set sending to true when starting to send
+    setLoading(true);
 
     try {
       const response = await axios.post(replyUrl, payload, {
@@ -77,65 +80,31 @@ const UserFeedback = () => {
         },
       });
 
-      const newReply = response.data; // Adjust based on your API's response
+      const newReply = response.data;
+      // console.log(newReply);
 
-      let len = newReply.feedback.replies.length;
-      let record = {
+      const len = newReply.feedback.replies.length;
+      const record = {
         message: newReply.feedback.replies[len - 1].message,
         createdAt: newReply.feedback.replies[len - 1].createdAt,
+        userId: newReply.feedback.replies[len - 1].userId,
       };
 
       setReplies((prevReplies) => [...prevReplies, record]);
-
-      setReply(""); // Clear the input field
+      setReply("");
     } catch (error) {
       const errorMessage =
         error.response?.data?.error || "Error sending reply. Please try again.";
       message.error(errorMessage);
     } finally {
-      setLoading(false); // Reset sending status
+      setLoading(false);
     }
   };
 
-//   const feedbackReply = async () => {
-//     if (!record || !record.key) {
-//       message.error("Invalid feedback record. Please refresh and try again.");
-//       return;
-//     }
-
-//     const replyUrl = `${baseUrl}/feedback/admin-reply`;
-//     const payload = {
-//       feedbackId: record.key,
-//       message: reply,
-//       files: [],
-//     };
-
-//     try {
-//       const response = await axios.post(replyUrl, payload, {
-//         headers: {
-//           Authorization: `Bearer ${accessToken}`,
-//         },
-//       });
-
-//       // Assuming response.data contains the newly created reply
-//       const newReply = response.data; // Adjust based on your API's response
-
-//       let len = newReply.feedback.replies.length;
-//       let record = {
-//         message: newReply.feedback.replies[len - 1].message,
-//         createdAt: newReply.feedback.replies[len - 1].createdAt,
-//       };
-
-//       setReplies((prevReplies) => [...prevReplies, record]);
-
-//       console.log("testing", newReply);
-//       setReply(""); // Clear the input field
-//     } catch (error) {
-//       const errorMessage =
-//         error.response?.data?.error || "Error sending reply. Please try again.";
-//       message.error(errorMessage);
-//     }
-//   };
+  // const currentUserId = record.userIds;
+  // console.log(currentUserId);
+  console.log("current user", record.senderId);
+  console.log("admin id", loggedInUser._id);
 
   return (
     <div className="relative top-14">
@@ -157,8 +126,6 @@ const UserFeedback = () => {
         </div>
 
         <div className="overflow-y-auto max-h-96 p-4">
-          {" "}
-          {/* Add scroll functionality */}
           <div className="p-2">
             <Card className="bg-[#F5F5F5] shadow-lg rounded-tr-lg rounded-br-lg rounded-bl-none w-96 max-w-full">
               <p>{record.message}</p>
@@ -175,7 +142,14 @@ const UserFeedback = () => {
           </div>
           {replies.length > 0 ? (
             replies.map((reply, index) => (
-              <div key={index} className="p-2 flex justify-end">
+              <div
+                key={index}
+                className={`p-2 ${
+                  reply.sender._id === loggedInUser._id
+                    ? "flex justify-end"
+                    : "flex justify-start"
+                }`}
+              >
                 <Card className="bg-[#F5F5F5] shadow-lg rounded-tr-lg rounded-br-lg rounded-bl-none w-96 max-w-full">
                   <p>{reply.message}</p>
                   <div className="flex justify-end">
@@ -210,10 +184,9 @@ const UserFeedback = () => {
                 type="primary"
                 onClick={feedbackReply}
                 style={{ borderRadius: "0" }}
-                disabled={loading} // Disable button while sending
+                disabled={loading}
               >
-                {loading ? "Sending..." : "Send"}{" "}
-                {/* Show 'Sending...' when in sending state */}
+                {loading ? "Sending..." : "Send"}
               </Button>
             }
             addonBefore={
