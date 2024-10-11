@@ -92,7 +92,10 @@
   color: #FFFFFF !important;
   font-weight: bold;
 }
-
+.ant-input-group-addon{
+  border: none !important;
+  padding: 0 !important;
+}
 
 @keyframes fadeIn {
   0% { opacity: 0; }
