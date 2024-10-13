@@ -34,12 +34,8 @@ const UserFeedback = () => {
           (feedback) => feedback._id === record.key
         );
 
-        // console.log("User Feedback Array:", feedbackArray);
-        // console.log("Sourced Data Sender Avatar:", sourcedData?.sender?.avatar);
-
         if (sourcedData) {
           setReplies(sourcedData.replies || []);
-          // console.log("Replies with Files:", sourcedData.replies || []);
         } else {
           message.error("Feedback record not found.");
         }
@@ -65,7 +61,6 @@ const UserFeedback = () => {
     formData.append("feedbackId", record.key);
     formData.append("message", reply);
 
-    // Append each file individually to the formData
     files.forEach((file) => {
       formData.append("files", file.originFileObj);
     });
@@ -80,11 +75,8 @@ const UserFeedback = () => {
         },
       });
 
-      console.log("Reply Response:", response);
-
       const newReplyData = response.data;
       const len = newReplyData.feedback.replies.length;
-
       const newReply = newReplyData.feedback.replies[len - 1];
 
       const replyRecord = {
@@ -96,12 +88,12 @@ const UserFeedback = () => {
           fullName: loggedInUser.fullName,
           avatar: loggedInUser.avatar,
         },
-        files: newReply.files || [], 
+        files: newReply.files || [],
       };
 
       setReplies((prevReplies) => [...prevReplies, replyRecord]);
       setReply("");
-      setFiles([]); // Clear files after sending
+      setFiles([]);
       message.success("Reply sent successfully!");
     } catch (error) {
       const errorMessage =
@@ -116,36 +108,37 @@ const UserFeedback = () => {
     setFiles(fileList);
   };
 
-  // Helper function to determine if a file is an image
   const isImage = (url) => {
     return /\.(jpg|jpeg|png|gif|bmp|svg)$/.test(url.toLowerCase());
   };
 
   return (
-    <div className="relative top-14">
+    <div className="relative top-14 px-2 lg:px-0">
       <div className="bg-white rounded p-4">
         {/* Header Section */}
-        <div className="flex justify-between items-center">
-          <div className="flex gap-1 items-center">
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex gap-2 items-center">
             <img
               src={record.avatar}
               alt={record.fullName}
-              className="w-12 rounded-full h-12 object-cover"
+              className="w-8 h-8 lg:w-12 lg:h-12 rounded-full object-cover"
             />
-            <h3 className="font-bold">{record.fullName}</h3>
+            <h3 className="font-bold text-sm lg:text-base">
+              {record.fullName}
+            </h3>
           </div>
           <Link to="/feedback">
             <Button>
-              <img src={close} alt="Close" className="w-3" />
+              <img src={close} alt="Close" className="w-4" />
             </Button>
           </Link>
         </div>
 
         {/* Main Feedback and Replies */}
-        <div className="overflow-y-auto max-h-96 p-4">
+        <div className="overflow-y-auto max-h-72 lg:max-h-96 p-4">
           {/* Main Feedback Card */}
           <div className="p-2">
-            <Card className="bg-[#F5F5F5] shadow-lg rounded-tr-lg rounded-br-lg rounded-bl-none w-96 max-w-full">
+            <Card className="bg-[#F5F5F5] shadow-lg rounded-tr-lg rounded-br-lg rounded-bl-none w-full max-w-full lg:max-w-lg">
               <p>{record.message}</p>
               <div className="flex justify-end">
                 <span className="text-xs">
@@ -177,7 +170,7 @@ const UserFeedback = () => {
                       : "justify-start"
                   }`}
                 >
-                  <div className="w-10 h-10 rounded-full overflow-hidden">
+                  <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full overflow-hidden">
                     <img
                       src={reply.sender.avatar}
                       alt={reply.sender.fullName}
@@ -185,7 +178,13 @@ const UserFeedback = () => {
                     />
                   </div>
                   <div>
-                    <Card className="bg-[#F5F5F5] shadow-lg rounded-tr-lg rounded-br-lg rounded-bl-none w-96 max-w-full">
+                    <Card
+                      className={`shadow-lg rounded-tr-lg rounded-br-lg rounded-bl-none w-full max-w-full lg:max-w-lg ${
+                        reply.sender && reply.sender._id === loggedInUser._id
+                          ? "bg-[#f2c84c6a]" // Light blue for logged-in user
+                          : "bg-gray-100" // Light gray for other users
+                      }`}
+                    >
                       <p>{reply.message}</p>
                       {/* Render Files */}
                       {reply.files && reply.files.length > 0 && (
@@ -203,7 +202,11 @@ const UserFeedback = () => {
                                   // onClick={() => window.open(file, "_blank")}
                                 />
                               ) : (
-                                <a href={file} target="_blank" rel="noopener noreferrer">
+                                <a
+                                  href={file}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
                                   <Button icon={<UploadOutlined />}>
                                     Download File {fileIndex + 1}
                                   </Button>
@@ -229,8 +232,8 @@ const UserFeedback = () => {
             ))
           ) : (
             <div className="p-2 flex justify-end">
-              <Card className="bg-[#F5F5F5] shadow-lg rounded-tr-lg rounded-br-lg rounded-bl-none w-96 max-w-full">
-                <p>No replies yet</p>
+              <Card className="bg-[#F5F5F5] shadow-lg rounded-tr-lg rounded-br-lg rounded-bl-none w-full lg:w-96 max-w-full">
+                {loading ? <p>Loading replies ....</p> : <p>No replies yet</p>}
               </Card>
             </div>
           )}
