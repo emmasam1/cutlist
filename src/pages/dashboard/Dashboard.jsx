@@ -4,61 +4,125 @@ import { Table, Button } from "antd";
 import { PrinterOutlined } from "@ant-design/icons";
 import LineChart3 from "../../components/chart/LineChart3";
 import { Context } from "../../context/Context";
+import { ThreeDots } from "react-loader-spinner";
 
 import edit from "../../assets/images/icons/edit.png";
 import user from "../../assets/images/icons/user.png";
 import book from "../../assets/images/icons/book.png";
 import arrow from "../../assets/images/icons/arrow_long_right.png";
-import user_2 from '../../assets/images/user_2.png';
-import user_3 from '../../assets/images/user_3.png';
-import user_1 from '../../assets/images/user_1.png';
+import user_2 from "../../assets/images/user_2.png";
+import user_3 from "../../assets/images/user_3.png";
+import user_1 from "../../assets/images/user_1.png";
 
 const Dashboard = () => {
-
+  const [loading, setLoading] = useState(false);
   const { baseUrl, accessToken } = useContext(Context);
-  const [totalUser, setTotalUser] = useState(0)
-  const [newUsers, setNewUsers] = useState(0)
-  const [totalCutList, setTotalCutList] = useState(0)
+  const [sourcedData, setSourcedData] = useState([]);
+  const [totalUser, setTotalUser] = useState(0);
+  const [newUsers, setNewUsers] = useState(0);
+  const [totalCutList, setTotalCutList] = useState(0);
+
+  useEffect(() => {
+    const getPayments = async () => {
+      const paymentUrl = `${baseUrl}/payments/admin`;
+      setLoading(true);
+      try {
+        const response = await axios.get(paymentUrl, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        setSourcedData(
+          response.data.payments.map((payment) => ({
+            key: payment._id,
+            customer_name: payment.user.fullName,
+            status: payment.status,
+            date: new Date(payment.paymentDate).toLocaleDateString(),
+            credits: payment.credits,
+            amount: payment.amount,
+            invoice: payment.paymentId,
+            currency: payment.currency,
+          }))
+        );
+
+        // message.success(response.data.message);
+      } catch (error) {
+        console.log(error);
+        message.error("Error fetching payments");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getPayments();
+  }, [baseUrl, accessToken]);
+
+  const getUsers = async () => {
+    const allUsers = `${baseUrl}/admin/all-users`;
+    try {
+      const response = await axios.get(allUsers, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const users = response.data.data;
+      setTotalUser(users.length);
+      // console.log("Number of users:", users.length);
+    } catch (error) {
+      console.error("Error while getting records:", error);
+    }
+  };
+
+  useEffect(() => {
+    getUsers();
+  }, []);
 
   useEffect(() => {
     if (!accessToken) return;
-  
+
     const getUsers = async () => {
       const allUsersUrl = `${baseUrl}/admin/all-users`;
-    
+
       try {
         const response = await axios.get(allUsersUrl, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-    
+
+        console.log(response);
         const users = response.data.data;
 
-      if (Array.isArray(users)) {
-        console.log("Users Array:", users);
-        setTotalUser(users.length);
-    
+        if (Array.isArray(users)) {
+          // console.log("Users Array:", users);
+
           const todayStart = new Date();
           todayStart.setHours(0, 0, 0, 0);
           const todayEnd = new Date();
           todayEnd.setHours(23, 59, 59, 999);
-    
+
           const registeredTodayCount = users.reduce((count, user) => {
             const createdAtDate = new Date(user.createdAt);
-            return (createdAtDate >= todayStart && createdAtDate <= todayEnd) ? count + 1 : count;
+            return createdAtDate >= todayStart && createdAtDate <= todayEnd
+              ? count + 1
+              : count;
           }, 0);
-    
-          console.log("Registered Today Count:", registeredTodayCount); // Debugging line
-    
+
+          // console.log("Registered Today Count:", registeredTodayCount);
+
           const today = new Date();
           const expiryDate = new Date(today);
-          expiryDate.setDate(today.getDate() + 7); // Set expiry for 7 days
-          localStorage.setItem('newUsers', JSON.stringify({
-            count: registeredTodayCount,
-            expiry: expiryDate.toISOString(),
-          }));
-    
+          expiryDate.setDate(today.getDate() + 7);
+          localStorage.setItem(
+            "newUsers",
+            JSON.stringify({
+              count: registeredTodayCount,
+              expiry: expiryDate.toISOString(),
+            })
+          );
+
           setNewUsers(registeredTodayCount);
         } else {
           console.error("Data is not in expected format:", response.data);
@@ -67,28 +131,26 @@ const Dashboard = () => {
         console.error("Error while getting records:", error);
       }
     };
-    
-  
+
     // Check local storage first
-    const storedData = localStorage.getItem('newUsers');
+    const storedData = localStorage.getItem("newUsers");
     if (storedData) {
       const parsedData = JSON.parse(storedData);
       const expiry = new Date(parsedData.expiry);
       const now = new Date();
-  
+
       if (now < expiry) {
-        // Use stored count if not expired
         setNewUsers(parsedData.count);
       } else {
-        // Expired, fetch new data
         getUsers();
       }
     } else {
-      // No stored data, fetch new data
       getUsers();
     }
   }, [accessToken]);
-  
+
+  // Monitor totalUser changes in a separate useEffect
+  useEffect(() => {}, [totalUser]);
 
   useEffect(() => {
     const getCategory = async () => {
@@ -100,7 +162,7 @@ const Dashboard = () => {
           },
         });
         const cut = response.data.length;
-        setTotalCutList(cut)
+        setTotalCutList(cut);
       } catch (error) {
         console.log("error", error);
       }
@@ -108,9 +170,7 @@ const Dashboard = () => {
     getCategory();
   }, [accessToken]);
 
-
-  useEffect(() => {
-  }, [totalUser]);
+  useEffect(() => {}, [totalUser]);
 
   function formatDate(date) {
     const day = date.getDate();
@@ -135,7 +195,7 @@ const Dashboard = () => {
   }
 
   const today = new Date();
-  const formattedDate = formatDate(today);
+  // const formattedDate = formatDate(today);
 
   const items = [
     {
@@ -199,43 +259,24 @@ const Dashboard = () => {
       id: 1,
       name: "Rory Mcllroy",
       dec: "Made Payments for 10 credits",
-      img: user_1
+      img: user_1,
     },
     {
       id: 2,
       name: "Manuel Ugate",
       dec: "Created a new cutlist",
-      img: user_2
+      img: user_2,
     },
     {
       id: 3,
       name: "Alxis Sanchez",
       dec: "Complited a cutlist",
-      img: user_3
-    }
-  ]
-
-  const handlePrint = (record) => {
-    const printContent = `
-      Customer Name: ${record.customer_name}\n
-      Status: ${record.status}\n
-      Date: ${record.date}\n
-      Credit Package: ${record.credit_package}\n
-      Amount: ${record.amount}
-    `;
-    const printWindow = window.open("", "", "height=400,width=600");
-    printWindow.document.write("<pre>" + printContent + "</pre>");
-    printWindow.document.close();
-    printWindow.print();
-  };
+      img: user_3,
+    },
+  ];
 
   const columns = [
-    {
-      title: "SN",
-      key: "sn",
-      render: (text, record, index) => index + 1,
-      width: 50,
-    },
+    { title: "SN", render: (_, __, index) => index + 1, width: 70 },
     {
       title: "Customer Name",
       dataIndex: "customer_name",
@@ -246,15 +287,14 @@ const Dashboard = () => {
       dataIndex: "status",
       key: "status",
       render: (text) => {
-        let color = "";
-        let bgColor = "";
-
+        let color = "",
+          bgColor = "";
         switch (text) {
           case "pending":
             color = "#127CDD";
             bgColor = "#D0E8FF";
             break;
-          case "paid":
+          case "successful":
             color = "#1F7700";
             bgColor = "#5EDA79";
             break;
@@ -265,7 +305,6 @@ const Dashboard = () => {
           default:
             break;
         }
-
         return (
           <span
             style={{
@@ -280,21 +319,14 @@ const Dashboard = () => {
         );
       },
     },
-    {
-      title: "Date",
-      dataIndex: "date",
-      key: "date",
-    },
+    { title: "Date", dataIndex: "date", key: "date" },
     {
       title: "Credit Package",
-      dataIndex: "credit_package",
-      key: "credit_package",
+      dataIndex: "credits",
+      key: "credits",
+      render: (text) => `${text} Credits`,
     },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      key: "amount",
-    },
+    { title: "Amount", dataIndex: "amount", key: "amount" },
     {
       title: "Invoice",
       dataIndex: "invoice",
@@ -307,14 +339,115 @@ const Dashboard = () => {
             cursor: "pointer",
             color: "#1890ff",
           }}
-          onClick={() => handlePrint(record)}
+          onClick={() => openModal(record)}
         >
-          <PrinterOutlined style={{ fontSize: "18px", marginRight: "5px" }} />{" "}
+          <PrinterOutlined style={{ fontSize: "18px", marginRight: "5px" }} />
           Print
         </span>
       ),
     },
   ];
+
+  // const handlePrint = (record) => {
+  //   const printContent = `
+  //     Customer Name: ${record.customer_name}\n
+  //     Status: ${record.status}\n
+  //     Date: ${record.date}\n
+  //     Credit Package: ${record.credit_package}\n
+  //     Amount: ${record.amount}
+  //   `;
+  //   const printWindow = window.open("", "", "height=400,width=600");
+  //   printWindow.document.write("<pre>" + printContent + "</pre>");
+  //   printWindow.document.close();
+  //   printWindow.print();
+  // };
+
+  // const columns = [
+  //   {
+  //     title: "SN",
+  //     key: "sn",
+  //     render: (text, record, index) => index + 1,
+  //     width: 50,
+  //   },
+  //   {
+  //     title: "Customer Name",
+  //     dataIndex: "customer_name",
+  //     key: "customer_name",
+  //   },
+  //   {
+  //     title: "Status",
+  //     dataIndex: "status",
+  //     key: "status",
+  //     render: (text) => {
+  //       let color = "";
+  //       let bgColor = "";
+
+  //       switch (text) {
+  //         case "pending":
+  //           color = "#127CDD";
+  //           bgColor = "#D0E8FF";
+  //           break;
+  //         case "paid":
+  //           color = "#1F7700";
+  //           bgColor = "#5EDA79";
+  //           break;
+  //         case "canceled":
+  //           color = "#FF3D00";
+  //           bgColor = "#FFCCCC";
+  //           break;
+  //         default:
+  //           break;
+  //       }
+
+  //       return (
+  //         <span
+  //           style={{
+  //             color,
+  //             backgroundColor: bgColor,
+  //             padding: "2px 8px",
+  //             borderRadius: "10px",
+  //           }}
+  //         >
+  //           {text.charAt(0).toUpperCase() + text.slice(1)}
+  //         </span>
+  //       );
+  //     },
+  //   },
+  //   {
+  //     title: "Date",
+  //     dataIndex: "date",
+  //     key: "date",
+  //   },
+  //   {
+  //     title: "Credit Package",
+  //     dataIndex: "credit_package",
+  //     key: "credit_package",
+  //   },
+  //   {
+  //     title: "Amount",
+  //     dataIndex: "amount",
+  //     key: "amount",
+  //   },
+  //   {
+  //     title: "Invoice",
+  //     dataIndex: "invoice",
+  //     key: "invoice",
+  //     render: (text, record) => (
+  //       <span
+  //         style={{
+  //           display: "flex",
+  //           alignItems: "center",
+  //           cursor: "pointer",
+  //           color: "#1890ff",
+  //         }}
+  //         onClick={() => handlePrint(record)}
+  //       >
+  //         <PrinterOutlined style={{ fontSize: "18px", marginRight: "5px" }} />{" "}
+  //         Print
+  //       </span>
+  //     ),
+  //   },
+  // ];
 
   return (
     <div className="relative top-14">
@@ -348,21 +481,33 @@ const Dashboard = () => {
                 </Button>
               </div>
 
-              <div className="overflow-x-auto">
-                <Table
-                  columns={columns}
-                  dataSource={tableData}
-                  className="mt-8 custom-table"
-                  size="small"
-                  pagination={{
-                    pageSize: 7,
-                    position: ["bottomCenter"],
-                    className: "custom-pagination", 
-                  }}
-                  // className="custom-table"
-                  scroll={{ x: 'max-content' }}
-                  style={{ fontSize: "11px" }}
-                />
+              <div className="overflow-x-auto mt-7">
+                {loading ? (
+                  <div className="flex justify-center items-center h-64">
+                    <ThreeDots
+                      visible={true}
+                      height="80"
+                      width="80"
+                      color="#F1B31C"
+                      radius="9"
+                      ariaLabel="three-dots-loading"
+                      wrapperClass="three-dots-loading"
+                    />
+                  </div>
+                ) : (
+                  <Table
+                    columns={columns}
+                    dataSource={sourcedData}
+                    size="small"
+                    pagination={{
+                      pageSize: 5,
+                      position: ["bottomCenter"],
+                      className: "custom-pagination",
+                    }}
+                    className="custom-table"
+                    scroll={{ x: "max-content" }}
+                  />
+                )}
               </div>
             </div>
           </div>
