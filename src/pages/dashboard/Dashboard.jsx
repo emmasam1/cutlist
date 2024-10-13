@@ -14,6 +14,9 @@ import user_2 from "../../assets/images/user_2.png";
 import user_3 from "../../assets/images/user_3.png";
 import user_1 from "../../assets/images/user_1.png";
 
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
+
 const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const { baseUrl, accessToken } = useContext(Context);
@@ -25,38 +28,48 @@ const Dashboard = () => {
   useEffect(() => {
     const getPayments = async () => {
       const paymentUrl = `${baseUrl}/payments/admin`;
-      setLoading(true);
+      // setLoading(true);
       try {
         const response = await axios.get(paymentUrl, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-
-        setSourcedData(
-          response.data.payments.map((payment) => ({
+  
+        // Sort payments by paymentDate in descending order (newest first)
+        const sortedData = response.data.payments
+          .map((payment) => ({
             key: payment._id,
-            customer_name: payment.user.fullName,
+            customer_name: payment.user.fullName, // Full name from user object
             status: payment.status,
-            date: new Date(payment.paymentDate).toLocaleDateString(),
+            date: new Date(payment.paymentDate).toLocaleDateString(), // Format paymentDate
             credits: payment.credits,
             amount: payment.amount,
             invoice: payment.paymentId,
             currency: payment.currency,
           }))
-        );
-
-        // message.success(response.data.message);
+          .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sorting by paymentDate
+  
+        setSourcedData(sortedData);
+        // message.success("Payments data fetched successfully");
       } catch (error) {
-        console.log(error);
-        message.error("Error fetching payments");
-      } finally {
-        setLoading(false);
+        if (error.response && error.response.status === 403) {
+          // Handle token expiration
+          message.error("Session expired, please log in again.");
+          Cookies.remove("loggedInUser");
+          Cookies.remove("accessToken");
+          setTimeout(() => {
+            navigate("/admin-login");
+          }, 3000);
+        } else {
+          console.error("Error fetching credits:", error);
+        }
       }
     };
-
+  
     getPayments();
   }, [baseUrl, accessToken]);
+  
 
   const getUsers = async () => {
     const allUsers = `${baseUrl}/admin/all-users`;
@@ -92,7 +105,7 @@ const Dashboard = () => {
           },
         });
 
-        console.log(response);
+        // console.log(response);
         const users = response.data.data;
 
         if (Array.isArray(users)) {

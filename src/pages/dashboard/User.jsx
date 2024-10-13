@@ -292,7 +292,7 @@ const User = () => {
 
   const getUsers = async () => {
     const allUsers = `${baseUrl}/admin/all-users`;
-
+  
     setLoading(true);
     try {
       const response = await axios.get(allUsers, {
@@ -300,29 +300,33 @@ const User = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-
+  
       const err = response.data;
-      console.log(err);
-
       if (err === "login credentials not authentic") {
         message.error("Session expired, please log in again.");
         setTimeout(() => {
           history.push("/admin-login");
         }, 3000);
+        return; // Stop execution if credentials are not valid
       }
-      // console.log(response.data.data);
-      const sourcedData = response.data.data.map((user) => ({
-        key: user._id,
-        avatar: user.avatar,
-        fullName: user.fullName,
-        phoneNumber: user.phoneNumber.replace(/^(\+234)/, ""), // Remove the +234 prefix
-        status: user.status,
-        isVerified: user.isVerified,
-        email: user.email,
-        credits: user.credits,
-        projects: user.projects,
-        // Add other fields as needed
-      }));
+  
+      // Map user data and sort by `updatedAt` (newest first)
+      const sourcedData = response.data.data
+        .map((user) => ({
+          key: user._id,
+          avatar: user.avatar,
+          fullName: user.fullName,
+          phoneNumber: user.phoneNumber.replace(/^(\+234)/, ""), // Remove +234 prefix
+          status: user.status,
+          isVerified: user.isVerified,
+          email: user.email,
+          credits: user.credits,
+          projects: user.projects.length, // Count number of projects
+          updatedAt: new Date(user.updatedAt), // Parse updatedAt for sorting
+          // Add other fields as needed
+        }))
+        .sort((a, b) => b.updatedAt - a.updatedAt); // Sort by updatedAt (descending order)
+  
       setDataSource(sourcedData);
     } catch (error) {
       console.error("Error while getting records:", error);
@@ -331,6 +335,7 @@ const User = () => {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     getUsers();

@@ -8,7 +8,6 @@ import {
   Select,
   Button,
   Dropdown,
-  Menu,
   message,
   DatePicker,
 } from "antd";
@@ -25,6 +24,8 @@ import bin from "../../assets/images/icons/bin.png";
 import { Context } from "../../context/Context";
 import { ThreeDots } from "react-loader-spinner";
 import axios from "axios";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 const { RangePicker } = DatePicker;
 
 const Credit = () => {
@@ -35,6 +36,8 @@ const Credit = () => {
   const [showDate, setShowDate] = useState("");
   const [currentRecord, setCurrentRecord] = useState(null);
   const [form] = Form.useForm();
+
+  const navigate = useNavigate();
 
   const handleDate = (value) => {
     setShowDate(value);
@@ -51,6 +54,7 @@ const Credit = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
+      
       const data = response.data.data.map((credit) => ({
         key: credit._id,
         duration: credit.duration,
@@ -58,14 +62,26 @@ const Credit = () => {
         price: credit.price,
         status: credit.status,
       }));
-
+      
       setDataSource(data);
     } catch (error) {
-      console.error(error);
+      if (error.response && error.response.status === 403) {
+        // Handle token expiration
+        message.error("Session expired, please log in again.");
+        Cookies.remove("loggedInUser");
+        Cookies.remove("accessToken");
+        setTimeout(() => {
+          navigate("/admin-login");
+        }, 3000);
+      } else {
+        console.error("Error fetching credits:", error);
+      }
     } finally {
       setLoading(false);
     }
   };
+  
+  
 
   const createCredit = async (values) => {
     const creditUrl = `${baseUrl}/credit-package/create`;

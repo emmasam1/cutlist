@@ -6,6 +6,8 @@ import { ThreeDots } from "react-loader-spinner";
 import LineChart from "../../components/chart/LineChart";
 import LineChart2 from "../../components/chart/LinChart2";
 import axios from "axios";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 const Payment = () => {
   const [loading, setLoading] = useState(false);
@@ -26,31 +28,44 @@ const Payment = () => {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-
-        setSourcedData(
-          response.data.payments.map((payment) => ({
+  
+        // Sort payments by paymentDate in descending order (newest first)
+        const sortedData = response.data.payments
+          .map((payment) => ({
             key: payment._id,
-            customer_name: payment.user.fullName,
+            customer_name: payment.user.fullName, // Full name from user object
             status: payment.status,
-            date: new Date(payment.paymentDate).toLocaleDateString(),
+            date: new Date(payment.paymentDate).toLocaleDateString(), // Format paymentDate
             credits: payment.credits,
             amount: payment.amount,
             invoice: payment.paymentId,
             currency: payment.currency,
           }))
-        );
-
-        message.success(response.data.message);
+          .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sorting by paymentDate
+  
+        setSourcedData(sortedData);
+        message.success("Payments data fetched successfully");
       } catch (error) {
-        console.log(error);
-        message.error("Error fetching payments");
+        if (error.response && error.response.status === 403) {
+          // Handle token expiration
+          message.error("Session expired, please log in again.");
+          Cookies.remove("loggedInUser");
+          Cookies.remove("accessToken");
+          setTimeout(() => {
+            navigate("/admin-login");
+          }, 3000);
+        } else {
+          console.error("Error fetching credits:", error);
+        }
       } finally {
         setLoading(false);
       }
     };
-
+  
     getPayments();
   }, [baseUrl, accessToken]);
+  
+  
 
   const data = [
     { id: 1, title: "Credit Purchased", count: 10, bg_color: "#FBECC4" },

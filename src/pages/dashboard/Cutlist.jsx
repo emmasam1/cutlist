@@ -27,6 +27,9 @@ import no_data from "../../assets/images/icons/no_data.png";
 
 import Users from "../../components/allUsers/AllUsers";
 
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
+
 const Cutlist = () => {
   const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -70,22 +73,41 @@ const Cutlist = () => {
 
   const getCutList = async () => {
     const cutList = `${baseUrl}/admin/tasks`;
+    setLoading(true)
     try {
       const response = await axios.get(cutList, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      // console.log(response.data);
-      setTabledata(response.data);
+  
+      // Sort by createdAt in descending order, assuming createdAt is part of the data
+      const sortedData = response.data.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+  
+      setTabledata(sortedData); // Set sorted data to table
     } catch (error) {
-      console.log("error", error);
+      if (error.response && error.response.status === 403) {
+        // Handle token expiration
+        message.error("Session expired, please log in again.");
+        Cookies.remove("loggedInUser");
+        Cookies.remove("accessToken");
+        setTimeout(() => {
+          navigate("/admin-login");
+        }, 3000);
+      } else {
+        console.error("Error fetching credits:", error);
+      }
+    } finally {
+      setLoading(false);
     }
   };
+  
   useEffect(() => {
     getCutList();
   }, [accessToken, baseUrl]);
-
+  
   useEffect(() => {
     const getCategory = async () => {
       const categoryUrl = `${baseUrl}/all-cat`;

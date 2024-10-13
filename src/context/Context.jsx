@@ -51,7 +51,7 @@ export const ContextProvider = ({ children }) => {
   }, [navigate]);
 
   const setCookie = (name, value, days) => {
-    const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+    const expires = new Date(Date.now() + 60 * 60 * 1000);
     Cookies.set(name, value, {
       expires,
       secure: true,
@@ -63,8 +63,8 @@ export const ContextProvider = ({ children }) => {
     setLoggedInUser(userData);
     setAccessToken(token);
     setUserBlockedStatus(userData.blockedStatus || "active");
-    setCookie("loggedInUser", JSON.stringify(userData), 30);
-    setCookie("accessToken", token, 30);
+    setCookie("loggedInUser", JSON.stringify(userData)); // Expire in 1 hour
+    setCookie("accessToken", token); // Expire in 1 hour
   };
 
   const logout = () => {

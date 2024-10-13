@@ -15,67 +15,12 @@ import archive_btn from "../../assets/images/icons/archive_btn.png";
 import axios from "axios";
 
 import user from "../../assets/user.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-
-const handleMenuClick = (e, record) => {
-  if (e.key === "reply") {
-    console.log("Reply", record);
-    // Handle view logic here
-  } else if (e.key === "archive") {
-    console.log("Archive", record);
-    // Handle edit logic here
-  } else if (e.key === "delete") {
-    console.log("Delete", record);
-    // Handle delete logic here
-  }
-};
-
-const getMenu = (record) => (
-  <Menu onClick={(e) => handleMenuClick(e, record)}>
-    <Menu.Item
-      key="reply"
-      icon={
-        <img
-          src={edit}
-          alt="Reply"
-          style={{ width: "16px", marginRight: "8px" }}
-        />
-      }
-    >
-      Reply
-    </Menu.Item>
-    <Menu.Item
-      key="archive"
-      icon={
-        <img
-          src={archive}
-          alt="Archive"
-          style={{ width: "16px", marginRight: "8px" }}
-        />
-      }
-    >
-      Archive
-    </Menu.Item>
-    <Menu.Item
-      key="delete"
-      icon={
-        <img
-          src={bin}
-          alt="Delete"
-          style={{ width: "16px", marginRight: "8px" }}
-        />
-      }
-    >
-      Delete
-    </Menu.Item>
-  </Menu>
-);
 
 const Feedback = () => {
   const [searchText, setSearchText] = useState("");
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sourcedData, setSourcedData] = useState([])
 
@@ -98,7 +43,7 @@ const Feedback = () => {
         });
 
         message.success('Got all feedbacks');
-        console.log('Response Data:', response.data.feedback.sender);
+        // console.log('Response Data:', response.data.feedback.sender);
 
         const feedbackArray = response.data.feedback;
 
@@ -108,7 +53,7 @@ const Feedback = () => {
 
         // Map _id to userId
         const userIds = feedbackArray.map(feedback => feedback.sender._id);
-        console.log('User IDs:', userIds);
+        // console.log('User IDs:', userIds);
 
         const sourcedData = feedbackArray.map((feedback) => {
             const createdAt = new Date(feedback.createdAt);
@@ -135,37 +80,25 @@ const Feedback = () => {
             };
         });
 
-        console.log('Sourced Data with Replies:', sourcedData);
+        // console.log('Sourced Data with Replies:', sourcedData);
         setSourcedData(sourcedData);
 
     } catch (error) {
-        console.log(error);
-        const errorMessage = error.response?.data?.msg || 'An error occurred';
-
-        if (errorMessage === 'Login credentials not authentic') {
-            console.log('Clearing cookies:', {
-                accessToken: Cookies.get('accessToken'),
-                loggedInUser: Cookies.get('loggedInUser'),
-            });
-
-            Cookies.remove('accessToken');
-            Cookies.remove('loggedInUser');
-
-            window.location.href = '/admin-login';
-        }
-
-        message.error(errorMessage);
-
+      if (error.response && error.response.status === 403) {
+        // Handle token expiration
+        message.error("Session expired, please log in again.");
+        Cookies.remove("loggedInUser");
+        Cookies.remove("accessToken");
+        setTimeout(() => {
+          navigate("/admin-login");
+        }, 3000);
+      } else {
+        console.error("Error fetching credits:", error);
+      }
     } finally {
         setLoading(false);
     }
 };
-
-
-  
-  
-  
-  
 
   useEffect(() => {
     getFeedBack();
@@ -277,7 +210,6 @@ const Feedback = () => {
                 ),
               },
             ],
-            onClick: (e) => handleMenuClick(e, record),
           }}
           trigger={["click"]}
         >
