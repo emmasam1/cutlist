@@ -188,7 +188,9 @@ const DashboardLayout = () => {
                 <img src={bell} alt="" className="w-5" />
               </div>
               <div className="hidden sm:flex justify-center items-center">
-                <div className="rounded-full w-10 h-10 bg-slate-800 mr-1"></div>
+                <div className="rounded-full w-10 h-10 mr-1 overflow-hidden">
+                  <img src={loggedInUser?.avatar} alt="" className="object-cover"/>
+                </div>
                 <div>
                   <p className="font-semibold text-[.9rem] relative top-1">
                     {loggedInUser?.fullName || 'Guest'}
