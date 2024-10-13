@@ -81,6 +81,7 @@ const Cutlist = () => {
         },
       });
   
+      // console.log(response)
       // Sort by createdAt in descending order, assuming createdAt is part of the data
       const sortedData = response.data.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -146,9 +147,9 @@ const Cutlist = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
+      const data = response.data.task;
       setPreviewTask(true);
       setSideModal(false);
-      const data = response.data.task;
       setTask(data.cutlist);
       console.log(response.data.task._id);
     } catch (error) {
@@ -158,50 +159,65 @@ const Cutlist = () => {
     }
   };
 
-  const createCutlit = async () => {
-    const cutListUrl = `${baseUrl}/task`;
+  const createCutlist = async () => {
+    const cutListUrl = `${baseUrl}/task/save`;
     const cutListData = {
-      categoryId: selectedCategoryId,
-      userId: user,
-      name: projectName,
-      measurement: { height, width, depth },
-      material: "MDF",
+      categoryId: selectedCategoryId, // Ensure this is valid
+      userId: user,  // Ensure this is valid and correct user ID
+      name: projectName, // Ensure non-empty name
+      measurement: {
+        height: Number(height), // Ensure this is a number
+        width: Number(width),   // Ensure this is a number
+        depth: Number(depth),   // Ensure this is a number
+      },
+      material: "MDF", // Ensure this is valid if it needs to match predefined materials
     };
-
+  
     setLoading(true);
-    console.log("Cut List Data:", cutListData);
-    console.log("Access Token:", accessToken);
-
+    // console.log("Cut List Data being sent:", cutListData); // Log data before sending
+  
     try {
       const response = await axios.post(cutListUrl, cutListData, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      message.success("Cut List Created");
-      // setPreviewCutlist(true);
-      setSideModal(false);
-
-      // Reset input fields
+  
+      message.success("Cut List Created Successfully!");
+  
+      // Clear the form input fields
       setProjectName("");
       setHeight("");
       setWidth("");
       setDepth("");
       setSelectedCategoryId("");
       setUser("");
-
+  
+      // Extract the cutlist data from the response
       const data = response.data.cutlist;
       setPreviewData(data);
+      setSideModal(false);
+      setPreviewTask(false);
+  
+      getCutList(); // Refresh the cutlist after creation
+  
     } catch (error) {
-      console.error("Error creating cut list:", error);
-      message.error(
-        "Failed to create Cut List: " +
-          (error.response ? error.response.data.message : error.message)
-      );
+      // Log full error response for debugging
+      console.error("Full error response:", error.response);
+  
+      // Improved error handling with more detailed message
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message || "An unknown error occurred"
+          : "Network error. Please try again.";
+  
+      message.error(`Failed to create Cut List: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
   };
+  
+  
 
   // const createCutlit = async () => {
   //   const cutListUrl = `${baseUrl}/task`;
@@ -694,11 +710,12 @@ const Cutlist = () => {
           footer={[
             <div className="flex justify-center " key="footer">
               <Button
+              loading={loading}
                 htmlType="submit"
                 className="bg-[#F2C94C] hover:!bg-[#F2C94C] rounded-full border-none hover:!text-black px-10"
-                onClick={() => createCutlit()}
+                onClick={() => createCutlist()}
               >
-                Save Cut List
+                {loading ? 'Please wait...' : 'Save Cut List'}
               </Button>
             </div>,
           ]}
