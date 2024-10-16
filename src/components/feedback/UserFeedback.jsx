@@ -113,7 +113,7 @@ const UserFeedback = () => {
   };
 
   return (
-    <div className="relative top-14 px-2 lg:px-0">
+    <div className="relative top-14 px-4 lg:px-8 mx-auto max-w-screen-lg">
       <div className="bg-white rounded p-4">
         {/* Header Section */}
         <div className="flex justify-between items-center mb-4">
@@ -121,11 +121,9 @@ const UserFeedback = () => {
             <img
               src={record.avatar}
               alt={record.fullName}
-              className="w-8 h-8 lg:w-12 lg:h-12 rounded-full object-cover"
+              className="w-10 h-10 lg:w-14 lg:h-14 rounded-full object-cover"
             />
-            <h3 className="font-bold text-sm lg:text-base">
-              {record.fullName}
-            </h3>
+            <h3 className="font-bold text-base lg:text-lg">{record.fullName}</h3>
           </div>
           <Link to="/feedback">
             <Button>
@@ -141,7 +139,7 @@ const UserFeedback = () => {
             <Card className="bg-[#F5F5F5] shadow-lg rounded-tr-lg rounded-br-lg rounded-bl-none w-full max-w-full lg:max-w-lg">
               <p>{record.message}</p>
               <div className="flex justify-end">
-                <span className="text-xs">
+                <span className="text-xs text-gray-600">
                   {new Date(record.createdAt).toLocaleTimeString("en-US", {
                     hour: "2-digit",
                     minute: "2-digit",
@@ -156,77 +154,78 @@ const UserFeedback = () => {
           {replies.length > 0 ? (
             replies.map((reply, index) => (
               <div
-                key={reply._id || index} // Preferably use a unique identifier
-                className={`p-2 ${
+                key={reply._id || index}
+                className={`chat ${
                   reply.sender && reply.sender._id === loggedInUser._id
-                    ? "flex justify-end"
-                    : "flex justify-start"
+                    ? "chat-end" // Right side for logged-in user
+                    : "chat-start" // Left side for other users
                 }`}
               >
-                <div
-                  className={`flex items-center gap-4 ${
-                    reply.sender && reply.sender._id === loggedInUser._id
-                      ? "flex-row-reverse justify-end"
-                      : "justify-start"
-                  }`}
-                >
-                  <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full overflow-hidden">
+                <div className="chat-image avatar">
+                  <div className="w-10 rounded-full">
                     <img
                       src={reply.sender.avatar}
                       alt={reply.sender.fullName}
                       className="object-cover"
                     />
                   </div>
-                  <div>
-                    <Card
-                      className={`shadow-lg rounded-tr-lg rounded-br-lg rounded-bl-none w-full max-w-full lg:max-w-lg ${
-                        reply.sender && reply.sender._id === loggedInUser._id
-                          ? "bg-[#f2c84c6a]" // Light blue for logged-in user
-                          : "bg-gray-100" // Light gray for other users
-                      }`}
-                    >
-                      <p>{reply.message}</p>
-                      {/* Render Files */}
-                      {reply.files && reply.files.length > 0 && (
-                        <List
-                          grid={{ gutter: 16, column: 4 }}
-                          dataSource={reply.files}
-                          renderItem={(file, fileIndex) => (
-                            <List.Item key={fileIndex}>
-                              {isImage(file) ? (
-                                <Image
-                                  width={100}
-                                  src={file}
-                                  alt={`file-${fileIndex}`}
-                                  style={{ cursor: "pointer" }}
-                                  // onClick={() => window.open(file, "_blank")}
-                                />
-                              ) : (
-                                <a
-                                  href={file}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  <Button icon={<UploadOutlined />}>
-                                    Download File {fileIndex + 1}
-                                  </Button>
-                                </a>
-                              )}
-                            </List.Item>
+                </div>
+                <div className="chat-header">
+                  <span className="font-semibold">{reply.sender.fullName}</span>
+                  <time className="ml-2 text-xs text-gray-500">
+                    {new Date(reply.createdAt).toLocaleTimeString("en-US", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: true,
+                    })}
+                  </time>
+                </div>
+                <div className="chat-bubble bg-[#E5F5F9]">
+                  <p className="text-black">
+                    {reply.message}
+                  </p>
+                  {/* Render Files */}
+                  {reply.files && reply.files.length > 0 && (
+                    <List
+                      grid={{ gutter: 16, column: 4 }}
+                      dataSource={reply.files}
+                      renderItem={(file, fileIndex) => (
+                        <List.Item key={fileIndex}>
+                          {isImage(file) ? (
+                            <Image
+                              width={100}
+                              src={file}
+                              alt={`file-${fileIndex}`}
+                              className="mt-2 cursor-pointer"
+                              // style={{ cursor: "pointer" }}
+                            />
+                          ) : (
+                            <a
+                              href={file}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <Button icon={<UploadOutlined />}>
+                                Download File {fileIndex + 1}
+                              </Button>
+                            </a>
                           )}
-                        />
+                        </List.Item>
                       )}
-                    </Card>
-                    <div className="flex justify-end mt-2">
-                      <span className="text-xs text-gray-400">
-                        {new Date(reply.createdAt).toLocaleTimeString("en-US", {
+                    />
+                  )}
+                </div>
+                <div className="chat-footer text-xs text-gray-400">
+                  {reply.sender && reply.sender._id === loggedInUser._id
+                    ? "Delivered"
+                    : `Seen at ${new Date(reply.createdAt).toLocaleTimeString(
+                        "en-US",
+                        {
                           hour: "2-digit",
                           minute: "2-digit",
                           hour12: true,
-                        })}
-                      </span>
-                    </div>
-                  </div>
+                        }
+                      )}`}
                 </div>
               </div>
             ))
@@ -251,29 +250,20 @@ const UserFeedback = () => {
                 type="primary"
                 className="bg-[#F1B31C] hover:!bg-[#F1B31C] hover:!text-black border-none text-black"
                 onClick={feedbackReply}
-                style={{ borderRadius: "0" }}
-                disabled={loading}
+                loading={loading}
               >
-                {loading ? "Sending..." : "Send"}
+                Send
               </Button>
             }
-            addonBefore={
-              <Upload
-                multiple
-                beforeUpload={() => false}
-                onChange={handleFileChange} 
-                fileList={files}
-                showUploadList={false} // This line hides the file names
-              >
-                <Button
-                  icon={<UploadOutlined className="hover:!text-black" />}
-                  className="bg-[#F1B31C] hover:!bg-[#F1B31C] rounded-none border-none"
-                ></Button>
-              </Upload>
-            }
-            style={{ borderRadius: "5px" }}
-            
           />
+          <Upload
+            multiple
+            fileList={files}
+            onChange={handleFileChange}
+            beforeUpload={() => false} // Don't auto-upload files
+          >
+            <Button icon={<UploadOutlined />}>Attach files</Button>
+          </Upload>
         </div>
       </div>
     </div>

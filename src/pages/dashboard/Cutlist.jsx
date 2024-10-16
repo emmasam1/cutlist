@@ -174,7 +174,7 @@ const Cutlist = () => {
     };
   
     setLoading(true);
-    // console.log("Cut List Data being sent:", cutListData); // Log data before sending
+    console.log("Cut List Data being sent:", cutListData); // Log data before sending
   
     try {
       const response = await axios.post(cutListUrl, cutListData, {

@@ -7,9 +7,14 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        "primary": ['Inter', 'sans-serif']
-      }
+        "primary": ['Inter', 'sans-serif'],
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    require('daisyui'),
+  ],
+  daisyui: {
+    themes: ["light"], // Use the light theme to avoid overriding your custom colors
+  },
 }
