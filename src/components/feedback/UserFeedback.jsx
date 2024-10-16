@@ -250,20 +250,29 @@ const UserFeedback = () => {
                 type="primary"
                 className="bg-[#F1B31C] hover:!bg-[#F1B31C] hover:!text-black border-none text-black"
                 onClick={feedbackReply}
-                loading={loading}
+                style={{ borderRadius: "0" }}
+                disabled={loading}
               >
-                Send
+                {loading ? "Sending..." : "Send"}
               </Button>
             }
+            addonBefore={
+              <Upload
+                multiple
+                beforeUpload={() => false}
+                onChange={handleFileChange} 
+                fileList={files}
+                showUploadList={false} // This line hides the file names
+              >
+                <Button
+                  icon={<UploadOutlined className="hover:!text-black" />}
+                  className="bg-[#F1B31C] hover:!bg-[#F1B31C] rounded-none border-none"
+                ></Button>
+              </Upload>
+            }
+            style={{ borderRadius: "5px" }}
+            
           />
-          <Upload
-            multiple
-            fileList={files}
-            onChange={handleFileChange}
-            beforeUpload={() => false} // Don't auto-upload files
-          >
-            <Button icon={<UploadOutlined />}>Attach files</Button>
-          </Upload>
         </div>
       </div>
     </div>
