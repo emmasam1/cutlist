@@ -381,13 +381,11 @@ const Cutlist = () => {
           const response = await axios.delete(removeTask, {
             headers: { Authorization: `Bearer ${accessToken}` },
           });
-          console.log(response);
+          // console.log(response);
           message.success(response.data.message)
           getCutList()
-          // Optionally, handle successful deletion (e.g., refresh task list)
         } catch (error) {
           console.log(error);
-          // Optionally, handle error (e.g., show a notification)
           message.error(error.message)
         }
       },

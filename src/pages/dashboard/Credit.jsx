@@ -8,8 +8,8 @@ import {
   Select,
   Button,
   Dropdown,
-  message,
   DatePicker,
+  notification,
 } from "antd";
 
 import dots from "../../assets/images/icons/dots.png";
@@ -44,6 +44,69 @@ const Credit = () => {
   };
 
 
+  const deleteCredit = (record) => {
+    const packageId = record.key;
+    const deleteUrl =  `${baseUrl}/credit/credit-package/${packageId}`
+    Modal.confirm({
+      title: "Are you sure you want to delete this task?",
+      content: "This action cannot be undone.",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      onOk: async () => {
+        try {
+          const response = await axios.delete(deleteUrl, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+          notification.success({
+            message: response.data.message
+          })
+          
+          getCredit()
+        } catch (error) {
+          console.log(error);
+          // Optionally, handle error (e.g., show a notification)
+          notification.error({
+            message: error.message
+          })
+        }
+      },
+    });
+  }
+
+  const toggleCredit = async (record) => {
+    const packageId = record.key;
+    const creditUrl = `${baseUrl}/credit/credit-package/${packageId}/toggle-status`;
+
+    setLoading(true);
+
+    try {
+      const response = await axios.patch(
+        creditUrl, 
+        {}, 
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`, 
+          },
+        }
+      );
+
+      notification.success({
+        message: response.data.message, 
+      });
+      
+      getCredit(); 
+      // console.log(record);
+    } catch (error) {
+      notification.error({
+        message: "Error toggling credit package",
+        description: error.response?.data?.message || "An error occurred.",
+      });
+    } finally {
+      setLoading(false); 
+    }
+  };
+  
 
   const getCredit = async () => {
     const packageUrl = `${baseUrl}/credit/credit-packages`;
@@ -63,11 +126,16 @@ const Credit = () => {
         status: credit.status,
       }));
       
+      notification.success({
+        message: "All credit packages retrieved successfully."
+      })
       setDataSource(data);
     } catch (error) {
       if (error.response && error.response.status === 403) {
         // Handle token expiration
-        message.error("Session expired, please log in again.");
+        notification.error({
+          message: "Session expired, please log in again."
+        });
         Cookies.remove("loggedInUser");
         Cookies.remove("accessToken");
         setTimeout(() => {
@@ -99,7 +167,7 @@ const Credit = () => {
     }
 
     try {
-      console.log("Submitting values:", values);
+      // console.log("Submitting values:", values);
 
       const response = await axios.post(creditUrl, values, {
         headers: {
@@ -109,12 +177,16 @@ const Credit = () => {
 
       form.resetFields();
       setIsModalOpen(false);
-      message.success("Package created successfully");
+      notification.success({
+        message: "Package created successfully"
+      });
       getCredit();
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Failed to create";
       console.error("Error:", error);
-      message.error(errorMessage);
+      notification.error({
+        message: errorMessage
+      });
     } finally {
       setLoading(false);
     }
@@ -163,13 +235,17 @@ const Credit = () => {
         },
       });
 
-      message.success("Package updated successfully");
+      notification.success({
+        message: "Package updated successfully"
+      });
       form.resetFields();
       setIsModalOpen(false);
       getCredit();
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Failed to update";
-      message.error(errorMessage);
+      notification.error({
+        message: errorMessage
+      });
     } finally {
       setLoading(false);
     }
@@ -248,24 +324,24 @@ const Credit = () => {
               {
                 key: "deactivate",
                 label: (
-                  <span className="flex items-center">
+                  <span className="flex items-center" onClick={() => toggleCredit(record)}>
                     <img
                       src={no_data}
-                      alt="Deactivate"
+                      alt={record.status === false ? "Activate" : "Deactivate"} 
                       style={{
                         width: "17px",
                         height: "17px",
                         marginRight: "8px",
                       }}
                     />
-                    Deactivate
+                    {record.status === false ? "Activate" : "Deactivate"}
                   </span>
                 ),
-              },
+              },              
               {
                 key: "delete",
                 label: (
-                  <span className="flex items-center">
+                  <span className="flex items-center" onClick={()=> deleteCredit(record)}>
                     <img
                       src={bin}
                       alt="Delete"
