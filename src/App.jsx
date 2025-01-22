@@ -33,8 +33,9 @@ function App() {
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/feedback/:feedbackId" element={<UserFeedback />} />
           <Route path="/cutlist" element={<Cutlist />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          
         </Route>
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       </Routes>
     </>
     // </ContextProvider>
