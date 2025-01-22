@@ -14,7 +14,7 @@ import Cutlist from "./pages/dashboard/Cutlist";
 import ScrollTop from "./components/top/ScrollTop";
 import UserDetails from "./components/user/UserDetails";
 import UserFeedback from './components/feedback/UserFeedback'
-
+import PrivacyPolicy from './pages/PrivacyPolicy'
 function App() {
   return (
     // <ContextProvider>
@@ -33,6 +33,7 @@ function App() {
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/feedback/:feedbackId" element={<UserFeedback />} />
           <Route path="/cutlist" element={<Cutlist />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         </Route>
       </Routes>
     </>
