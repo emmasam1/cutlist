@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 
 const PrivacyPolicy = () => {
+ 
   return (
     <>
       <div className='PrivacyPolicy'>

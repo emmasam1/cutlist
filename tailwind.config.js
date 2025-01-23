@@ -12,7 +12,7 @@ export default {
     },
   },
   plugins: [
-    require('daisyui'),
+    // require('daisyui'),
   ],
   daisyui: {
     themes: ["light"], // Use the light theme to avoid overriding your custom colors

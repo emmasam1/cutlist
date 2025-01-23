@@ -14,8 +14,7 @@ export const ContextProvider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    let isMounted = true;
-
+    let isMounted = true; 
     const savedUser = Cookies.get("loggedInUser");
     const savedToken = Cookies.get("accessToken");
 
@@ -36,7 +35,9 @@ export const ContextProvider = ({ children }) => {
         Cookies.remove("accessToken");
         if (isMounted) navigate("/admin-login");
       }
-    } else {
+    } else if(window.location.pathname==="/privacy-policy"){
+      navigate("/privacy-policy");
+    }else {
       if (isMounted) navigate("/admin-login");
     }
 

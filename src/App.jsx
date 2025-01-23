@@ -13,8 +13,9 @@ import Feedback from "./pages/dashboard/Feedback";
 import Cutlist from "./pages/dashboard/Cutlist";
 import ScrollTop from "./components/top/ScrollTop";
 import UserDetails from "./components/user/UserDetails";
-import UserFeedback from './components/feedback/UserFeedback'
-import PrivacyPolicy from './pages/PrivacyPolicy'
+import UserFeedback from './components/feedback/UserFeedback' 
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+ 
 function App() {
   return (
     // <ContextProvider>
@@ -22,7 +23,8 @@ function App() {
       <ScrollTop />
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="admin-login" element={<Login />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/admin-login" element={<Login />} />
         <Route path="" element={<DashboardLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/users" element={<User />} />
@@ -33,9 +35,9 @@ function App() {
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/feedback/:feedbackId" element={<UserFeedback />} />
           <Route path="/cutlist" element={<Cutlist />} />
-          
         </Route>
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      
+        
       </Routes>
     </>
     // </ContextProvider>
