@@ -15,6 +15,7 @@ import ScrollTop from "./components/top/ScrollTop";
 import UserDetails from "./components/user/UserDetails";
 import UserFeedback from './components/feedback/UserFeedback' 
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import DeleteAccount from "./pages/DeleteAccount";
  
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/delete-account" element={<DeleteAccount />} />
         <Route path="/admin-login" element={<Login />} />
         <Route path="" element={<DashboardLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />

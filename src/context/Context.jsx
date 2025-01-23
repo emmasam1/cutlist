@@ -37,6 +37,8 @@ export const ContextProvider = ({ children }) => {
       }
     } else if(window.location.pathname==="/privacy-policy"){
       navigate("/privacy-policy");
+    }else if(window.location.pathname==="/delete-account"){
+      navigate("/delete-account");
     }else {
       if (isMounted) navigate("/admin-login");
     }
